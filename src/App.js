@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 
-function App() {
+// Material UI
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { ThemeProvider } from '@material-ui/core/styles';
+import {
+  // createMuiTheme,
+  // Fixes forward Ref issue - NOT FOR PRODUCTION USE
+  // https://material-ui.com/customization/theming/#unstable-createmuistrictmodetheme-options-args-theme
+  unstable_createMuiStrictModeTheme as createMuiTheme,
+} from '@material-ui/core/styles';
+import Toolbar from '@material-ui/core/Toolbar';
+
+// App assets
+import { context } from './context/StoreProvider';
+import dark from './themes/dark';
+import light from './themes/light';
+
+// App components
+import HeaderComponent from './components/Header/HeaderComponent';
+import LandingComponent from './components/Landing/LandingComponent';
+import Error404Component from './components/Error/Error404Component';
+
+const App = () => {
+  const [state] = React.useContext(context);
+  const appTheme = createMuiTheme(state.theme.isDark ? dark : light);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={appTheme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <HeaderComponent />
+        <Toolbar />
+        <Switch>
+          <Route path="/" exact component={LandingComponent} />
+          <Route component={Error404Component} />
+        </Switch>
+      </BrowserRouter>
+    </ThemeProvider>
   );
-}
+};
 
 export default App;
