@@ -1,0 +1,2 @@
+Add Microsoft login button to a single page application for authentication
+https://docs.microsoft.com/en-us/azure/developer/javascript/tutorial/single-page-application-azure-login-button-sdk-msal
