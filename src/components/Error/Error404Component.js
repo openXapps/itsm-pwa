@@ -4,7 +4,7 @@ import Box from '@material-ui/core/Box';
 
 const Error404Component = () => {
     return (
-        <Container maxWidth="md">
+        <Container>
             <Box mt={2}>
                 <Typography variant="h6">404 - Page not found</Typography>
             </Box>
