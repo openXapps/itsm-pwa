@@ -1,24 +1,28 @@
 /**
  * Local storage object types
  */
-export const storageObject = {
+export const storageObjects = {
   settings: 'sb-itsm-settings',
+  session: 'sb-itsm-session',
 };
 
 /**
  * Default data for app local storage
  */
-export const getDefaultData = () => {
-  const response = {
-    // sb-itsm-settings
-    settings: {
-      version: '0.1.0',
-      theme: {
-        isDark: false,
-        template: 'light'
-      },
+export const defaultStorage = {
+  // sb-itsm-settings
+  settings: {
+    version: '0.1.0',
+    theme: {
+      isDark: false,
+      template: 'light'
     },
-  };
-  return response;
+  },
+  // sb-itsm-session
+  session: {
+    user: '',
+    pw: '',
+    jwt: '',
+  },
 };
 

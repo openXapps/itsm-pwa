@@ -20,6 +20,7 @@ import light from './themes/light';
 // App components
 import HeaderComponent from './components/Header/HeaderComponent';
 import LandingComponent from './components/Landing/LandingComponent';
+import ApprovalComponent from './components/Approval/ApprovalComponent';
 import Error404Component from './components/Error/Error404Component';
 
 const App = () => {
@@ -34,6 +35,7 @@ const App = () => {
         <Toolbar />
         <Switch>
           <Route path="/" exact component={LandingComponent} />
+          <Route path="/approval" component={ApprovalComponent} />
           <Route component={Error404Component} />
         </Switch>
       </BrowserRouter>

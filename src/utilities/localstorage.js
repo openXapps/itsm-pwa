@@ -1,6 +1,6 @@
 // Utility module to manage HTML5 localStorage
 
-import { storageObject, getDefaultData } from './defaultdata';
+import { storageObjects, defaultStorage } from './defaultdata';
 
 /**
  * Check whether localStorage is available.
@@ -30,17 +30,22 @@ export const isLocalStorage = () => {
  */
 export const initialUse = () => {
   const settings = getSettings();
+  const session = getSession();
 
   // Bump version if it exists and is not the latest
-  if (settings.data.version && settings.data.version !== getDefaultData().settings.version) {
-    saveLocalStorage(storageObject.setting, { ...settings.data, version: getDefaultData().settings.version });
+  if (settings.data.version && settings.data.version !== defaultStorage.settings.version) {
+    saveLocalStorage(storageObjects.setting, { ...settings.data, version: defaultStorage.settings.version });
   }
 
   // No settings exist
   if (!settings.statusOK) {
-    saveLocalStorage(storageObject.settings, getDefaultData().settings);
+    saveLocalStorage(storageObjects.settings, defaultStorage.settings);
   }
 
+  // No session exist
+  if (!session.statusOK) {
+    saveLocalStorage(storageObjects.session, defaultStorage.session);
+  }
 };
 
 /**
@@ -63,14 +68,37 @@ export const saveLocalStorage = (obj, data) => {
  export const getSettings = () => {
   let response = {
     statusOK: false,
-    data: getDefaultData().settings,
+    data: defaultStorage.settings,
   };
   try {
-    const settings = JSON.parse(localStorage.getItem(storageObject.setting));
+    const settings = JSON.parse(localStorage.getItem(storageObjects.settings));
     if (settings) {
       response = {
         statusOK: true,
         data: settings
+      };
+    } else {
+      throw new Error('No items found in localStorage');
+    }
+  } catch (err) {
+    // Life goes on ...
+    // console.log(err);
+  }
+  return response;
+};
+
+
+export const getSession = () => {
+  let response = {
+    statusOK: false,
+    data: defaultStorage.session,
+  };
+  try {
+    const session = JSON.parse(localStorage.getItem(storageObjects.session));
+    if (session) {
+      response = {
+        statusOK: true,
+        data: session
       };
     } else {
       throw new Error('No items found in localStorage');
