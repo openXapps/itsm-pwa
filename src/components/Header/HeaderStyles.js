@@ -10,7 +10,10 @@ const useStyles = makeStyles((theme) => ({
   },
   logo: {
     height: theme.spacing(5),
-  }
+  },
+  appVersion: {
+    fontSize: 12,
+  },
 }));
 
 export default useStyles;
