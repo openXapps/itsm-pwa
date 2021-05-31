@@ -23,6 +23,7 @@ export const defaultStorage = {
     user: '',
     pw: '',
     jwt: '',
+    jwtDate: '',
   },
 };
 

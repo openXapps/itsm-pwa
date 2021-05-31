@@ -10,9 +10,11 @@ import {
  * Initial state
  * Loads default site data if first use
  */
- initialUse();
+initialUse();
+// const testAuth = 
 const data = {
   theme: getSettings().data.theme,
+  isAuth: false
 };
 
 export const context = React.createContext(data);

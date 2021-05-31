@@ -10,8 +10,13 @@ const StoreReducer = (state, action) => {
     case 'THEME':
       return {
         ...state,
-        theme: action.payload
+        theme: action.payload,
       };
+    case 'AUTH':
+      return {
+        ...state,
+        isAuth: action.payload,
+      }
     default:
       throw new Error(`Reducer action type not defined: ${action.type}`);
   }
