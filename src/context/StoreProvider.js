@@ -1,10 +1,8 @@
 import React from 'react';
 
 import StoreReducer from './StoreReducer';
-import {
-  initialUse,
-  getSettings,
-} from '../utilities/localstorage';
+import { initialUse, getSettings } from '../utilities/localstorage';
+import { hasValidJWT } from '../service/AuthService';
 
 /**
  * Initial state
@@ -14,7 +12,7 @@ initialUse();
 // const testAuth = 
 const data = {
   theme: getSettings().data.theme,
-  isAuth: false
+  isAuth: hasValidJWT(),
 };
 
 export const context = React.createContext(data);

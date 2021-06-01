@@ -27,3 +27,11 @@ export const defaultStorage = {
   },
 };
 
+/**
+ * Helper object to return local environment variables
+ * @returns Environment variables from .env.local
+ */
+export const localEnvironment = {
+  ARHOST: process.env.REACT_APP_ARHOST,
+  ARPORT: process.env.REACT_APP_ARPORT,
+};

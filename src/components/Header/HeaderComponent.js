@@ -1,4 +1,4 @@
-import React from 'react';
+import { useContext } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import AppBar from '@material-ui/core/AppBar';
@@ -10,13 +10,23 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Hidden from '@material-ui/core/Hidden';
 
 import useStyles from './HeaderStyles';
-import { defaultStorage } from '../../utilities/defaultdata';
 import { context } from '../../context/StoreProvider';
+import { defaultStorage } from '../../utilities/defaultdata';
+import { getSession } from '../../utilities/localstorage';
+import { logout } from '../../service/AuthService';
 
-// const HeaderComponent = ({ history, location }) => {
-const HeaderComponent = () => {
-  const [state, dispatch] = React.useContext(context);
+const HeaderComponent = ({ history, location }) => {
+  const [state, dispatch] = useContext(context);
   const classes = useStyles();
+
+  const handleLoginButton = () => {
+    history.push('/login');
+  };
+
+  const handleLogoutButton = () => {
+    logout(getSession().data.jwt);
+    dispatch({ type: 'AUTH', payload: false });
+  };
 
   return (
     <div className={classes.root}>
@@ -26,7 +36,19 @@ const HeaderComponent = () => {
           <Typography variant="h6" className={classes.title}
           >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{defaultStorage.settings.version}</Hidden></span>
           </Typography>
-          <Button color="inherit">Login</Button>
+          {location.pathname === '/' ? (
+            state.isAuth ? (
+              <Button
+                color="inherit"
+                onClick={handleLogoutButton}
+              >Logout</Button>
+            ) : (
+              <Button
+                color="inherit"
+                onClick={handleLoginButton}
+              >Login</Button>
+            )
+          ) : (null)}
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
             <MenuIcon />
           </IconButton>
