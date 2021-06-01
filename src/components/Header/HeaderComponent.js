@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useState, useContext } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import AppBar from '@material-ui/core/AppBar';
@@ -8,6 +8,8 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Hidden from '@material-ui/core/Hidden';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 
 import useStyles from './HeaderStyles';
 import { context } from '../../context/StoreProvider';
@@ -18,6 +20,11 @@ import { logout } from '../../service/AuthService';
 const HeaderComponent = ({ history, location }) => {
   const [state, dispatch] = useContext(context);
   const classes = useStyles();
+  const [snackState, setSnackState] = useState({
+    severity: 'success',
+    message: 'Logout successful',
+    show: false
+  });
 
   const handleLoginButton = () => {
     history.push('/login');
@@ -26,6 +33,11 @@ const HeaderComponent = ({ history, location }) => {
   const handleLogoutButton = () => {
     logout(getSession().data.jwt);
     dispatch({ type: 'AUTH', payload: false });
+    setSnackState({ ...snackState, show: true });
+  };
+
+  const handleSnackState = () => {
+    setSnackState({ ...snackState, show: false });
   };
 
   return (
@@ -54,6 +66,17 @@ const HeaderComponent = ({ history, location }) => {
           </IconButton>
         </Toolbar>
       </AppBar>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        open={snackState.show}
+        autoHideDuration={4000}
+        onClose={handleSnackState}
+      ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}>
+          {snackState.message}
+        </Alert></Snackbar>
     </div>
   );
 };

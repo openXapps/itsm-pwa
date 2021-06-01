@@ -24,10 +24,10 @@ export const getJWT = (username, password) => {
 
 /**
  * Helper function to release a Remedy JWT
- * @param {string} url Remedy URL to call
- * @param {string} token Token to release
+ * @param {boolean} flushUser Should we clear user creds in local storage
+ * @param {string} token Token to be release
  */
-export const releaseJWT = (token) => {
+export const logout = (flushUser, token) => {
   const host = 'http://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const logoutURL = '/api/jwt/logout';
   const session = getSession().data;
@@ -39,13 +39,12 @@ export const releaseJWT = (token) => {
     mode: 'cors',
   }).then((response) => {
     // console.log('releaseJWT: response...', response);
-    saveLocalStorage(storageObjects.session, { ...session, jwt: '', jwtDate: '' });
+    if (flushUser) {
+      saveLocalStorage(storageObjects.session, defaultStorage.session);
+    } else {
+      saveLocalStorage(storageObjects.session, { ...session, jwt: '', jwtDate: '' });
+    }
   });
-};
-
-export const logout = (token) => {
-  releaseJWT(token);
-  saveLocalStorage(storageObjects.session, defaultStorage);
 };
 
 /**

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -10,8 +10,8 @@ import Container from '@material-ui/core/Container';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
-// import { context } from '../../context/StoreProvider';
-import { getJWT, releaseJWT } from '../../service/AuthService';
+import { context } from '../../context/StoreProvider';
+import { getJWT, logout } from '../../service/AuthService';
 import { storageObjects } from '../../utilities/defaultdata';
 import { saveLocalStorage, getSession } from '../../utilities/localstorage';
 import { utoa, atou } from '../../utilities/base64';
@@ -19,12 +19,12 @@ import { utoa, atou } from '../../utilities/base64';
 const initialFieldData = {
   username: getSession().data.user,
   password: atou(getSession().data.pw),
-  jwt: getSession().data.jwt,
 };
 
 const LoginComponent = ({ history }) => {
   const [fields, setFields] = useState(initialFieldData);
-  // const [state, dispatch] = useContext(context);
+  const [state, dispatch] = useContext(context);
+  const [lockLoginButton, setLockLoginButton] = useState(false);
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Login successful',
@@ -41,7 +41,7 @@ const LoginComponent = ({ history }) => {
   const handleLoginButton = () => {
     const session = getSession().data;
     if (fields.username && fields.password) {
-      if (session.jwt) releaseJWT(session.jwt);
+      if (session.jwt) logout(false, session.jwt);
       getJWT(fields.username, fields.password)
         .then((response) => {
           // console.log('LoginComponent: RES...', response);
@@ -55,9 +55,13 @@ const LoginComponent = ({ history }) => {
             jwt: token,
             jwtDate: new Date(),
           });
+          setLockLoginButton(true);
+          dispatch({ type: 'AUTH', payload: true });
           setSnackState({ severity: 'success', message: 'Login successful', show: true });
         }).catch((err) => {
           // console.log('LoginComponent: ERR...', err);
+          setLockLoginButton(false);
+          dispatch({ type: 'AUTH', payload: false });
           setSnackState({ severity: 'error', message: 'Login failed', show: true });
         });
     }
@@ -74,7 +78,7 @@ const LoginComponent = ({ history }) => {
       <Box mt={2} />
       <Typography variant="h6">User Login</Typography>
       <Box my={{ xs: 1, sm: 2 }} />
-      <Paper component="form" autoComplete="off">
+      <Paper component="form">
         <Box p={2}>
           <Box mt={{ xs: 1, sm: 2 }} />
           <TextField
@@ -104,22 +108,23 @@ const LoginComponent = ({ history }) => {
         <Grid item xs={12} sm={3}>
           <Button
             variant="outlined"
-            onClick={handleLoginButton}
             fullWidth
+            onClick={handleLoginButton}
+            disabled={lockLoginButton}
           >Login</Button>
         </Grid>
         <Grid item xs={12} sm={3}>
           <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 0.5, sm: 0 }}>
             <Button
               variant="outlined"
-              onChange={() => history.goBack()}
               fullWidth
+              onClick={() => history.goBack()}
             >Back</Button></Box>
         </Grid>
       </Grid>
       <Snackbar
         anchorOrigin={{
-          vertical: 'top',
+          vertical: 'bottom',
           horizontal: 'center',
         }}
         open={snackState.show}
