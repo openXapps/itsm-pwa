@@ -9,7 +9,6 @@ import { hasValidJWT } from '../service/AuthService';
  * Loads default site data if first use
  */
 initialUse();
-// const testAuth = 
 const data = {
   theme: getSettings().data.theme,
   isAuth: hasValidJWT(),

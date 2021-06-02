@@ -31,7 +31,7 @@ const HeaderComponent = ({ history, location }) => {
   };
 
   const handleLogoutButton = () => {
-    logout(getSession().data.jwt);
+    logout(false, getSession().data.jwt);
     dispatch({ type: 'AUTH', payload: false });
     setSnackState({ ...snackState, show: true });
   };
@@ -41,7 +41,7 @@ const HeaderComponent = ({ history, location }) => {
   };
 
   return (
-    <div className={classes.root}>
+    <div>
       <AppBar position="static" color="inherit">
         <Toolbar>
           <img className={classes.logo} alt="SB Logo" src="./logo192.png" />

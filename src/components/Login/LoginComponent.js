@@ -14,16 +14,16 @@ import { context } from '../../context/StoreProvider';
 import { getJWT, logout } from '../../service/AuthService';
 import { storageObjects } from '../../utilities/defaultdata';
 import { saveLocalStorage, getSession } from '../../utilities/localstorage';
-import { utoa, atou } from '../../utilities/base64';
+import { utoa } from '../../utilities/base64';
 
 const initialFieldData = {
   username: getSession().data.user,
-  password: atou(getSession().data.pw),
+  password: '',
 };
 
 const LoginComponent = ({ history }) => {
   const [fields, setFields] = useState(initialFieldData);
-  const [state, dispatch] = useContext(context);
+  const [, dispatch] = useContext(context);
   const [lockLoginButton, setLockLoginButton] = useState(false);
   const [snackState, setSnackState] = useState({
     severity: 'success',
@@ -43,11 +43,11 @@ const LoginComponent = ({ history }) => {
     if (fields.username && fields.password) {
       if (session.jwt) logout(false, session.jwt);
       getJWT(fields.username, fields.password)
-        .then((response) => {
+        .then(response => {
           // console.log('LoginComponent: RES...', response);
           if (!response.ok) throw new Error(response.statusText);
           return response.text();
-        }).then((token) => {
+        }).then(token => {
           // console.log('LoginComponent: JWT...', token);
           saveLocalStorage(storageObjects.session, {
             user: fields.username,
@@ -57,17 +57,15 @@ const LoginComponent = ({ history }) => {
           });
           setLockLoginButton(true);
           dispatch({ type: 'AUTH', payload: true });
-          setSnackState({ severity: 'success', message: 'Login successful', show: true });
+          setSnackState({ severity: 'success', message: 'Authentication successful', show: true });
         }).catch((err) => {
           // console.log('LoginComponent: ERR...', err);
           setLockLoginButton(false);
           dispatch({ type: 'AUTH', payload: false });
-          setSnackState({ severity: 'error', message: 'Login failed', show: true });
+          setSnackState({ severity: 'error', message: 'Authentication failed', show: true });
         });
     }
   };
-
-  // [{"messageType":"ERROR","messageText":"Authentication failed","messageNumber":623,"messageAppendedText":"gavin.dalton@standardbank.co.za"}]
 
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
@@ -77,10 +75,9 @@ const LoginComponent = ({ history }) => {
     <Container maxWidth="sm">
       <Box mt={2} />
       <Typography variant="h6">User Login</Typography>
-      <Box my={{ xs: 1, sm: 2 }} />
+      <Box my={2} />
       <Paper component="form">
-        <Box p={2}>
-          <Box mt={{ xs: 1, sm: 2 }} />
+        <Box p={3}>
           <TextField
             label="Username"
             variant="outlined"
@@ -90,7 +87,7 @@ const LoginComponent = ({ history }) => {
             onChange={handleFieldChange}
             fullWidth
           />
-          <Box mt={2} />
+          <Box mt={3} />
           <TextField
             label="Password"
             variant="outlined"
@@ -103,9 +100,9 @@ const LoginComponent = ({ history }) => {
           />
         </Box>
       </Paper>
-      <Box my={{ xs: 1, sm: 2 }} />
+      <Box my={2} />
       <Grid container alignItems="center">
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={6}>
           <Button
             variant="outlined"
             fullWidth
@@ -113,8 +110,8 @@ const LoginComponent = ({ history }) => {
             disabled={lockLoginButton}
           >Login</Button>
         </Grid>
-        <Grid item xs={12} sm={3}>
-          <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 0.5, sm: 0 }}>
+        <Grid item xs={12} sm={6}>
+          <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 1, sm: 0 }}>
             <Button
               variant="outlined"
               fullWidth
@@ -138,3 +135,27 @@ const LoginComponent = ({ history }) => {
 };
 
 export default LoginComponent;
+
+
+// getJWT(fields.username, fields.password)
+//         .then((response) => {
+//           // console.log('LoginComponent: RES...', response);
+//           if (!response.ok) throw new Error(response.statusText);
+//           return response.text();
+//         }).then((token) => {
+//           // console.log('LoginComponent: JWT...', token);
+//           saveLocalStorage(storageObjects.session, {
+//             user: fields.username,
+//             pw: utoa(fields.password),
+//             jwt: token,
+//             jwtDate: new Date(),
+//           });
+//           setLockLoginButton(true);
+//           dispatch({ type: 'AUTH', payload: true });
+//           setSnackState({ severity: 'success', message: 'Login successful', show: true });
+//         }).catch((err) => {
+//           // console.log('LoginComponent: ERR...', err);
+//           setLockLoginButton(false);
+//           dispatch({ type: 'AUTH', payload: false });
+//           setSnackState({ severity: 'error', message: 'Login failed', show: true });
+//         });
