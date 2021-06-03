@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
@@ -41,31 +42,34 @@ const HeaderComponent = ({ history, location }) => {
   };
 
   return (
-    <div>
-      <AppBar position="static" color="inherit">
-        <Toolbar>
-          <img className={classes.logo} alt="SB Logo" src="./logo192.png" />
-          <Typography variant="h6" className={classes.title}
-          >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{defaultStorage.settings.version}</Hidden></span>
-          </Typography>
-          {location.pathname === '/' ? (
-            state.isAuth ? (
-              <Button
-                color="inherit"
-                onClick={handleLogoutButton}
-              >Logout</Button>
-            ) : (
-              <Button
-                color="inherit"
-                onClick={handleLoginButton}
-              >Login</Button>
-            )
-          ) : (null)}
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
-        </Toolbar>
+    <>
+      <AppBar position="fixed" color="inherit">
+        <Container maxWidth="md" disableGutters>
+          <Toolbar disableGutters>
+            <img className={classes.logo} alt="SB Logo" src="./logo192.png" />
+            <Typography variant="h6" className={classes.title}
+            >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{defaultStorage.settings.version}</Hidden></span>
+            </Typography>
+            {location.pathname === '/' ? (
+              state.isAuth ? (
+                <Button
+                  color="inherit"
+                  onClick={handleLogoutButton}
+                >Logout</Button>
+              ) : (
+                <Button
+                  color="inherit"
+                  onClick={handleLoginButton}
+                >Login</Button>
+              )
+            ) : (null)}
+            <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+              <MenuIcon />
+            </IconButton>
+          </Toolbar>
+        </Container>
       </AppBar>
+      {/* <Toolbar /> */}
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
@@ -77,7 +81,7 @@ const HeaderComponent = ({ history, location }) => {
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}>
           {snackState.message}
         </Alert></Snackbar>
-    </div>
+    </>
   );
 };
 

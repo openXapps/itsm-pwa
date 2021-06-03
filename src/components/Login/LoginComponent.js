@@ -11,10 +11,10 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
 import { context } from '../../context/StoreProvider';
-import { getJWT, logout } from '../../service/AuthService';
+import { getJWT } from '../../service/AuthService';
 import { storageObjects } from '../../utilities/defaultdata';
 import { saveLocalStorage, getSession } from '../../utilities/localstorage';
-import { utoa } from '../../utilities/base64';
+// import { utoa } from '../../utilities/base64';
 
 const initialFieldData = {
   username: getSession().data.user,
@@ -39,9 +39,9 @@ const LoginComponent = ({ history }) => {
   };
 
   const handleLoginButton = () => {
-    const session = getSession().data;
+    // const session = getSession().data;
     if (fields.username && fields.password) {
-      if (session.jwt) logout(false, session.jwt);
+      // if (session.jwt) logout(false, session.jwt);
       getJWT(fields.username, fields.password)
         .then(response => {
           // console.log('LoginComponent: RES...', response);
@@ -51,7 +51,6 @@ const LoginComponent = ({ history }) => {
           // console.log('LoginComponent: JWT...', token);
           saveLocalStorage(storageObjects.session, {
             user: fields.username,
-            pw: utoa(fields.password),
             jwt: token,
             jwtDate: new Date(),
           });

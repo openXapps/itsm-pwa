@@ -45,7 +45,7 @@ export const logout = async (flushUser, token) => {
     if (flushUser) {
       saveLocalStorage(storageObjects.session, defaultStorage.session);
     } else {
-      saveLocalStorage(storageObjects.session, { ...session, pw: '', jwt: '', jwtDate: '' });
+      saveLocalStorage(storageObjects.session, { ...session, jwt: '', jwtDate: '' });
     }
   }
 };
@@ -76,6 +76,7 @@ export const hasValidJWT = () => {
 export const hasJWTExpired = (jwtDate) => {
   let response = true;
   let jwtAge = 0;
+  // console.log('hasJWTExpired: testing JWT date...', jwtDate);
   if (jwtDate) {
     const d1 = new Date();
     const d2 = new Date(jwtDate);
@@ -94,14 +95,15 @@ export const hasJWTExpired = (jwtDate) => {
  */
 export const testJWT = async (jwt) => {
   const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
-  const url = host + '/api/arsys/v1.0/entry/COM:Company/CPY000000000015?fields=values(Company Entry ID)';
-  const response = await fetch(url, {
+  const url = '/api/arsys/v1.0/entry/COM:Company/CPY000000000015?fields=values(Company Entry ID)';
+  // console.log('testJWT: testing URL...', url);
+  const response = await fetch(host + url, {
     method: 'GET',
     headers: {
       'Authorization': 'AR-JWT ' + jwt,
     },
     mode: 'cors',
   });
-  // console.log('testJWT: response...', response);
+  // response.json().then(data => { console.log('testJWT: response...', data) });
   return response.ok;
 };

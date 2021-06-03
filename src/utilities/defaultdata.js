@@ -21,7 +21,6 @@ export const defaultStorage = {
   // sb-itsm-session
   session: {
     user: '',
-    pw: '',
     jwt: '',
     jwtDate: '',
   },
