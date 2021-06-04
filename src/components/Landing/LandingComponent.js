@@ -32,7 +32,7 @@ const LandingComponent = ({ history }) => {
     <Container maxWidth="md">
       {modules.map((v, i) => {
         return (
-          <Box mt={3}>
+          <Box mt={3} key={i}>
             <Paper elevation={2}>
               <Box display="flex" p={{ xs: 1, md: 2 }} alignItems="center">
                 <img src={v.img} alt={v.name} />

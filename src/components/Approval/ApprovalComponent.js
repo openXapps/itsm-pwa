@@ -10,7 +10,9 @@ import Box from '@material-ui/core/Box';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -21,13 +23,15 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 
 import { context } from '../../context/StoreProvider';
-import { getApprovals } from '../../service/DataService';
+import { getApprovals, approvalsModel } from '../../service/DataService';
 import { getSession } from '../../utilities/localstorage';
+import useStyles from './ApprovalStyles';
 
-const ApprovalComponent = () => {
+const ApprovalComponent = ({ history }) => {
+  const classes = useStyles();
   const [state,] = useContext(context);
   const [isLoading, setIsLoading] = useState(false);
-  const [approvals, setApprovals] = useState([]);
+  const [approvals, setApprovals] = useState([approvalsModel]);
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Approvals fetched',
@@ -37,6 +41,7 @@ const ApprovalComponent = () => {
   useEffect(() => {
     if (state.isAuth) handleReload();
     return () => true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isAuth])
 
   const handleReload = () => {
@@ -59,7 +64,8 @@ const ApprovalComponent = () => {
             return response.json().then(data => {
               // console.log('LandingComponent: approvals...', data);
               setIsLoading(false);
-              setApprovals(data.entries);
+              populateApprovals(data.entries);
+              // setApprovals(data.entries);
               setSnackState({ severity: 'success', message: 'Approvals fetched', show: true });
             });
           }
@@ -67,6 +73,40 @@ const ApprovalComponent = () => {
     } else {
       setSnackState({ severity: 'info', message: 'Please login first', show: true });
     }
+  }
+
+  const populateApprovals = (data) => {
+    // console.log('populateApprovals: data', data);
+    let _approvals = [];
+    data.forEach(v => {
+      _approvals.push({
+        ...approvalsModel,
+        requester: v.values['Requester'],
+        application: v.values['Application'],
+        signatureId: v.values['Signature ID'],
+        sourceNumber: v.values['14516'],
+        description: v.values['14506'],
+        createDate: v.values['Create-Date-Sig'],
+        avatar: getAvatar(v.values['Application']),
+      });
+    });
+    // console.log('populateApprovals: _approvals', _approvals);
+    setApprovals(_approvals);
+  };
+
+  const getAvatar = (applicationName) => {
+    let avatar = 'BOB';
+    switch (applicationName) {
+      case 'CHG:Infrastructure Change':
+        avatar = 'CRQ'
+        break;
+      case 'SRM:Request':
+        avatar = 'REQ'
+        break;
+      default:
+        break;
+    }
+    return avatar;
   }
 
   const handleSnackState = () => {
@@ -83,6 +123,11 @@ const ApprovalComponent = () => {
           variant="outlined"
           onClick={handleReload}
         >Reload</Button>
+        <Button
+          style={{ marginLeft: '8px' }}
+          variant="outlined"
+          onClick={() => history.goBack()}
+        >Back</Button>
       </Box>
       <Box width="100%" mt={5}>
         <List disablePadding>
@@ -101,10 +146,13 @@ const ApprovalComponent = () => {
                     // rel="noopener"
                     // data-site-id={v.siteId}
                     // onClick={handleLastClicked}
-                    ><ListItemText
-                        primary={v.values['Signature ID'] + ' - ' + v.values.Requester}
+                    ><ListItemAvatar>
+                        <Avatar className={classes.avatar}>{v.avatar}</Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={v.requester}
                         // primaryTypographyProps={breakpointSM ? ({ variant: 'body1' }) : ({ variant: 'h5' })}
-                        secondary={v.values.Application + ' [' + v.values[14516] + ']' + ' - ' + v.values[14506]}
+                        secondary={v.sourceNumber + ': ' + v.description}
                       /><ListItemSecondaryAction>
                         <IconButton
                         // edge="end"

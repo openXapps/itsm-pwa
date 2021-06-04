@@ -45,7 +45,7 @@ const HeaderComponent = ({ history, location }) => {
     <>
       <AppBar position="fixed" color="inherit">
         <Container maxWidth="md" disableGutters>
-          <Toolbar >
+          <Toolbar disableGutters>
             <img className={classes.logo} alt="SB Logo" src="./logo192.png" />
             <Typography variant="h6" className={classes.title}
             >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{defaultStorage.settings.version}</Hidden></span>
@@ -63,7 +63,7 @@ const HeaderComponent = ({ history, location }) => {
                 >Login</Button>
               )
             ) : (null)}
-            <IconButton edge="end" className={classes.menuButton} color="inherit" aria-label="menu">
+            <IconButton className={classes.menuButton} color="inherit" aria-label="menu">
               <MenuIcon />
             </IconButton>
           </Toolbar>
