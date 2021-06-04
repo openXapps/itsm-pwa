@@ -37,7 +37,7 @@ const App = () => {
         <Switch>
           <Route path="/" exact component={LandingComponent} />
           <Route path="/login" component={LoginComponent} />
-          <Route path="/approval" component={ApprovalComponent} />
+          <Route path="/approvals" component={ApprovalComponent} />
           <Route component={Error404Component} />
         </Switch>
       </BrowserRouter>

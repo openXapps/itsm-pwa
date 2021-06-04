@@ -14,8 +14,10 @@ export const defaultStorage = {
   settings: {
     version: '0.1.0',
     theme: {
-      isDark: false,
-      template: 'light'
+      // isDark: false,
+      // template: 'light'
+      isDark: true,
+      template: 'dark'
     },
   },
   // sb-itsm-session

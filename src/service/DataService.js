@@ -9,10 +9,9 @@ export const getApprovals = (user) => {
   const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   // const query = encodeURI(`(";" + 'Approvers' + ";" LIKE "%;${user};%") AND (('Approval Status' = 0) OR ('Approval Status' = 3) OR ('Approval Status' = 4))`);
   const query = `'Approvers' LIKE "%${user}%" AND (('Approval Status' = 0) OR ('Approval Status' = 3) OR ('Approval Status' = 4))`;
-  console.log('getApprovals: query...', query);
+  // console.log('getApprovals: query...', query);
   // const query = `('Approval Status' = 0 OR 'Approval Status' = 3 OR 'Approval Status' = 4)`;
   // const query = `'Signature ID' = "000000000002059"`;
-  // const query = `'Requester' = "bafana.khumalo@standardbank.co.za"`;
   const fields = 'Requester,Application,Signature ID,14506,14516';
   const approvalsURL = '/api/arsys/v1/entry/AP:Detail-Signature/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + approvalsURL, {
