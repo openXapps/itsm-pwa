@@ -48,7 +48,7 @@ const HeaderComponent = ({ history, location }) => {
           <Toolbar disableGutters>
             <img className={classes.logo} alt="SB Logo" src="./logo192.png" />
             <Typography variant="h6" className={classes.title}
-            >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{defaultStorage.settings.version}</Hidden></span>
+            >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{defaultStorage.application.version}</Hidden></span>
             </Typography>
             {location.pathname === '/' ? (
               state.isAuth ? (

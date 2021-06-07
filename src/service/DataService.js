@@ -1,18 +1,56 @@
-import { getLocalSession } from '../utilities/localstorage';
+import { getLocalSession, getLocalSettings } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 // https://docs.bmc.com/docs/ars1902/end-points-in-ar-rest-api-851893757.html
 // https://docs.bmc.com/docs/ars2002/resources-for-the-rest-api-931133650.html
 
+
+export const syncARSettings = async (user) => {
+  if (getLocalSettings().data.requestId) {
+
+  } else {
+    const getResponse = await getARSettings(user);
+    console.log('syncARSettings: getResponse...', getResponse);
+    if (getResponse.ok) {
+      getResponse.json().then(getData => {
+        console.log('syncARSettings: getData...', getData);
+        if (getData.entries.length === 0) {
+          postARSettings().then(postResponse => {
+            console.log('syncARSettings: postResponse...', postResponse);
+            if (postResponse.ok) {
+              postResponse.json().then(postData => {
+                console.log('syncARSettings: postData...', postData);
+              });
+            }
+          });
+        } else {
+
+        }
+      });
+    }
+  }
+};
+
 /**
- * Settings model
+ * Helper function to create a user settings entry
+ * @returns Promise of new entry
  */
-export const settingsModel = {
-  requestId: '',
-  instanceId: '',
-  theme: 'light',
-  showApprovals: true,
-  showIncidents: true,
+export const postARSettings = () => {
+  const session = getLocalSession().data;
+  const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const fields = 'requestId';
+  const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?fields=values(' + fields + ')';
+  return fetch(host + url, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'AR-JWT ' + session.jwt,
+      'Content-Type': 'application/json',
+    },
+    mode: 'cors',
+    body: { 'values': { 'shortDescription': 'x' } }
+  });
+  // console.log('putARSettings: response...', response);
+  // return response;
 };
 
 /**
@@ -24,7 +62,7 @@ export const getARSettings = (user) => {
   const session = getLocalSession().data;
   const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const query = `'submitter' = "${user}"`;
-  const fields = 'requestId,instanceId,theme,showApprovals,showIncidents';
+  const fields = 'requestId,theme,showApproval,showIncident';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',
@@ -38,7 +76,7 @@ export const getARSettings = (user) => {
 export const putARSettings = (requestId) => {
   const session = getLocalSession().data;
   const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
-  const fields = 'requestId,instanceId,theme,showApprovals,showIncidents';
+  const fields = 'requestId';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=()&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',

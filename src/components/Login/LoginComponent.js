@@ -12,6 +12,7 @@ import Alert from '@material-ui/lab/Alert';
 
 import { context } from '../../context/StoreProvider';
 import { getJWT } from '../../service/AuthService';
+import { syncARSettings } from '../../service/DataService';
 import { storageObjects } from '../../utilities/defaultdata';
 import { saveLocalStorage, getLocalSession } from '../../utilities/localstorage';
 // import { utoa } from '../../utilities/base64';
@@ -66,6 +67,10 @@ const LoginComponent = ({ history }) => {
     }
   };
 
+  const testSync = () => {
+    syncARSettings(fields.username);
+  };
+
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
   };
@@ -118,6 +123,7 @@ const LoginComponent = ({ history }) => {
             >Back</Button></Box>
         </Grid>
       </Grid>
+      <Button onClick={testSync}>Sync</Button>
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',

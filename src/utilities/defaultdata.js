@@ -10,11 +10,17 @@ export const storageObjects = {
  * Default data for app local storage
  */
 export const defaultStorage = {
+  // sb-itsm-application
+  application: {
+    version: '0.1.0',
+  },
   // sb-itsm-settings
   settings: {
-    version: '0.1.0',
+    requestId: '',
     // theme: 'dark',
     theme: 'light',
+    showApprovals: true,
+    showIncidents: true,
   },
   // sb-itsm-session
   session: {

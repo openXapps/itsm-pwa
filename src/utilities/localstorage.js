@@ -32,19 +32,14 @@ export const initialUse = () => {
   const settings = getLocalSettings();
   const session = getLocalSession();
 
-  // Bump version if it exists and is not the latest
-  if (settings.data.version && settings.data.version !== defaultStorage.settings.version) {
-    saveLocalStorage(storageObjects.setting, { ...settings.data, version: defaultStorage.settings.version });
+  // No session exist
+  if (!session.statusOK) {
+    saveLocalStorage(storageObjects.session, defaultStorage.session);
   }
 
   // No settings exist
   if (!settings.statusOK) {
     saveLocalStorage(storageObjects.settings, defaultStorage.settings);
-  }
-
-  // No session exist
-  if (!session.statusOK) {
-    saveLocalStorage(storageObjects.session, defaultStorage.session);
   }
 };
 
@@ -65,7 +60,7 @@ export const saveLocalStorage = (obj, data) => {
  * Get SETTINGS from local storage
  * @returns Returns an object {statusOk: boolean, data: any}
  */
- export const getLocalSettings = () => {
+export const getLocalSettings = () => {
   let response = {
     statusOK: false,
     data: defaultStorage.settings,
@@ -87,7 +82,10 @@ export const saveLocalStorage = (obj, data) => {
   return response;
 };
 
-
+/**
+ * Get SESSION from local storage
+ * @returns Returns an object {statusOk: boolean, data: any}
+ */
 export const getLocalSession = () => {
   let response = {
     statusOK: false,
