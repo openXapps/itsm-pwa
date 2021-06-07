@@ -29,8 +29,8 @@ export const isLocalStorage = () => {
 * Write initial storage on first time usage
  */
 export const initialUse = () => {
-  const settings = getSettings();
-  const session = getSession();
+  const settings = getLocalSettings();
+  const session = getLocalSession();
 
   // Bump version if it exists and is not the latest
   if (settings.data.version && settings.data.version !== defaultStorage.settings.version) {
@@ -65,7 +65,7 @@ export const saveLocalStorage = (obj, data) => {
  * Get SETTINGS from local storage
  * @returns Returns an object {statusOk: boolean, data: any}
  */
- export const getSettings = () => {
+ export const getLocalSettings = () => {
   let response = {
     statusOK: false,
     data: defaultStorage.settings,
@@ -88,7 +88,7 @@ export const saveLocalStorage = (obj, data) => {
 };
 
 
-export const getSession = () => {
+export const getLocalSession = () => {
   let response = {
     statusOK: false,
     data: defaultStorage.session,

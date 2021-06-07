@@ -24,7 +24,7 @@ import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 
 import { context } from '../../context/StoreProvider';
 import { getApprovals, approvalsModel } from '../../service/DataService';
-import { getSession } from '../../utilities/localstorage';
+import { getLocalSession } from '../../utilities/localstorage';
 import useStyles from './ApprovalStyles';
 
 const ApprovalComponent = ({ history }) => {
@@ -48,7 +48,7 @@ const ApprovalComponent = ({ history }) => {
     // console.log('LandingComponent: state...', state);
     if (state.isAuth) {
       setIsLoading(true);
-      getApprovals(getSession().data.user)
+      getApprovals(getLocalSession().data.user)
         .then(response => {
           // console.log('LandingComponent: response...', response.json());
           if (!response.ok) {
@@ -147,7 +147,9 @@ const ApprovalComponent = ({ history }) => {
                     // data-site-id={v.siteId}
                     // onClick={handleLastClicked}
                     ><ListItemAvatar>
-                        <Avatar className={classes.avatar}>{v.avatar}</Avatar>
+                        <Avatar className={classes.avatar}>
+                          <Typography style={{ fontSize: 14 }}>{v.avatar}</Typography>
+                        </Avatar>
                       </ListItemAvatar>
                       <ListItemText
                         primary={v.requester}

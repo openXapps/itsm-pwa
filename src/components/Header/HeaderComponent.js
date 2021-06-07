@@ -15,7 +15,7 @@ import Alert from '@material-ui/lab/Alert';
 import useStyles from './HeaderStyles';
 import { context } from '../../context/StoreProvider';
 import { defaultStorage } from '../../utilities/defaultdata';
-import { getSession } from '../../utilities/localstorage';
+import { getLocalSession } from '../../utilities/localstorage';
 import { logout } from '../../service/AuthService';
 
 const HeaderComponent = ({ history, location }) => {
@@ -32,7 +32,7 @@ const HeaderComponent = ({ history, location }) => {
   };
 
   const handleLogoutButton = () => {
-    logout(false, getSession().data.jwt);
+    logout(false, getLocalSession().data.jwt);
     dispatch({ type: 'AUTH', payload: false });
     setSnackState({ ...snackState, show: true });
   };

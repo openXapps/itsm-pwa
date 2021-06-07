@@ -14,8 +14,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 
 // App assets
 import { context } from './context/StoreProvider';
-import dark from './themes/dark';
-import light from './themes/light';
+import { themes } from './service/ThemeService';
 
 // App components
 import HeaderComponent from './components/Header/HeaderComponent';
@@ -26,7 +25,7 @@ import Error404Component from './components/Error/Error404Component';
 
 const App = () => {
   const [state] = React.useContext(context);
-  const appTheme = createMuiTheme(state.theme.isDark ? dark : light);
+  const appTheme = createMuiTheme(themes[state.theme]);
 
   return (
     <ThemeProvider theme={appTheme}>

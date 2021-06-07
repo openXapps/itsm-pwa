@@ -1,7 +1,7 @@
 import React from 'react';
 
 import StoreReducer from './StoreReducer';
-import { initialUse, getSettings } from '../utilities/localstorage';
+import { initialUse, getLocalSettings } from '../utilities/localstorage';
 import { hasValidJWT } from '../service/AuthService';
 
 /**
@@ -10,7 +10,7 @@ import { hasValidJWT } from '../service/AuthService';
  */
 initialUse();
 const data = {
-  theme: getSettings().data.theme,
+  theme: getLocalSettings().data.theme,
   isAuth: hasValidJWT(),
 };
 

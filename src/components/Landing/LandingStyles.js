@@ -1,8 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-  },
   title: {
     marginLeft: theme.spacing(2),
     flexGrow: 1,
@@ -10,8 +8,10 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
     },
   },
-  logo: {
-    height: theme.spacing(5),
+  image: {
+    [theme.breakpoints.down('xs')]: {
+      height: 80,
+    },
   },
 }));
 

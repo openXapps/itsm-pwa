@@ -13,11 +13,11 @@ import Alert from '@material-ui/lab/Alert';
 import { context } from '../../context/StoreProvider';
 import { getJWT } from '../../service/AuthService';
 import { storageObjects } from '../../utilities/defaultdata';
-import { saveLocalStorage, getSession } from '../../utilities/localstorage';
+import { saveLocalStorage, getLocalSession } from '../../utilities/localstorage';
 // import { utoa } from '../../utilities/base64';
 
 const initialFieldData = {
-  username: getSession().data.user,
+  username: getLocalSession().data.user,
   password: '',
 };
 
@@ -39,7 +39,7 @@ const LoginComponent = ({ history }) => {
   };
 
   const handleLoginButton = () => {
-    // const session = getSession().data;
+    // const session = getLocalSession().data;
     if (fields.username && fields.password) {
       // if (session.jwt) logout(false, session.jwt);
       getJWT(fields.username, fields.password)

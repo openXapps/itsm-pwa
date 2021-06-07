@@ -1,4 +1,4 @@
-import { saveLocalStorage, getSession } from '../utilities/localstorage';
+import { saveLocalStorage, getLocalSession } from '../utilities/localstorage';
 import { storageObjects, localEnvironment, defaultStorage } from '../utilities/defaultdata';
 // import { utoa } from '../utilities/base64';
 
@@ -34,7 +34,7 @@ export const getJWT = async (username, password) => {
 export const logout = async (flushUser, token) => {
   const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const logoutURL = '/api/jwt/logout';
-  const session = getSession().data;
+  const session = getLocalSession().data;
   const response = await fetch(host + logoutURL, {
     method: 'POST',
     headers: { 'Authorization': 'AR-JWT ' + token },
@@ -57,7 +57,7 @@ export const logout = async (flushUser, token) => {
  */
 export const hasValidJWT = () => {
   let response = false;
-  const session = getSession();
+  const session = getLocalSession();
   if (session.statusOK) {
     if (session.data.jwtDate && session.data.jwt) {
       if (!hasJWTExpired(session.data.jwtDate)) {
