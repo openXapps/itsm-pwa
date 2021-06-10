@@ -23,7 +23,7 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 
 import { context } from '../../context/StoreProvider';
-import { getApprovals, approvalsModel } from '../../service/DataService';
+import { getApprovals, approvalModel } from '../../service/DataService';
 import { getLocalSession } from '../../utilities/localstorage';
 import useStyles from './ApprovalStyles';
 
@@ -31,7 +31,7 @@ const ApprovalComponent = ({ history }) => {
   const classes = useStyles();
   const [state,] = useContext(context);
   const [isLoading, setIsLoading] = useState(false);
-  const [approvals, setApprovals] = useState([approvalsModel]);
+  const [approvals, setApprovals] = useState([approvalModel]);
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Approvals fetched',
@@ -80,7 +80,7 @@ const ApprovalComponent = ({ history }) => {
     let _approvals = [];
     data.forEach(v => {
       _approvals.push({
-        ...approvalsModel,
+        ...approvalModel,
         requester: v.values['Requester'],
         application: v.values['Application'],
         signatureId: v.values['Signature ID'],

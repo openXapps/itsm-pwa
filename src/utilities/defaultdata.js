@@ -1,33 +1,32 @@
+import { settingsModel } from '../service/DataService';
+
+/**
+ * Application meta data
+ */
+export const application = {
+  version: '0.1.0',
+};
+
 /**
  * Local storage object types
  */
 export const storageObjects = {
-  settings: 'sb-itsm-settings',
   session: 'sb-itsm-session',
+  settings: 'db-itsm-settings',
 };
 
 /**
  * Default data for app local storage
  */
 export const defaultStorage = {
-  // sb-itsm-application
-  application: {
-    version: '0.1.0',
-  },
-  // sb-itsm-settings
-  settings: {
-    requestId: '',
-    // theme: 'dark',
-    theme: 'light',
-    showApprovals: true,
-    showIncidents: true,
-  },
   // sb-itsm-session
   session: {
     user: '',
     jwt: '',
     jwtDate: '',
   },
+  // sb-itsm-settings
+  settings: settingsModel,
 };
 
 /**

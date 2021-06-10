@@ -1,38 +1,26 @@
-import { getLocalSession, getLocalSettings } from '../utilities/localstorage';
+import { getLocalSession } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 // https://docs.bmc.com/docs/ars1902/end-points-in-ar-rest-api-851893757.html
 // https://docs.bmc.com/docs/ars2002/resources-for-the-rest-api-931133650.html
 
-
-export const syncARSettings = async (user) => {
-  if (getLocalSettings().data.requestId) {
-
-  } else {
-    const getResponse = await getARSettings(user);
-    console.log('syncARSettings: getResponse...', getResponse);
-    if (getResponse.ok) {
-      getResponse.json().then(getData => {
-        console.log('syncARSettings: getData...', getData);
-        if (getData.entries.length === 0) {
-          postARSettings().then(postResponse => {
-            console.log('syncARSettings: postResponse...', postResponse);
-            if (postResponse.ok) {
-              postResponse.json().then(postData => {
-                console.log('syncARSettings: postData...', postData);
-              });
-            }
-          });
-        } else {
-
-        }
-      });
-    }
-  }
-};
+/**
+ * Settings model
+ */
+export const settingsModel = {
+  settingsId: '',
+  // theme: 'dark',
+  theme: 'light',
+  showApproval: true,
+  showIncident: true,
+  showChange: true,
+  showProblem: true,
+  showAsset: true,
+  showPeople: true,
+}
 
 /**
- * Helper function to create a user settings entry
+ * Helper function to create user settings
  * @returns Promise of new entry
  */
 export const postARSettings = () => {
@@ -47,7 +35,7 @@ export const postARSettings = () => {
       'Content-Type': 'application/json',
     },
     mode: 'cors',
-    body: { 'values': { 'shortDescription': 'x' } }
+    body: { 'values': { 'shortDescription': new Date() } }
   });
   // console.log('putARSettings: response...', response);
   // return response;
@@ -56,7 +44,7 @@ export const postARSettings = () => {
 /**
  * Helper function to fetch user settings
  * @param {string} user Request ID of settings entry
- * @returns Promise of settings
+ * @returns Promise of existing entry
  */
 export const getARSettings = (user) => {
   const session = getLocalSession().data;
@@ -73,24 +61,30 @@ export const getARSettings = (user) => {
   // return response;
 };
 
+/**
+ * Helper function to update user settings
+ * @param {string} requestId Request ID to update
+ * @returns Promise of updated entry
+ */
 export const putARSettings = (requestId) => {
   const session = getLocalSession().data;
   const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = 'requestId';
-  const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=()&fields=values(' + fields + ')';
+  const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + requestId + '&fields=values(' + fields + ')';
   return fetch(host + url, {
-    method: 'GET',
+    method: 'PUT',
     headers: { 'Authorization': 'AR-JWT ' + session.jwt },
     mode: 'cors',
+    body: { 'values': { 'shortDescription': new Date() } }
   });
   // console.log('putARSettings: response...', response);
   // return response;
 };
 
 /**
- * Approvals model
+ * Approval model
  */
-export const approvalsModel = {
+export const approvalModel = {
   avatar: '',
   requester: '',
   application: '',

@@ -2,25 +2,35 @@ import { useState, useContext } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import AppBar from '@material-ui/core/AppBar';
+import Drawer from '@material-ui/core/Drawer';
 import Toolbar from '@material-ui/core/Toolbar';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
+import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import SettingsIcon from '@material-ui/icons/Settings';
 import Hidden from '@material-ui/core/Hidden';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
 import useStyles from './HeaderStyles';
 import { context } from '../../context/StoreProvider';
-import { defaultStorage } from '../../utilities/defaultdata';
+import { application } from '../../utilities/defaultdata';
 import { getLocalSession } from '../../utilities/localstorage';
 import { logout } from '../../service/AuthService';
 
 const HeaderComponent = ({ history, location }) => {
   const [state, dispatch] = useContext(context);
   const classes = useStyles();
+  const [drawerState, setDrawerState] = useState(false);
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Logout successful',
@@ -37,6 +47,10 @@ const HeaderComponent = ({ history, location }) => {
     setSnackState({ ...snackState, show: true });
   };
 
+  const handleDrawerState = () => {
+    setDrawerState(!drawerState);
+  };
+
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
   };
@@ -48,7 +62,7 @@ const HeaderComponent = ({ history, location }) => {
           <Toolbar disableGutters>
             <img className={classes.logo} alt="SB Logo" src="./logo192.png" />
             <Typography variant="h6" className={classes.title}
-            >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{defaultStorage.application.version}</Hidden></span>
+            >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{application.version}</Hidden></span>
             </Typography>
             {location.pathname === '/' ? (
               state.isAuth ? (
@@ -63,13 +77,29 @@ const HeaderComponent = ({ history, location }) => {
                 >Login</Button>
               )
             ) : (null)}
-            <IconButton className={classes.menuButton} color="inherit" aria-label="menu">
+            <IconButton className={classes.menuButton} color="inherit" aria-label="menu" onClick={handleDrawerState}>
               <MenuIcon />
             </IconButton>
           </Toolbar>
         </Container>
       </AppBar>
       {/* <Toolbar /> */}
+      <Drawer anchor="right" open={drawerState}>
+        <div className={classes.drawerSize}>
+          <Box p={1}>
+            <Button onClick={handleDrawerState} fullWidth>
+              <ChevronRightIcon />
+            </Button>
+          </Box>
+          <Divider />
+          <List>
+            <ListItem button>
+              <ListItemIcon><SettingsIcon /></ListItemIcon>
+              <ListItemText primary="Settings" />
+            </ListItem>
+          </List>
+        </div>
+      </Drawer>
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',

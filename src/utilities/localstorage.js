@@ -1,5 +1,3 @@
-// Utility module to manage HTML5 localStorage
-
 import { storageObjects, defaultStorage } from './defaultdata';
 
 /**
@@ -29,8 +27,8 @@ export const isLocalStorage = () => {
 * Write initial storage on first time usage
  */
 export const initialUse = () => {
-  const settings = getLocalSettings();
   const session = getLocalSession();
+  const settings = getLocalSettings();
 
   // No session exist
   if (!session.statusOK) {
@@ -57,32 +55,6 @@ export const saveLocalStorage = (obj, data) => {
 };
 
 /**
- * Get SETTINGS from local storage
- * @returns Returns an object {statusOk: boolean, data: any}
- */
-export const getLocalSettings = () => {
-  let response = {
-    statusOK: false,
-    data: defaultStorage.settings,
-  };
-  try {
-    const settings = JSON.parse(localStorage.getItem(storageObjects.settings));
-    if (settings) {
-      response = {
-        statusOK: true,
-        data: settings
-      };
-    } else {
-      throw new Error('No items found in localStorage');
-    }
-  } catch (err) {
-    // Life goes on ...
-    // console.log(err);
-  }
-  return response;
-};
-
-/**
  * Get SESSION from local storage
  * @returns Returns an object {statusOk: boolean, data: any}
  */
@@ -97,6 +69,32 @@ export const getLocalSession = () => {
       response = {
         statusOK: true,
         data: session
+      };
+    } else {
+      throw new Error('No items found in localStorage');
+    }
+  } catch (err) {
+    // Life goes on ...
+    // console.log(err);
+  }
+  return response;
+};
+
+/**
+ * Get SETTINGS from local storage
+ * @returns Returns an object {statusOk: boolean, data: any}
+ */
+export const getLocalSettings = () => {
+  let response = {
+    statusOK: false,
+    data: defaultStorage.settings,
+  };
+  try {
+    const settings = JSON.parse(localStorage.getItem(storageObjects.settings));
+    if (settings) {
+      response = {
+        statusOK: true,
+        data: settings
       };
     } else {
       throw new Error('No items found in localStorage');

@@ -12,10 +12,9 @@ import Alert from '@material-ui/lab/Alert';
 
 import { context } from '../../context/StoreProvider';
 import { getJWT } from '../../service/AuthService';
-import { syncARSettings } from '../../service/DataService';
+// import { syncARSettings } from '../../service/DataService';
 import { storageObjects } from '../../utilities/defaultdata';
 import { saveLocalStorage, getLocalSession } from '../../utilities/localstorage';
-// import { utoa } from '../../utilities/base64';
 
 const initialFieldData = {
   username: getLocalSession().data.user,
@@ -68,7 +67,7 @@ const LoginComponent = ({ history }) => {
   };
 
   const testSync = () => {
-    syncARSettings(fields.username);
+    // syncARSettings(fields.username);
   };
 
   const handleSnackState = () => {
@@ -80,7 +79,7 @@ const LoginComponent = ({ history }) => {
       <Box mt={2} />
       <Typography variant="h6">User Login</Typography>
       <Box my={2} />
-      <Paper component="form">
+      <Paper component="form" elevation={0}>
         <Box p={3}>
           <TextField
             label="Username"
@@ -123,7 +122,7 @@ const LoginComponent = ({ history }) => {
             >Back</Button></Box>
         </Grid>
       </Grid>
-      <Button onClick={testSync}>Sync</Button>
+      <Button onClick={testSync} disabled={!lockLoginButton}>Sync</Button>
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
@@ -140,27 +139,3 @@ const LoginComponent = ({ history }) => {
 };
 
 export default LoginComponent;
-
-
-// getJWT(fields.username, fields.password)
-//         .then((response) => {
-//           // console.log('LoginComponent: RES...', response);
-//           if (!response.ok) throw new Error(response.statusText);
-//           return response.text();
-//         }).then((token) => {
-//           // console.log('LoginComponent: JWT...', token);
-//           saveLocalStorage(storageObjects.session, {
-//             user: fields.username,
-//             pw: utoa(fields.password),
-//             jwt: token,
-//             jwtDate: new Date(),
-//           });
-//           setLockLoginButton(true);
-//           dispatch({ type: 'AUTH', payload: true });
-//           setSnackState({ severity: 'success', message: 'Login successful', show: true });
-//         }).catch((err) => {
-//           // console.log('LoginComponent: ERR...', err);
-//           setLockLoginButton(false);
-//           dispatch({ type: 'AUTH', payload: false });
-//           setSnackState({ severity: 'error', message: 'Login failed', show: true });
-//         });

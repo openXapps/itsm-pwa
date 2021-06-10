@@ -24,6 +24,9 @@ const useStyles = makeStyles((theme) => ({
       marginRight: theme.spacing(1),
     },
   },
+  drawerSize: {
+    width: 250,
+  },
 }));
 
 export default useStyles;
