@@ -20,6 +20,7 @@ import { themes } from './service/ThemeService';
 import HeaderComponent from './components/Header/HeaderComponent';
 import LandingComponent from './components/Landing/LandingComponent';
 import LoginComponent from './components/Login/LoginComponent';
+import SettingsComponent from './components/Settings/SettingsComponent';
 import ApprovalComponent from './components/Approval/ApprovalComponent';
 import Error404Component from './components/Error/Error404Component';
 
@@ -36,6 +37,7 @@ const App = () => {
         <Switch>
           <Route path="/" exact component={LandingComponent} />
           <Route path="/login" component={LoginComponent} />
+          <Route path="/settings" component={SettingsComponent} />
           <Route path="/approvals" component={ApprovalComponent} />
           <Route component={Error404Component} />
         </Switch>

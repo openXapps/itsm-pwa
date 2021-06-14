@@ -37,20 +37,23 @@ const HeaderComponent = ({ history, location }) => {
     show: false
   });
 
+  // Button handlers
   const handleLoginButton = () => {
     history.push('/login');
   };
-
   const handleLogoutButton = () => {
     logout(false, getLocalSession().data.jwt);
     dispatch({ type: 'AUTH', payload: false });
     setSnackState({ ...snackState, show: true });
   };
+  const handleSettingsButton = () => {
+    history.push('/settings');
+  };
 
+  // State handlers
   const handleDrawerState = () => {
     setDrawerState(!drawerState);
   };
-
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
   };
@@ -84,8 +87,8 @@ const HeaderComponent = ({ history, location }) => {
         </Container>
       </AppBar>
       {/* <Toolbar /> */}
-      <Drawer anchor="right" open={drawerState}>
-        <div className={classes.drawerSize}>
+      <Drawer anchor="right" open={drawerState} onClose={handleDrawerState}>
+        <div className={classes.drawerSize} onClick={handleDrawerState}>
           <Box p={1}>
             <Button onClick={handleDrawerState} fullWidth>
               <ChevronRightIcon />
@@ -93,7 +96,7 @@ const HeaderComponent = ({ history, location }) => {
           </Box>
           <Divider />
           <List>
-            <ListItem button>
+            <ListItem button onClick={handleSettingsButton}>
               <ListItemIcon><SettingsIcon /></ListItemIcon>
               <ListItemText primary="Settings" />
             </ListItem>
