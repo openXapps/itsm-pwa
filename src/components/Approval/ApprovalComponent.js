@@ -3,6 +3,7 @@ import {
   useState,
   useContext
 } from 'react';
+import clsx from 'clsx';
 
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
@@ -147,7 +148,7 @@ const ApprovalComponent = ({ history }) => {
                     // data-site-id={v.siteId}
                     // onClick={handleLastClicked}
                     ><ListItemAvatar>
-                        <Avatar className={classes.avatar}>
+                        <Avatar className={clsx(classes['avatar' + v.avatar])}>
                           <Typography style={{ fontSize: 14 }}>{v.avatar}</Typography>
                         </Avatar>
                       </ListItemAvatar>
