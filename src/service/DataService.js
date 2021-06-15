@@ -11,12 +11,12 @@ export const settingsModel = {
   settingsId: '',
   // theme: 'dark',
   theme: 'light',
-  showApproval: true,
-  showIncident: true,
-  showChange: true,
-  showProblem: true,
-  showAsset: true,
-  showPeople: true,
+  approvals: true,
+  incidents: true,
+  changes: true,
+  problems: true,
+  assets: true,
+  people: true,
 }
 
 /**

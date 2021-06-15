@@ -52,8 +52,8 @@ const LandingComponent = ({ history }) => {
             <Box mt={{ xs: 1, sm: 2 }} key={i}>
               <Paper elevation={0}>
                 <Box display="flex" p={{ xs: 1, md: 2 }} alignItems="center">
-                  <img className={classes.image} src={v.img} alt={v.name} />
-                  <Typography className={classes.title} variant="h5">{v.name}</Typography>
+                  <img className={classes.image} src={v.img} alt={v.label} />
+                  <Typography className={classes.title} variant="h5">{v.label}</Typography>
                   {state.isAuth ? (
                     <><Divider orientation="vertical" flexItem />
                       <Box p={1}>

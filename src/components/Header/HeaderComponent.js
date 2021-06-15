@@ -96,7 +96,7 @@ const HeaderComponent = ({ history, location }) => {
           </Box>
           <Divider />
           <List>
-            <ListItem button onClick={handleSettingsButton}>
+            <ListItem button onClick={handleSettingsButton} disabled={!state.isAuth}>
               <ListItemIcon><SettingsIcon /></ListItemIcon>
               <ListItemText primary="Settings" />
             </ListItem>
