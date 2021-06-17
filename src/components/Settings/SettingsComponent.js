@@ -1,7 +1,7 @@
 import {
-  // useEffect,
+  useEffect,
   useState,
-  // useContext
+  useContext,
 } from 'react';
 
 import Container from '@material-ui/core/Container';
@@ -15,15 +15,25 @@ import Switch from '@material-ui/core/Switch';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
-import Divider from '@material-ui/core/Divider';
-// import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 import useStyles from './SettingsStyles';
-// import { context } from '../../context/StoreProvider';
+import { context } from '../../context/StoreProvider';
+import { putARSettings, postARSettings, getARSettings } from '../../service/DataService';
 import { themeList } from '../../service/ThemeService';
 import { settingsModel } from '../../service/DataService';
-import { getLocalSettings } from '../../utilities/localstorage';
+import { getLocalSettings, saveLocalStorage } from '../../utilities/localstorage';
+import { storageObjects } from '../../utilities/defaultdata';
 import { modules } from '../../utilities/defaultdata';
+
+/**
+theme: string,
+approvals: boolean,
+incidents: boolean,
+changes: boolean,
+problems: boolean,
+assets: boolean,
+people: boolean,
+ */
 
 const initialFieldData = () => {
   let result = settingsModel;
@@ -33,14 +43,110 @@ const initialFieldData = () => {
 };
 
 const SettingsComponent = ({ history }) => {
-  // const [state,] = useContext(context);
+  const [, dispatch] = useContext(context);
   const classes = useStyles();
   const [fields, setFields] = useState(initialFieldData());
+  const [settingsId, setSettingsId] = useState(getLocalSettings().data.settingsId);
+  const [isSaved, setIsSaved] = useState(fields.settingsId ? true : false);
+  const [criticalErr, setCriticalErr] = useState({ status: false, message: '' });
   const [snackState, setSnackState] = useState({
     severity: 'info',
     message: 'Not active session, please login',
     show: false
   });
+
+  useEffect(() => {
+    if (!settingsId) {
+      getARSettings()
+        .then(response => {
+          if (!response.ok) throw new Error('Critical ERR ' + response.status + ' : ' + response.statusText);
+          return response.json();
+        }).then(data => {
+          // console.log('SettingsComponent: get JSON...', data);
+          if (data.entries.length > 0) {
+            setSettingsId(data.entries[0].values.requestId);
+            setFields({
+              settingsId: data.entries[0].values.requestId,
+              theme: data.entries[0].values.theme,
+              approvals: data.entries[0].values.showApproval === 'true' ? true : false,
+              incidents: data.entries[0].values.showIncident === 'true' ? true : false,
+              changes: data.entries[0].values.showChange === 'true' ? true : false,
+              problems: data.entries[0].values.showProblem === 'true' ? true : false,
+              assets: data.entries[0].values.showAsset === 'true' ? true : false,
+              people: data.entries[0].values.showPeople === 'true' ? true : false,
+            });
+          }
+        }).catch(err => {
+          setCriticalErr({ status: true, message: err.message })
+          setSnackState({ severity: 'error', message: err.message, show: true });
+        });
+    }
+    return () => { };
+  }, [settingsId]);
+
+  const handleFieldChange = ({ target: { name, value } }) => {
+    // console.log('SettingsComponent: on change name........', name);
+    // console.log('SettingsComponent: on change value.......', value);
+    // console.log('--------------------------------------------------------');
+    setFields({
+      ...fields,
+      [name]: value,
+    });
+    // if (name === 'theme') dispatch({ type: 'THEME', payload: value });
+    if (isSaved) setIsSaved(false);
+  };
+
+  const handleSaveButton = () => {
+    const data = `{ "values": {
+      "theme":        "${fields.theme}",
+      "showApproval": "${fields.approvals}",
+      "showIncident": "${fields.incidents}",
+      "showChange":   "${fields.changes}",
+      "showProblem":  "${fields.problems}",
+      "showAsset":    "${fields.assets}",
+      "showPeople":   "${fields.people}"
+    }}`;
+    if (criticalErr.status) {
+      setSnackState({ severity: 'error', message: criticalErr.message, show: true });
+      return;
+    }
+    if (!fields.theme) {
+      setSnackState({ severity: 'error', message: 'Must have a theme', show: true });
+      return;
+    }
+    dispatch({ type: 'THEME', payload: fields.theme });
+    if (!settingsId) {
+      postARSettings(data)
+        .then((response) => {
+          // console.log('SettingsComponent: submit RES...', response);
+          if (response.status !== 201) throw new Error('ERR ' + response.status + ' : ' + response.statusText);
+          return response.json();
+        }).then(data => {
+          // console.log('SettingsComponent: submit JSON...', data);
+          if (!data.values.requestId) throw new Error('Settings ID error on submit');
+          saveLocalStorage(storageObjects.settings, { ...fields, settingsId: data.values.requestId });
+          setFields({ ...fields, settingsId: data.values.requestId });
+          setSettingsId(data.values.requestId);
+          setIsSaved(true);
+          setSnackState({ severity: 'success', message: 'Settings created', show: true });
+        }).catch(err => {
+          // console.log('SettingsComponent: submit ERR...', err);
+          setSnackState({ severity: 'error', message: err.message, show: true });
+        });
+    } else {
+      putARSettings(settingsId, data)
+        .then((response) => {
+          // console.log('SettingsComponent: update RES...', response);
+          if (response.status !== 204) throw new Error('ERR ' + response.status + ' : ' + response.statusText);
+          saveLocalStorage(storageObjects.settings, fields);
+          setIsSaved(true);
+          setSnackState({ severity: 'success', message: 'Settings updated', show: true });
+        }).catch(err => {
+          // console.log('SettingsComponent: update ERR...', err);
+          setSnackState({ severity: 'error', message: err.message, show: true });
+        });
+    }
+  };
 
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
@@ -49,29 +155,29 @@ const SettingsComponent = ({ history }) => {
   return (
     <Container maxWidth="sm">
       <Box mt={2} />
-      <Typography variant="h6">Application Settings</Typography>
+      <Typography variant="h6">Application Settings ({settingsId})</Typography>
       <Box my={2} />
       <Paper component="form" elevation={0} autoComplete="off">
         <Box p={3}>
           <Autocomplete
             value={fields.theme}
-            // onChange={(e, v) => handleFieldChange({ target: { name: 'categoryValue', value: v } })}
-            // inputValue={fields.categoryInputValue}
-            // onInputChange={(e, v) => handleFieldChange({ target: { name: 'categoryInputValue', value: v } })}
-            // options={categories.map((option) => option.category)}
+            onChange={(e, v) => handleFieldChange({ target: { name: 'theme', value: v } })}
             options={themeList}
             // getOptionLabel={(option) => option.category}
             // https://github.com/mui-org/material-ui/issues/18344
             getOptionLabel={option => typeof option === 'string' ? option : option.themeList}
             renderInput={(params) => (
-              <TextField {...params} label="Theme" variant="outlined" fullWidth />
+              <TextField {...params} label="Theme" variant="outlined" />
             )}
           />
           {modules.map((v, i) => {
             return (
               <Box key={i} mt={3} display="flex" alignItems="center">
                 <Typography className={classes.grow} variant="body1">Show {v.label}</Typography>
-                <Switch checked={fields[v.name]} name={v.name} />
+                <Switch
+                  checked={fields[v.name]}
+                  onChange={() => handleFieldChange({ target: { name: v.name, value: !fields[v.name] } })}
+                />
               </Box>
             );
           })}
@@ -80,7 +186,7 @@ const SettingsComponent = ({ history }) => {
       <Box my={2} />
       <Grid container alignItems="center">
         <Grid item xs={12} sm={6}>
-          <Button variant="outlined" fullWidth >Save</Button>
+          <Button variant="outlined" fullWidth onClick={handleSaveButton} disabled={isSaved}>Save</Button>
         </Grid>
         <Grid item xs={12} sm={6}>
           <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 1, sm: 0 }}>
@@ -88,6 +194,7 @@ const SettingsComponent = ({ history }) => {
           </Box>
         </Grid>
       </Grid>
+      <Box my={2} />
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}

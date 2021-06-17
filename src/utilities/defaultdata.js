@@ -12,7 +12,7 @@ export const application = {
  */
 export const storageObjects = {
   session: 'sb-itsm-session',
-  settings: 'db-itsm-settings',
+  settings: 'sb-itsm-settings',
 };
 
 /**
