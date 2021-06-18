@@ -17,10 +17,12 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import useStyles from './LandingStyles';
 import { context } from '../../context/StoreProvider';
 import { modules } from '../../utilities/defaultdata';
+import { getLocalSettings } from '../../utilities/localstorage';
 
 const LandingComponent = ({ history }) => {
   const [state,] = useContext(context);
   const classes = useStyles();
+  const settings = getLocalSettings().data;
   const [snackState, setSnackState] = useState({
     severity: 'info',
     message: 'Not active session, please login',
@@ -48,7 +50,7 @@ const LandingComponent = ({ history }) => {
     <Container maxWidth="md" disableGutters>
       {modules.map((v, i) => {
         return (
-          v.hide ? (null) : (
+          settings[v.name] ? (
             <Box mt={{ xs: 1, sm: 2 }} key={i}>
               <Paper elevation={0}>
                 <Box display="flex" p={{ xs: 1, md: 2 }} alignItems="center">
@@ -65,7 +67,7 @@ const LandingComponent = ({ history }) => {
                 </Box>
               </Paper>
             </Box>
-          )
+          ) : (null)
         );
       })}
       <Snackbar

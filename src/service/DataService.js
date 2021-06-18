@@ -5,12 +5,13 @@ import { localEnvironment } from '../utilities/defaultdata';
 // https://docs.bmc.com/docs/ars2002/resources-for-the-rest-api-931133650.html
 
 /**
- * Settings model
+ * Default settings model
  */
 export const settingsModel = {
   settingsId: '',
-  // theme: 'dark',
   theme: 'light',
+  // theme: 'dark',
+  // theme: 'concrete',
   approvals: true,
   incidents: true,
   changes: true,

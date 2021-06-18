@@ -1,6 +1,7 @@
 export const themeList = [
   'light',
   'dark',
+  'concrete',
 ];
 
 export const themes =
@@ -9,8 +10,7 @@ export const themes =
     palette: {
       type: 'dark',
       primary: {
-        main: '#738bbf',
-        // main: '#455a64',
+        main: '#90caf9',
       },
       secondary: {
         main: '#fb8c00',
@@ -20,18 +20,22 @@ export const themes =
   light: {
     palette: {
       type: 'light',
-      // primary: {
-      //   main: '#cfd8dc',
-      // },
-      // secondary: {
-      //   main: '#fb8c00',
-      // },
+    },
+  },
+  concrete: {
+    palette: {
+      primary: {
+        main: '#5c6bc0',
+      },
+      secondary: {
+        main: '#f44336',
+      },
       background: {
-        default: '#efebe9',
-        paper: '#e6e6e6',
+        default: '#c3c7c9',
+        paper: '#dde9f0',
       },
     },
-  }
+  },
 };
 
 

@@ -66,10 +66,6 @@ const LoginComponent = ({ history }) => {
     }
   };
 
-  const testSync = () => {
-    // syncARSettings(fields.username);
-  };
-
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
   };
@@ -122,7 +118,6 @@ const LoginComponent = ({ history }) => {
             >Back</Button></Box>
         </Grid>
       </Grid>
-      <Button onClick={testSync} disabled={!lockLoginButton}>Sync</Button>
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
