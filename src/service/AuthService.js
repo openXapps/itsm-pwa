@@ -1,4 +1,4 @@
-import { saveLocalStorage, getLocalSession } from '../utilities/localstorage';
+import { saveLocalStorage, getLocalSession, getLocalSettings } from '../utilities/localstorage';
 import { storageObjects, localEnvironment, defaultStorage } from '../utilities/defaultdata';
 // import { utoa } from '../utilities/base64';
 
@@ -61,7 +61,7 @@ export const hasValidJWT = () => {
   if (session.statusOK) {
     if (session.data.jwtDate && session.data.jwt) {
       if (!hasJWTExpired(session.data.jwtDate)) {
-        if (testJWT(session.data.jwt)) response = true;
+        if (testJWT(session.data.jwt, session.data.user)) response = true;
       }
     }
   }
@@ -93,10 +93,16 @@ export const hasJWTExpired = (jwtDate) => {
  * @param {string} jwt Token to be used for testing connection
  * @returns A boolean to indicate whether the test was successful or not
  */
-export const testJWT = async (jwt) => {
+export const testJWT = async (jwt, user) => {
+  const settings = getLocalSettings().data;
   const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
-  const url = '/api/arsys/v1.0/entry/COM:Company/CPY000000000015?fields=values(Company Entry ID)';
-  // console.log('testJWT: testing URL...', url);
+  const query = `'submitter'="${user}"`;
+  const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
+  const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + (
+    settings.settingsId ? (settings.settingsId) : ('?q=(' + query + ')')
+  ) + '&fields=values(' + fields + ')';
+  // console.log('testJWT: url...', url);
+
   const response = await fetch(host + url, {
     method: 'GET',
     headers: {
@@ -105,5 +111,24 @@ export const testJWT = async (jwt) => {
     mode: 'cors',
   });
   // response.json().then(data => { console.log('testJWT: response...', data) });
+  
+  if (!settings.settingsId) {
+    if (response.ok) {
+      response.json().then(data => {
+        if (data.entries.length > 0) {
+          saveLocalStorage(storageObjects.settings, {
+            settingsId: data.entries[0].values.requestId,
+            theme: data.entries[0].values.theme,
+            approvals: data.entries[0].values.showApproval === 'true' ? true : false,
+            incidents: data.entries[0].values.showIncident === 'true' ? true : false,
+            changes: data.entries[0].values.showChange === 'true' ? true : false,
+            problems: data.entries[0].values.showProblem === 'true' ? true : false,
+            assets: data.entries[0].values.showAsset === 'true' ? true : false,
+            people: data.entries[0].values.showPeople === 'true' ? true : false,
+          });
+        }
+      })
+    }
+  }
   return response.ok;
 };

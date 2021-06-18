@@ -68,21 +68,17 @@ const HeaderComponent = ({ history, location }) => {
             >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{application.version}</Hidden></span>
             </Typography>
             {location.pathname === '/' ? (
-              state.isAuth ? (
-                <Button
-                  color="inherit"
-                  onClick={handleLogoutButton}
-                >Logout</Button>
-              ) : (
-                <Button
-                  color="inherit"
-                  onClick={handleLoginButton}
-                >Login</Button>
-              )
+              <>
+                {state.isAuth ? (
+                  <Button color="inherit" onClick={handleLogoutButton}>Logout</Button>
+                ) : (
+                  <Button color="inherit" onClick={handleLoginButton} >Login</Button>
+                )}
+                <IconButton className={classes.menuButton} color="inherit" aria-label="menu" onClick={handleDrawerState}>
+                  <MenuIcon />
+                </IconButton>
+              </>
             ) : (null)}
-            <IconButton className={classes.menuButton} color="inherit" aria-label="menu" onClick={handleDrawerState}>
-              <MenuIcon />
-            </IconButton>
           </Toolbar>
         </Container>
       </AppBar>
@@ -90,9 +86,7 @@ const HeaderComponent = ({ history, location }) => {
       <Drawer anchor="right" open={drawerState} onClose={handleDrawerState}>
         <div className={classes.drawerSize} onClick={handleDrawerState}>
           <Box p={1}>
-            <Button onClick={handleDrawerState} fullWidth>
-              <ChevronRightIcon />
-            </Button>
+            <Button onClick={handleDrawerState} fullWidth><ChevronRightIcon /></Button>
           </Box>
           <Divider />
           <List>
@@ -104,16 +98,12 @@ const HeaderComponent = ({ history, location }) => {
         </div>
       </Drawer>
       <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}
         autoHideDuration={4000}
         onClose={handleSnackState}
-      ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}>
-          {snackState.message}
-        </Alert></Snackbar>
+      ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}
+      >{snackState.message}</Alert></Snackbar>
     </>
   );
 };

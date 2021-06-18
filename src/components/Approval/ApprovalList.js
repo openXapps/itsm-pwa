@@ -28,7 +28,7 @@ import { getApprovals, approvalModel } from '../../service/DataService';
 import { getLocalSession } from '../../utilities/localstorage';
 import useStyles from './ApprovalStyles';
 
-const ApprovalComponent = ({ history }) => {
+const ApprovalList = ({ history }) => {
   const classes = useStyles();
   const [state,] = useContext(context);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,24 +46,24 @@ const ApprovalComponent = ({ history }) => {
   }, [state.isAuth])
 
   const handleReload = () => {
-    // console.log('LandingComponent: state...', state);
+    // console.log('ApprovalList: state...', state);
     if (state.isAuth) {
       setIsLoading(true);
       getApprovals(getLocalSession().data.user)
         .then(response => {
-          // console.log('LandingComponent: response...', response.json());
+          // console.log('ApprovalList: response...', response.json());
           if (!response.ok) {
             response.json().then(data => {
-              // console.log('LandingComponent: response false data...', data);
+              // console.log('ApprovalList: response false data...', data);
               throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
             }).catch(err => {
-              // console.log('LandingComponent: response false err...', err);
+              // console.log('ApprovalList: response false err...', err);
               setIsLoading(false);
               setSnackState({ severity: 'error', message: err.message, show: true });
             });
           } else {
             return response.json().then(data => {
-              // console.log('LandingComponent: approvals...', data);
+              // console.log('ApprovalList: approvals...', data);
               setIsLoading(false);
               populateApprovals(data.entries);
               // setApprovals(data.entries);
@@ -169,7 +169,7 @@ const ApprovalComponent = ({ history }) => {
                         ><ThumbDownIcon /></IconButton>
                       </ListItemSecondaryAction>
                     </ListItem>
-                    <Divider component="li" />
+                    <Divider />
                   </div>
                 );
               })
@@ -198,4 +198,4 @@ const ApprovalComponent = ({ history }) => {
   );
 };
 
-export default ApprovalComponent;
+export default ApprovalList;

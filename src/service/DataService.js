@@ -13,11 +13,11 @@ export const settingsModel = {
   // theme: 'dark',
   // theme: 'concrete',
   approvals: true,
-  incidents: true,
-  changes: true,
-  problems: true,
+  incidents: false,
+  changes: false,
+  problems: false,
   assets: true,
-  people: true,
+  people: false,
 }
 
 /**

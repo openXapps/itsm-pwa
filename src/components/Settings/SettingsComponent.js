@@ -49,11 +49,7 @@ const SettingsComponent = ({ history }) => {
   const [settingsId, setSettingsId] = useState(getLocalSettings().data.settingsId);
   const [isSaved, setIsSaved] = useState(fields.settingsId ? true : false);
   const [criticalErr, setCriticalErr] = useState({ status: false, message: '' });
-  const [snackState, setSnackState] = useState({
-    severity: 'info',
-    message: 'Not active session, please login',
-    show: false
-  });
+  const [snackState, setSnackState] = useState({ severity: 'info', message: 'X', show: false });
 
   useEffect(() => {
     if (!settingsId) {
