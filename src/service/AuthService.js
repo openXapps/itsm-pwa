@@ -98,9 +98,10 @@ export const testJWT = async (jwt, user) => {
   const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const query = `'submitter'="${user}"`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
-  const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + (
-    settings.settingsId ? (settings.settingsId) : ('?q=(' + query + ')')
-  ) + '&fields=values(' + fields + ')';
+  // const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + (
+  //   settings.settingsId ? (settings.settingsId) : ('?q=(' + query + ')')
+  // ) + '&fields=values(' + fields + ')';
+  const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings?q=(' + query + ')&fields=values(' + fields + ')';
   // console.log('testJWT: url...', url);
 
   const response = await fetch(host + url, {
@@ -111,24 +112,36 @@ export const testJWT = async (jwt, user) => {
     mode: 'cors',
   });
   // response.json().then(data => { console.log('testJWT: response...', data) });
-  
-  if (!settings.settingsId) {
-    if (response.ok) {
-      response.json().then(data => {
-        if (data.entries.length > 0) {
-          saveLocalStorage(storageObjects.settings, {
-            settingsId: data.entries[0].values.requestId,
-            theme: data.entries[0].values.theme,
-            approvals: data.entries[0].values.showApproval === 'true' ? true : false,
-            incidents: data.entries[0].values.showIncident === 'true' ? true : false,
-            changes: data.entries[0].values.showChange === 'true' ? true : false,
-            problems: data.entries[0].values.showProblem === 'true' ? true : false,
-            assets: data.entries[0].values.showAsset === 'true' ? true : false,
-            people: data.entries[0].values.showPeople === 'true' ? true : false,
-          });
+
+  if (response.ok) {
+    response.json().then(data => {
+      if (data.entries.length > 0) {
+        if (!settings.settingsId) {
+          saveSettings(data.entries[0].values);
+        } else {
+          if (settings.settingsId !== data.entries[0].values.requestId) {
+            saveSettings(data.entries[0].values);
+          }
         }
-      })
-    }
+      }
+    })
   }
   return response.ok;
 };
+
+/**
+ * Internal helper function to save settings into storage
+ * @param {any} data Seetings object to save
+ */
+function saveSettings(data) {
+  saveLocalStorage(storageObjects.settings, {
+    settingsId: data.requestId,
+    theme: data.theme,
+    approvals: data.showApproval === 'true' ? true : false,
+    incidents: data.showIncident === 'true' ? true : false,
+    changes: data.showChange === 'true' ? true : false,
+    problems: data.showProblem === 'true' ? true : false,
+    assets: data.showAsset === 'true' ? true : false,
+    people: data.showPeople === 'true' ? true : false,
+  });
+}

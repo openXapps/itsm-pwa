@@ -8,7 +8,7 @@ import { localEnvironment } from '../utilities/defaultdata';
  * Default settings model
  */
 export const settingsModel = {
-  settingsId: '',
+  settingsId: '000000000000002',
   theme: 'light',
   // theme: 'dark',
   // theme: 'concrete',
