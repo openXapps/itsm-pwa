@@ -22,6 +22,7 @@ import LandingComponent from './components/Landing/LandingComponent';
 import LoginComponent from './components/Login/LoginComponent';
 import SettingsComponent from './components/Settings/SettingsComponent';
 import ApprovalList from './components/Approval/ApprovalList';
+import AssetList from './components/Asset/AssetList';
 import Error404Component from './components/Error/Error404Component';
 
 const App = () => {
@@ -39,6 +40,7 @@ const App = () => {
           <Route path="/login" component={LoginComponent} />
           <Route path="/settings" component={SettingsComponent} />
           <Route path="/approvals" component={ApprovalList} />
+          <Route path="/assets" component={AssetList} />
           <Route component={Error404Component} />
         </Switch>
       </BrowserRouter>

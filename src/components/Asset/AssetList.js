@@ -1,9 +1,10 @@
 import {
   useEffect,
   useState,
-  useContext
+  useContext,
+  // Fragment,
 } from 'react';
-import clsx from 'clsx';
+// import clsx from 'clsx';
 
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
@@ -11,9 +12,7 @@ import Box from '@material-ui/core/Box';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -22,18 +21,18 @@ import Divider from '@material-ui/core/Divider';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { context } from '../../context/StoreProvider';
-import { getApprovals, approvalModel } from '../../service/ApprovalService';
+import { getAssets, assetModel } from '../../service/AssetService';
 import { getLocalSession } from '../../utilities/localstorage';
-import useStyles from './ApprovalStyles';
+import useStyles from './AssetStyles';
 
-const ApprovalList = ({ history }) => {
+const AssetList = ({ history }) => {
   const classes = useStyles();
   const [state,] = useContext(context);
   const [isLoading, setIsLoading] = useState(false);
-  const [approvals, setApprovals] = useState([approvalModel]);
+  const [assets, setAssets] = useState([assetModel]);
   const [snackState, setSnackState] = useState({
     severity: 'success',
-    message: 'Approvals fetched',
+    message: 'Assets fetched',
     show: false
   });
 
@@ -41,31 +40,31 @@ const ApprovalList = ({ history }) => {
     if (state.isAuth) handleReload();
     return () => true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.isAuth])
+  }, [])
 
   const handleReload = () => {
-    // console.log('ApprovalList: state...', state);
+    // console.log('AssetList: state...', state);
     if (state.isAuth) {
       setIsLoading(true);
-      getApprovals(getLocalSession().data.user)
+      getAssets(getLocalSession().data.user)
         .then(response => {
-          // console.log('ApprovalList: response...', response.json());
+          // console.log('AssetList: response...', response.json());
           if (!response.ok) {
             response.json().then(data => {
-              // console.log('ApprovalList: response false data...', data);
+              // console.log('AssetList: response false data...', data);
               throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
             }).catch(err => {
-              // console.log('ApprovalList: response false err...', err);
+              // console.log('AssetList: response false err...', err);
               setIsLoading(false);
               setSnackState({ severity: 'error', message: err.message, show: true });
             });
           } else {
             return response.json().then(data => {
-              // console.log('ApprovalList: approvals...', data);
+              // console.log('AssetList: assets...', data);
               setIsLoading(false);
-              populateApprovals(data.entries);
-              // setApprovals(data.entries);
-              setSnackState({ severity: 'success', message: 'Approvals fetched', show: true });
+              populateAssets(data.entries);
+              // setAssets(data.entries);
+              setSnackState({ severity: 'success', message: 'Assets fetched', show: true });
             });
           }
         });
@@ -74,41 +73,26 @@ const ApprovalList = ({ history }) => {
     }
   }
 
-  const populateApprovals = (data) => {
-    // console.log('populateApprovals: data', data);
-    let _approvals = [];
+  const populateAssets = (data) => {
+    let _assets = [];
     data.forEach(v => {
-      _approvals.push({
-        ...approvalModel,
-        requester: v.values['Requester'],
-        application: v.values['Application'],
-        signatureId: v.values['Signature ID'],
-        sourceNumber: v.values['14516'],
-        description: v.values['14506'],
-        createDate: v.values['Create-Date-Sig'],
-        avatar: getAvatar(v.values['Application']),
+      _assets.push({
+        ...assetModel,
+        reconId: v.values['AssetInstanceId'],
+        class: v.values['UserDisplayObjectName'],
+        item: v.values['Item'],
+        model: v.values['Model Number'],
+        make: v.values['240001003'],
+        serial: v.values['Serial Number'],
+        name: v.values['Name'],
+        status: v.values['AssetLifecycleStatus'],
       });
     });
-    // console.log('populateApprovals: _approvals', _approvals);
-    setApprovals(_approvals);
+    // console.log('populateAssets: _assets', _assets);
+    setAssets(_assets);
   };
 
-  const getAvatar = (applicationName) => {
-    let avatar = 'BOB';
-    switch (applicationName) {
-      case 'CHG:Infrastructure Change':
-        avatar = 'CRQ'
-        break;
-      case 'SRM:Request':
-        avatar = 'REQ'
-        break;
-      default:
-        break;
-    }
-    return avatar;
-  }
-
-  const handleApprovalDetailsButton = () => {
+  const handleAssetDetailsButton = () => {
 
   }
 
@@ -120,7 +104,7 @@ const ApprovalList = ({ history }) => {
     <Container maxWidth="md">
       <Box mt={3} display="flex" flexWrap="nowrap" alignItems="center">
         <Box flexGrow={1}>
-          <Typography className={classes.header} variant="h5">My Approvals</Typography>
+          <Typography className={classes.header} variant="h5">My Assets</Typography>
         </Box>
         <Button
           variant="outlined"
@@ -135,22 +119,17 @@ const ApprovalList = ({ history }) => {
       <Box width="100%" mt={3}>
         <List disablePadding>
           {!isLoading ? (
-            approvals.length > 0 ? (
-              approvals.map((v, i) => {
+            assets.length > 0 ? (
+              assets.map((v, i) => {
                 return (
                   <div key={i}>
                     <ListItem disableGutters>
-                      <ListItemAvatar>
-                        <Avatar className={clsx(classes['avatar' + v.avatar])}>
-                          <Typography style={{ fontSize: 14 }}>{v.avatar}</Typography>
-                        </Avatar>
-                      </ListItemAvatar>
                       <ListItemText
-                        primary={v.requester}
-                        secondary={v.sourceNumber + ': ' + v.description}
+                        primary={v.model + ' ' + v.item}
+                        secondary={'Serial: ' + v.serial}
                       /><ListItemSecondaryAction>
                         <IconButton edge="end"
-                          onClick={handleApprovalDetailsButton}
+                          onClick={handleAssetDetailsButton}
                         ><MoreVertIcon /></IconButton>
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -160,7 +139,7 @@ const ApprovalList = ({ history }) => {
               })
             ) : (
               <Box mt={3}>
-                <Typography variant="h6">No approvals found. Click Reload to get approvals.</Typography>
+                <Typography variant="h6">No assets found. Click Reload to get assets.</Typography>
               </Box>
             )
           ) : (
@@ -183,4 +162,4 @@ const ApprovalList = ({ history }) => {
   );
 };
 
-export default ApprovalList;
+export default AssetList;

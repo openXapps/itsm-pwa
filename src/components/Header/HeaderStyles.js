@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     [theme.breakpoints.down('xs')]: {
       fontSize: 16,
+      marginLeft: theme.spacing(1),
     },
   },
   appVersion: {

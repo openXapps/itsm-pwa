@@ -38,8 +38,9 @@ const LandingComponent = ({ history }) => {
     return () => { };
   }, [state.isAuth]);
 
-  const handleGoToModule = () => {
-    history.push(modules[0].path);
+  const handleGoToModule = (e) => {
+    const moduleId = parseInt(e.currentTarget.dataset.moduleId);
+    history.push(modules[moduleId].path);
   }
 
   const handleSnackState = () => {
@@ -59,7 +60,7 @@ const LandingComponent = ({ history }) => {
                   {state.isAuth ? (
                     <><Divider orientation="vertical" flexItem />
                       <Box p={1}>
-                        <IconButton edge="end" onClick={handleGoToModule}>
+                        <IconButton edge="end" onClick={handleGoToModule} data-module-id={i}>
                           <KeyboardArrowRightIcon />
                         </IconButton >
                       </Box></>
