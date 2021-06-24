@@ -102,14 +102,16 @@ const ApprovalList = ({ history }) => {
       case 'SRM:Request':
         avatar = 'REQ'
         break;
-      default:
-        break;
+      // default:
+      //   break;
     }
     return avatar;
   }
 
-  const handleApprovalDetailsButton = () => {
-
+  const handleApprovalDetailsButton = (e) => {
+    const id = e.currentTarget.dataset.id;
+    const module = String(e.currentTarget.dataset.module).toLowerCase();
+    history.push('/approval/' + module + '/' + id);
   }
 
   const handleSnackState = () => {
@@ -149,7 +151,10 @@ const ApprovalList = ({ history }) => {
                         primary={v.requester}
                         secondary={v.sourceNumber + ': ' + v.description}
                       /><ListItemSecondaryAction>
-                        <IconButton edge="end"
+                        <IconButton
+                          edge="end"
+                          data-id={v.signatureId}
+                          data-module={v.avatar}
                           onClick={handleApprovalDetailsButton}
                         ><MoreVertIcon /></IconButton>
                       </ListItemSecondaryAction>

@@ -42,10 +42,10 @@ export const localEnvironment = {
  * Modules to show on landing route
  */
 export const modules = [
-  { name: 'approvals', label: 'My Approvals', img: './img/itsm-apr-alpha.png', path: '/approvals', hide: false },
-  { name: 'incidents', label: 'My Incidents', img: './img/itsm-inc-alpha.png', path: '/incidents', hide: false },
-  { name: 'changes', label: 'My Changes', img: './img/itsm-chg-alpha.png', path: '/changes', hide: false },
-  { name: 'problems', label: 'My Investigations', img: './img/itsm-pbm-alpha.png', path: '/problems', hide: false },
-  { name: 'assets', label: 'My Assets', img: './img/itsm-ast-alpha.png', path: '/assets', hide: false },
-  { name: 'people', label: 'My People', img: './img/itsm-ppl-alpha.png', path: '/people', hide: false },
+  { name: 'approvals', label: 'My Approvals', img: './img/itsm-apr-alpha.png', path: '/approval' },
+  { name: 'incidents', label: 'My Incidents', img: './img/itsm-inc-alpha.png', path: '/incident' },
+  { name: 'changes', label: 'My Changes', img: './img/itsm-chg-alpha.png', path: '/change' },
+  { name: 'problems', label: 'My Investigations', img: './img/itsm-pbm-alpha.png', path: '/problem' },
+  { name: 'assets', label: 'My Assets', img: './img/itsm-ast-alpha.png', path: '/asset' },
+  { name: 'people', label: 'My People', img: './img/itsm-ppl-alpha.png', path: '/people' },
 ];
