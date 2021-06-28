@@ -102,8 +102,8 @@ const ApprovalList = ({ history }) => {
       case 'SRM:Request':
         avatar = 'REQ'
         break;
-      // default:
-      //   break;
+      default:
+        break;
     }
     return avatar;
   }

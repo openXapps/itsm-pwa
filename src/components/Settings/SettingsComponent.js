@@ -9,10 +9,14 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Switch from '@material-ui/core/Switch';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
+// import TextField from '@material-ui/core/TextField';
+// import Autocomplete from '@material-ui/lab/Autocomplete';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
@@ -155,7 +159,7 @@ const SettingsComponent = ({ history }) => {
       <Box my={2} />
       <Paper component="form" elevation={0} autoComplete="off">
         <Box p={3}>
-          <Autocomplete
+          {/* <Autocomplete
             value={fields.theme}
             onChange={(e, v) => handleFieldChange({ target: { name: 'theme', value: v } })}
             options={themeList}
@@ -165,7 +169,24 @@ const SettingsComponent = ({ history }) => {
             renderInput={(params) => (
               <TextField {...params} label="Theme" variant="outlined" />
             )}
-          />
+          /> */}
+          <FormControl variant="outlined" fullWidth>
+            <InputLabel id="sb-itsm-theme-label">Theme</InputLabel>
+            <Select
+              labelId="sb-itsm-theme-label"
+              // id="sb-itsm-theme-picker"
+              name="theme"
+              value={fields.theme}
+              onChange={handleFieldChange}
+              label="Theme"
+            >
+              {themeList.map((v, i) => {
+                return (
+                  <MenuItem key={i} value={v}>{v}</MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
           {modules.map((v, i) => {
             return (
               <Box key={i} mt={3} display="flex" alignItems="center">

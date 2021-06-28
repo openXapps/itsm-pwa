@@ -38,7 +38,8 @@ const LoginComponent = ({ history }) => {
     });
   };
 
-  const handleLoginButton = () => {
+  const handleLoginButton = (e) => {
+    e.preventDefault();
     // const session = getLocalSession().data;
     if (fields.username && fields.password) {
       // if (session.jwt) logout(false, session.jwt);
@@ -75,49 +76,52 @@ const LoginComponent = ({ history }) => {
       <Box mt={2} />
       <Typography variant="h6">User Login</Typography>
       <Box my={2} />
-      <Paper component="form" elevation={0}>
-        <Box p={3}>
-          <TextField
-            label="Username"
-            variant="outlined"
-            value={fields.username}
-            name="username"
-            autoComplete="username"
-            onChange={handleFieldChange}
-            fullWidth
-          />
-          <Box mt={3} />
-          <TextField
-            label="Password"
-            variant="outlined"
-            value={fields.password}
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            onChange={handleFieldChange}
-            fullWidth
-          />
-        </Box>
-      </Paper>
-      <Box my={2} />
-      <Grid container alignItems="center">
-        <Grid item xs={12} sm={6}>
-          <Button
-            variant="outlined"
-            fullWidth
-            onClick={handleLoginButton}
-            disabled={lockLoginButton}
-          >Login</Button>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 1, sm: 0 }}>
+      <form onSubmit={handleLoginButton}>
+        <Paper elevation={0} >
+          <Box p={3}>
+            <TextField
+              label="Username"
+              variant="outlined"
+              value={fields.username}
+              name="username"
+              autoComplete="username"
+              onChange={handleFieldChange}
+              fullWidth
+            />
+            <Box mt={3} />
+            <TextField
+              label="Password"
+              variant="outlined"
+              value={fields.password}
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              onChange={handleFieldChange}
+              fullWidth
+            />
+          </Box>
+        </Paper>
+        <Box my={2} />
+        <Grid container alignItems="center">
+          <Grid item xs={12} sm={6}>
             <Button
+              type="submit"
               variant="outlined"
               fullWidth
-              onClick={() => history.goBack()}
-            >Back</Button></Box>
+              onClick={handleLoginButton}
+              disabled={lockLoginButton}
+            >Login</Button>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 1, sm: 0 }}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => history.goBack()}
+              >Back</Button></Box>
+          </Grid>
         </Grid>
-      </Grid>
+      </form>
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',

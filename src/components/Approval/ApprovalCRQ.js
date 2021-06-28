@@ -11,7 +11,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
 import { context } from '../../context/StoreProvider';
-import { getApprovals, approvalModel } from '../../service/ApprovalService';
+// import { getApprovals, approvalModel } from '../../service/ApprovalService';
 
 const Field = (props) => {
   const { label, value, font } = props;
@@ -31,9 +31,9 @@ const Field = (props) => {
 
 const ApprovalCRQ = ({ history, location }) => {
   const [state,] = useContext(context);
-  const [isLoading, setIsLoading] = useState(false);
-  const [approvalData, setApprovalData] = useState({});
-  const [crqData, setCrqData] = useState({});
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [approvalData, setApprovalData] = useState({});
+  // const [crqData, setCrqData] = useState({});
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Login successful',
