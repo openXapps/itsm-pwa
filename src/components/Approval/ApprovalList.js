@@ -153,7 +153,7 @@ const ApprovalList = ({ history }) => {
                       /><ListItemSecondaryAction>
                         <IconButton
                           edge="end"
-                          data-id={v.signatureId}
+                          data-id={v.signatureId + '#' + v.sourceNumber}
                           data-module={v.avatar}
                           onClick={handleApprovalDetailsButton}
                         ><MoreVertIcon /></IconButton>
