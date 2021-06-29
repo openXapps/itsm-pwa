@@ -16,9 +16,7 @@ export const getJWT = async (username, password) => {
   const loginURL = '/api/jwt/login';
   const response = await fetch(host + loginURL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     mode: 'cors',
     body: `username=${username}&password=${password}&authString=`
   });
@@ -106,9 +104,7 @@ export const testJWT = async (jwt, user) => {
 
   const response = await fetch(host + url, {
     method: 'GET',
-    headers: {
-      'Authorization': 'AR-JWT ' + jwt,
-    },
+    headers: { 'Authorization': 'AR-JWT ' + jwt },
     mode: 'cors',
   });
   // response.json().then(data => { console.log('testJWT: response...', data) });
@@ -124,7 +120,7 @@ export const testJWT = async (jwt, user) => {
           }
         }
       }
-    })
+    });
   }
   return response.ok;
 };

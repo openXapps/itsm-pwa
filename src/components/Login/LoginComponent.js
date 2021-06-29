@@ -12,7 +12,7 @@ import Alert from '@material-ui/lab/Alert';
 
 import { context } from '../../context/StoreProvider';
 import { getJWT } from '../../service/AuthService';
-// import { syncARSettings } from '../../service/DataService';
+import { getARSettings, settingsModel } from '../../service/DataService';
 import { storageObjects } from '../../utilities/defaultdata';
 import { saveLocalStorage, getLocalSession } from '../../utilities/localstorage';
 
@@ -23,13 +23,9 @@ const initialFieldData = {
 
 const LoginComponent = ({ history }) => {
   const [fields, setFields] = useState(initialFieldData);
-  const [, dispatch] = useContext(context);
+  const [state, dispatch] = useContext(context);
   const [lockLoginButton, setLockLoginButton] = useState(false);
-  const [snackState, setSnackState] = useState({
-    severity: 'success',
-    message: 'Login successful',
-    show: false
-  });
+  const [snackState, setSnackState] = useState({ severity: 'success', message: 'XX', show: false });
 
   const handleFieldChange = ({ target: { name, value } }) => {
     setFields({
@@ -40,30 +36,59 @@ const LoginComponent = ({ history }) => {
 
   const handleLoginButton = (e) => {
     e.preventDefault();
-    // const session = getLocalSession().data;
     if (fields.username && fields.password) {
-      // if (session.jwt) logout(false, session.jwt);
       getJWT(fields.username, fields.password)
         .then(response => {
-          // console.log('LoginComponent: RES...', response);
+          // console.log('LoginComponent: JWT response...', response);
           if (!response.ok) throw new Error(response.statusText);
           return response.text();
         }).then(token => {
-          // console.log('LoginComponent: JWT...', token);
+          // console.log('LoginComponent: JWT token......', token);
           saveLocalStorage(storageObjects.session, {
             user: fields.username,
             jwt: token,
             jwtDate: new Date(),
           });
+
           setLockLoginButton(true);
           dispatch({ type: 'AUTH', payload: true });
           setSnackState({ severity: 'success', message: 'Authentication successful', show: true });
-        }).catch((err) => {
-          // console.log('LoginComponent: ERR...', err);
+        }).catch(error => {
+          // console.log('LoginComponent: JWT error...', error);
           setLockLoginButton(false);
           dispatch({ type: 'AUTH', payload: false });
           setSnackState({ severity: 'error', message: 'Authentication failed', show: true });
         });
+
+      // Need to validate settings about 1 second after login
+      setTimeout(() => {
+        getARSettings()
+          .then(response => {
+            // console.log('LoginComponent: settings response...', response);
+            if (!response.ok) throw new Error(response.statusText);
+            return response.json();
+          }).then(data => {
+            // console.log('LoginComponent: settings data.......', data);
+            if (data.entries.length > 0) {
+              saveLocalStorage(storageObjects.settings, {
+                settingsId: data.entries[0].values.requestId,
+                theme: data.entries[0].values.theme,
+                approvals: data.entries[0].values.showApproval === 'true' ? true : false,
+                incidents: data.entries[0].values.showIncident === 'true' ? true : false,
+                changes: data.entries[0].values.showChange === 'true' ? true : false,
+                problems: data.entries[0].values.showProblem === 'true' ? true : false,
+                assets: data.entries[0].values.showAsset === 'true' ? true : false,
+                people: data.entries[0].values.showPeople === 'true' ? true : false,
+              });
+            } else {
+              saveLocalStorage(storageObjects.settings, settingsModel);
+              if (state.theme !== settingsModel.theme) dispatch({ type: 'THEME', payload: settingsModel.theme });
+            }
+          }).catch(error => {
+            // console.log('LoginComponent: settings error...', error);
+            // setSnackState({ severity: 'error', message: 'Authentication failed', show: true });
+          });
+      }, 1000);
     }
   };
 

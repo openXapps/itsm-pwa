@@ -66,14 +66,14 @@ export const putARSettings = (requestId, data) => {
  * @returns Promise of existing entry
  */
 export const getARSettings = () => {
-  const session = getLocalSession().data;
+  const { user, jwt } = getLocalSession().data;
   const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
-  const query = `'submitter' = "${session.user}"`;
+  const query = `'submitter'="${user}"`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',
-    headers: { 'Authorization': 'AR-JWT ' + session.jwt },
+    headers: { 'Authorization': 'AR-JWT ' + jwt },
     mode: 'cors'
   });
 };

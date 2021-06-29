@@ -59,6 +59,7 @@ const SettingsComponent = ({ history }) => {
     if (!settingsId) {
       getARSettings()
         .then(response => {
+          console.log('SettingsComponent: useEffect.response...', response);
           if (!response.ok) throw new Error('Critical ERR ' + response.status + ' : ' + response.statusText);
           return response.json();
         }).then(data => {
