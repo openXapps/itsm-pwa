@@ -21,7 +21,7 @@ import { localEnvironment } from '../utilities/defaultdata';
  */
 export const getApprovals = (user) => {
   const session = getLocalSession().data;
-  const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   // const query = encodeURI(`(";" + 'Approvers' + ";" LIKE "%;${user};%") AND (('Approval Status' = 0) OR ('Approval Status' = 3) OR ('Approval Status' = 4))`);
   const query = `'Approvers' LIKE "%${user}%" AND (('Approval Status' = 0) OR ('Approval Status' = 3) OR ('Approval Status' = 4))`;
   // console.log('getApprovals: query...', query);

@@ -27,7 +27,7 @@ export const settingsModel = {
  */
 export const postARSettings = (data) => {
   const session = getLocalSession().data;
-  const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = 'requestId';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings?fields=values(' + fields + ')';
   return fetch(host + url, {
@@ -48,7 +48,7 @@ export const postARSettings = (data) => {
  */
 export const putARSettings = (requestId, data) => {
   const session = getLocalSession().data;
-  const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + requestId;
   return fetch(host + url, {
     method: 'PUT',
@@ -67,7 +67,7 @@ export const putARSettings = (requestId, data) => {
  */
 export const getARSettings = () => {
   const { user, jwt } = getLocalSession().data;
-  const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const query = `'submitter'="${user}"`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=(' + query + ')&fields=values(' + fields + ')';

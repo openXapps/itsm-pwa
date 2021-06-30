@@ -1,4 +1,4 @@
-import { settingsModel } from '../service/DataService';
+import { settingsModel } from '../service/SettingsService';
 
 /**
  * Application meta data
@@ -34,6 +34,7 @@ export const defaultStorage = {
  * @returns Environment variables from .env.local
  */
 export const localEnvironment = {
+  ARPROTOCOL: process.env.REACT_APP_ARPROTOCOL,
   ARHOST: process.env.REACT_APP_ARHOST,
   ARPORT: process.env.REACT_APP_ARPORT,
 };

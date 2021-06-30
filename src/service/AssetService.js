@@ -22,7 +22,7 @@ export const assetModel = {
  */
 export const getAssets = (user) => {
   const session = getLocalSession().data;
-  const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   // const query = encodeURI(`(";" + 'Approvers' + ";" LIKE "%;${user};%") AND (('Asset Status' = 0) OR ('Asset Status' = 3) OR ('Asset Status' = 4))`);
   const query = `'DatasetId' = "BMC.ASSET" AND 'Login Name' = "${user}"`;
   // 240001003 = Manufacturer Name+

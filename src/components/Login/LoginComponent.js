@@ -12,7 +12,7 @@ import Alert from '@material-ui/lab/Alert';
 
 import { context } from '../../context/StoreProvider';
 import { getJWT } from '../../service/AuthService';
-import { getARSettings, settingsModel } from '../../service/DataService';
+import { getARSettings, settingsModel } from '../../service/SettingsService';
 import { storageObjects } from '../../utilities/defaultdata';
 import { saveLocalStorage, getLocalSession } from '../../utilities/localstorage';
 
@@ -60,7 +60,7 @@ const LoginComponent = ({ history }) => {
           setSnackState({ severity: 'error', message: 'Authentication failed', show: true });
         });
 
-      // Need to validate settings about 1 second after login
+      // Need to validate settings about 1.5 seconds after login
       setTimeout(() => {
         getARSettings()
           .then(response => {
@@ -88,7 +88,7 @@ const LoginComponent = ({ history }) => {
             // console.log('LoginComponent: settings error...', error);
             // setSnackState({ severity: 'error', message: 'Authentication failed', show: true });
           });
-      }, 1000);
+      }, 1500);
     }
   };
 

@@ -12,7 +12,7 @@ import { storageObjects, localEnvironment, defaultStorage } from '../utilities/d
  * @returns Return a Promise
  */
 export const getJWT = async (username, password) => {
-  const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const loginURL = '/api/jwt/login';
   const response = await fetch(host + loginURL, {
     method: 'POST',
@@ -30,7 +30,7 @@ export const getJWT = async (username, password) => {
  * @param {string} token Token to be release
  */
 export const logout = async (flushUser, token) => {
-  const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const logoutURL = '/api/jwt/logout';
   const session = getLocalSession().data;
   const response = await fetch(host + logoutURL, {
@@ -93,7 +93,7 @@ export const hasJWTExpired = (jwtDate) => {
  */
 export const testJWT = async (jwt, user) => {
   const settings = getLocalSettings().data;
-  const host = 'https://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const query = `'submitter'="${user}"`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
   // const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + (

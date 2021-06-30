@@ -22,9 +22,13 @@ import Alert from '@material-ui/lab/Alert';
 
 import useStyles from './SettingsStyles';
 import { context } from '../../context/StoreProvider';
-import { putARSettings, postARSettings, getARSettings } from '../../service/DataService';
+import {
+  putARSettings,
+  postARSettings,
+  getARSettings,
+  settingsModel
+} from '../../service/SettingsService';
 import { themeList } from '../../service/ThemeService';
-import { settingsModel } from '../../service/DataService';
 import { getLocalSettings, saveLocalStorage } from '../../utilities/localstorage';
 import { storageObjects } from '../../utilities/defaultdata';
 import { modules } from '../../utilities/defaultdata';
