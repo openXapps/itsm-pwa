@@ -42,7 +42,7 @@ const App = () => {
           <Route path="/login" component={LoginComponent} />
           <Route path="/settings" component={SettingsComponent} />
           <Route path="/approval" exact component={ApprovalList} />
-          <Route path="/approval/crq/:id" component={ApprovalCRQ} />
+          <Route path="/approval/crq/:apid/:crqid" component={ApprovalCRQ} />
           <Route path="/approval/req/:id" component={ApprovalREQ} />
           <Route path="/asset" component={AssetList} />
           <Route component={Error404Component} />

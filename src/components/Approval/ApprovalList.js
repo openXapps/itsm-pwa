@@ -22,15 +22,15 @@ import Divider from '@material-ui/core/Divider';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { context } from '../../context/StoreProvider';
-import { getApprovals, approvalModel } from '../../service/ApprovalService';
+import { getApprovals } from '../../service/ApprovalService';
 import { getLocalSession } from '../../utilities/localstorage';
 import useStyles from './ApprovalStyles';
 
 const ApprovalList = ({ history }) => {
   const classes = useStyles();
-  const [state,] = useContext(context);
+  const [state, dispatch] = useContext(context);
   const [isLoading, setIsLoading] = useState(false);
-  const [approvals, setApprovals] = useState([approvalModel]);
+  const [approvals, setApprovals] = useState([]);
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Approvals fetched',
@@ -38,10 +38,10 @@ const ApprovalList = ({ history }) => {
   });
 
   useEffect(() => {
-    if (state.isAuth) handleReload();
+    handleReload();
     return () => true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.isAuth])
+  }, [])
 
   const handleReload = () => {
     // console.log('ApprovalList: state...', state);
@@ -54,10 +54,11 @@ const ApprovalList = ({ history }) => {
             response.json().then(data => {
               // console.log('ApprovalList: response false data...', data);
               throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-            }).catch(err => {
-              // console.log('ApprovalList: response false err...', err);
+            }).catch(error => {
+              // console.log('ApprovalList: response false error...', error);
               setIsLoading(false);
-              setSnackState({ severity: 'error', message: err.message, show: true });
+              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+              setSnackState({ severity: 'error', message: error.message, show: true });
             });
           } else {
             return response.json().then(data => {
@@ -77,15 +78,17 @@ const ApprovalList = ({ history }) => {
   const populateApprovals = (data) => {
     // console.log('populateApprovals: data', data);
     let _approvals = [];
+    let d = new Date();
     data.forEach(v => {
+      d = new Date(v.values['Create-Date-Sig']);
       _approvals.push({
-        ...approvalModel,
         requester: v.values['Requester'],
         application: v.values['Application'],
         signatureId: v.values['Signature ID'],
         sourceNumber: v.values['14516'],
         description: v.values['14506'],
-        createDate: v.values['Create-Date-Sig'],
+        // createDate: v.values['Create-Date-Sig'],
+        createDate: `${d.getFullYear()}-${String(d.getMonth()).padStart(2, 0)}-${String(d.getDay()).padStart(2, 0)}`,
         avatar: getAvatar(v.values['Application']),
       });
     });
@@ -148,12 +151,12 @@ const ApprovalList = ({ history }) => {
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
-                        primary={v.requester}
+                        primary={v.createDate + ': ' + v.requester}
                         secondary={v.sourceNumber + ': ' + v.description}
                       /><ListItemSecondaryAction>
                         <IconButton
                           edge="end"
-                          data-id={v.signatureId + '#' + v.sourceNumber}
+                          data-id={v.signatureId + '/' + v.sourceNumber}
                           data-module={v.avatar}
                           onClick={handleApprovalDetailsButton}
                         ><MoreVertIcon /></IconButton>
