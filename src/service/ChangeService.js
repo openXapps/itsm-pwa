@@ -9,9 +9,12 @@ export const changeRequestModel = {
   status: '',
   coordinator: '',
   description: '',
+  notes: '',
   serviceCI: '',
   impact: '',
   risk: '',
+  scheduleStart: '',
+  scheduleEnd: '',
 };
 
 /**
@@ -22,7 +25,18 @@ export const changeRequestModel = {
 export const getChangeRequest = (changeId) => {
   const { jwt } = getLocalSession().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
-  const fields = 'Infrastructure Change ID,Change Request Status,ASCHG,Description,ServiceCI,Impact,Risk Level';
+  const fields = `
+    Infrastructure Change ID,
+    Change Request Status,
+    ASCHG,
+    Description,
+    ServiceCI,
+    Impact,
+    Risk Level,
+    Detailed Description,
+    Scheduled Start Date,
+    Scheduled End Date
+    `;
   const query = `'Infrastructure Change ID'="${changeId}"`;
   const url = '/api/arsys/v1/entry/CHG:Infrastructure Change/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {

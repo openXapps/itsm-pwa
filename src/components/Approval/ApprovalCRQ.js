@@ -5,13 +5,18 @@ import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-// import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
+import Divider from '@material-ui/core/Divider';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import { context } from '../../context/StoreProvider';
+import { userDate } from '../../utilities/datetime';
 import { getChangeRequest, changeRequestModel } from '../../service/ChangeService';
 
 const Field = (props) => {
@@ -83,18 +88,18 @@ const ApprovalCRQ = ({ history }) => {
 
   const populateChange = (data) => {
     // console.log('populateChange: data', data);
-    // let d = new Date();
-    // createDate: `${d.getFullYear()}-${String(d.getMonth()).padStart(2, 0)}-${String(d.getDay()).padStart(2, 0)}`,
-    // d = new Date(v.values['Create-Date-Sig']);
     setCrqData({
       ...changeRequestModel,
       changeId: data[0].values['Infrastructure Change ID'],
       status: data[0].values['Change Request Status'],
       coordinator: data[0].values['ASCHG'],
       description: data[0].values['Description'],
+      notes: data[0].values['Detailed Description'],
       serviceCI: data[0].values['ServiceCI'],
       impact: data[0].values['Impact'],
       risk: data[0].values['Risk Level'],
+      scheduleStart: userDate(data[0].values['Scheduled Start Date'], true),
+      scheduleEnd: userDate(data[0].values['Scheduled End Date'], true),
     });
   };
 
@@ -118,8 +123,21 @@ const ApprovalCRQ = ({ history }) => {
               <Grid item xs={12} sm={6}><Field label="Coordinator" value={crqData.coordinator} font="" /></Grid>
               <Grid item xs={12} sm={6}><Field label="Description" value={crqData.description} font="" /></Grid>
               <Grid item xs={12} sm={6}><Field label="Service CI" value={crqData.serviceCI} font="" /></Grid>
+              <Grid item xs={12}><Divider /></Grid>
               <Grid item xs={12} sm={6}><Field label="Impact" value={crqData.impact} font="" /></Grid>
               <Grid item xs={12} sm={6}><Field label="Risk Level" value={crqData.risk} font="" /></Grid>
+              <Grid item xs={12} sm={6}><Field label="Start Date" value={crqData.scheduleStart} font="" /></Grid>
+              <Grid item xs={12} sm={6}><Field label="End Date" value={crqData.scheduleEnd} font="" /></Grid>
+              <Grid item xs={12}>
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Change Notes</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography>{crqData.notes}</Typography>
+                  </AccordionDetails>
+                </Accordion>
+              </Grid>
             </Grid>
           </Box>
         ) : (

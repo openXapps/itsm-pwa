@@ -22,6 +22,7 @@ import Divider from '@material-ui/core/Divider';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { context } from '../../context/StoreProvider';
+import { userDate } from '../../utilities/datetime';
 import { getApprovals } from '../../service/ApprovalService';
 import { getLocalSession } from '../../utilities/localstorage';
 import useStyles from './ApprovalStyles';
@@ -78,9 +79,7 @@ const ApprovalList = ({ history }) => {
   const populateApprovals = (data) => {
     // console.log('populateApprovals: data', data);
     let _approvals = [];
-    let d = new Date();
     data.forEach(v => {
-      d = new Date(v.values['Create-Date-Sig']);
       _approvals.push({
         requester: v.values['Requester'],
         application: v.values['Application'],
@@ -88,7 +87,7 @@ const ApprovalList = ({ history }) => {
         sourceNumber: v.values['14516'],
         description: v.values['14506'],
         // createDate: v.values['Create-Date-Sig'],
-        createDate: `${d.getFullYear()}-${String(d.getMonth()).padStart(2, 0)}-${String(d.getDay()).padStart(2, 0)}`,
+        createDate: userDate(v.values['Create-Date-Sig'], true),
         avatar: getAvatar(v.values['Application']),
       });
     });
