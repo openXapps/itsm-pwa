@@ -12,6 +12,7 @@ initialUse();
 const data = {
   theme: getLocalSettings().data.theme,
   isAuth: hasValidJWT(),
+  showProgress: false,
 };
 
 export const context = React.createContext(data);

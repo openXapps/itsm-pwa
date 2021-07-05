@@ -16,7 +16,12 @@ const StoreReducer = (state, action) => {
       return {
         ...state,
         isAuth: action.payload,
-      }
+      };
+    case 'PROGRESS':
+      return {
+        ...state,
+        showProgress: action.payload,
+      };
     default:
       throw new Error(`Reducer action type not defined: ${action.type}`);
   }

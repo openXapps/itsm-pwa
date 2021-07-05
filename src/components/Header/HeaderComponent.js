@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Container from '@material-ui/core/Container';
+import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
@@ -11,6 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Hidden from '@material-ui/core/Hidden';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
@@ -82,6 +84,7 @@ const HeaderComponent = ({ history, location }) => {
             <Typography variant="h6" className={classes.title}
             >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v{application.version}</Hidden></span>
             </Typography>
+            {state.showProgress ? (<Box mr={1}><CircularProgress /></Box>) : null}
             {location.pathname === '/' ? (
               <div>
                 <IconButton

@@ -30,7 +30,7 @@ import useStyles from './ApprovalStyles';
 const ApprovalList = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [approvals, setApprovals] = useState([]);
   const [snackState, setSnackState] = useState({
     severity: 'success',
@@ -47,30 +47,35 @@ const ApprovalList = ({ history }) => {
   const handleReload = () => {
     // console.log('ApprovalList: state...', state);
     if (state.isAuth) {
-      setIsLoading(true);
-      getApprovals(getLocalSession().data.user)
-        .then(response => {
-          // console.log('ApprovalList: response...', response.json());
-          if (!response.ok) {
-            response.json().then(data => {
-              // console.log('ApprovalList: response false data...', data);
-              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-            }).catch(error => {
-              // console.log('ApprovalList: response false error...', error);
-              setIsLoading(false);
-              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-              setSnackState({ severity: 'error', message: error.message, show: true });
-            });
-          } else {
-            return response.json().then(data => {
-              // console.log('ApprovalList: approvals...', data);
-              setIsLoading(false);
-              populateApprovals(data.entries);
-              // setApprovals(data.entries);
-              setSnackState({ severity: 'success', message: 'Approvals fetched', show: true });
-            });
-          }
-        });
+      // setIsLoading(true);
+      dispatch({ type: 'PROGRESS', payload: true });
+      setTimeout(() => {
+        getApprovals(getLocalSession().data.user)
+          .then(response => {
+            // console.log('ApprovalList: response...', response.json());
+            if (!response.ok) {
+              response.json().then(data => {
+                // console.log('ApprovalList: response false data...', data);
+                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+              }).catch(error => {
+                // console.log('ApprovalList: response false error...', error);
+                // setIsLoading(false);
+                dispatch({ type: 'PROGRESS', payload: false });
+                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+                setSnackState({ severity: 'error', message: error.message, show: true });
+              });
+            } else {
+              return response.json().then(data => {
+                // console.log('ApprovalList: approvals...', data);
+                // setIsLoading(false);
+                dispatch({ type: 'PROGRESS', payload: false });
+                populateApprovals(data.entries);
+                // setApprovals(data.entries);
+                setSnackState({ severity: 'success', message: 'Approvals fetched', show: true });
+              });
+            }
+          });
+      }, 1000);
     } else {
       setSnackState({ severity: 'info', message: 'Please login first', show: true });
     }
@@ -138,40 +143,38 @@ const ApprovalList = ({ history }) => {
       </Box>
       <Box width="100%" mt={3}>
         <List disablePadding>
-          {!isLoading ? (
-            approvals.length > 0 ? (
-              approvals.map((v, i) => {
-                return (
-                  <div key={i}>
-                    <ListItem disableGutters>
-                      <ListItemAvatar>
-                        <Avatar className={clsx(classes['avatar' + v.avatar])}>
-                          <Typography style={{ fontSize: 14 }}>{v.avatar}</Typography>
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={v.createDate + ': ' + v.requester}
-                        secondary={v.sourceNumber + ': ' + v.description}
-                      /><ListItemSecondaryAction>
-                        <IconButton
-                          edge="end"
-                          data-id={v.signatureId + '/' + v.sourceNumber}
-                          data-module={v.avatar}
-                          onClick={handleApprovalDetailsButton}
-                        ><MoreVertIcon /></IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <Divider />
-                  </div>
-                );
-              })
-            ) : (
+          {approvals.length > 0 ? (
+            approvals.map((v, i) => {
+              return (
+                <div key={i}>
+                  <ListItem disableGutters>
+                    <ListItemAvatar>
+                      <Avatar className={clsx(classes['avatar' + v.avatar])}>
+                        <Typography style={{ fontSize: 14 }}>{v.avatar}</Typography>
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={v.createDate + ': ' + v.requester}
+                      secondary={v.sourceNumber + ': ' + v.description}
+                    /><ListItemSecondaryAction>
+                      <IconButton
+                        edge="end"
+                        data-id={v.signatureId + '/' + v.sourceNumber}
+                        data-module={v.avatar}
+                        onClick={handleApprovalDetailsButton}
+                      ><MoreVertIcon /></IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <Divider />
+                </div>
+              );
+            })
+          ) : (
+            state.showProgress ? null : (
               <Box mt={3}>
                 <Typography variant="h6">No approvals found. Click Reload to get approvals.</Typography>
               </Box>
             )
-          ) : (
-            <Box>Loading...</Box>
           )}
         </List>
       </Box>

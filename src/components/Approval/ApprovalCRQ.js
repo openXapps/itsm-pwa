@@ -37,14 +37,17 @@ const Field = (props) => {
 
 const ApprovalCRQ = ({ history }) => {
   const [state, dispatch] = useContext(context);
-  const { apid, crqid } = useParams();
-  const [isLoading, setIsLoading] = useState(false);
-  // const [approvalData, setApprovalData] = useState({});
+  const { 
+    // apid, 
+    crqid } = useParams();
+  // const [isLoading, setIsLoading] = useState(false);
+  const [assessed, setAssessed] = useState(false);
   const [crqData, setCrqData] = useState(changeRequestModel);
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Login successful',
-    show: false
+    show: false,
+    duration: 4000,
   });
 
   // console.log('ApprovalCRQ: params.....', apid, crqid);
@@ -58,31 +61,38 @@ const ApprovalCRQ = ({ history }) => {
   const handleDataLoad = () => {
     // // console.log('ApprovalCRQ: state...', state);
     if (state.isAuth) {
-      setIsLoading(true);
-      getChangeRequest(crqid)
-        .then(response => {
-          // console.log('ApprovalCRQ: response...', response.json());
-          if (!response.ok) {
-            response.json().then(data => {
-              // console.log('ApprovalCRQ: response false data...', data);
-              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-            }).catch(error => {
-              // console.log('ApprovalCRQ: response false error...', error);
-              setIsLoading(false);
-              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-              setSnackState({ severity: 'error', message: error.message, show: true });
-            });
-          } else {
-            return response.json().then(data => {
-              // console.log('ApprovalCRQ: approvals...', data);
-              setIsLoading(false);
-              if (data.entries.length === 1) populateChange(data.entries);
-              setSnackState({ severity: 'success', message: 'Change details fetched', show: true });
-            });
-          }
-        });
+      // setIsLoading(true);
+      dispatch({ type: 'PROGRESS', payload: true });
+      setTimeout(() => {
+        getChangeRequest(crqid)
+          .then(response => {
+            // console.log('ApprovalCRQ: response...', response.json());
+            if (!response.ok) {
+              response.json().then(data => {
+                // console.log('ApprovalCRQ: response false data...', data);
+                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+              }).catch(error => {
+                // console.log('ApprovalCRQ: response false error...', error);
+                // setIsLoading(false);
+                dispatch({ type: 'PROGRESS', payload: false });
+                setAssessed(true);
+                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+                setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
+              });
+            } else {
+              return response.json().then(data => {
+                // console.log('ApprovalCRQ: approvals...', data);
+                // setIsLoading(false);
+                dispatch({ type: 'PROGRESS', payload: false });
+                if (data.entries.length === 1) populateChange(data.entries);
+                setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
+              });
+            }
+          });
+      }, 1000);
     } else {
-      setSnackState({ severity: 'info', message: 'Please login first', show: true });
+      setAssessed(true);
+      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
     }
   }
 
@@ -96,11 +106,22 @@ const ApprovalCRQ = ({ history }) => {
       description: data[0].values['Description'],
       notes: data[0].values['Detailed Description'],
       serviceCI: data[0].values['ServiceCI'],
+      reason: data[0].values['Reason For Change'],
       impact: data[0].values['Impact'],
       risk: data[0].values['Risk Level'],
       scheduleStart: userDate(data[0].values['Scheduled Start Date'], true),
       scheduleEnd: userDate(data[0].values['Scheduled End Date'], true),
     });
+  };
+
+  const handleApproveButton = () => {
+    setAssessed(true);
+    setSnackState({ severity: 'info', message: 'Change was approved', show: true });
+  };
+
+  const handleRejectButton = () => {
+    setAssessed(true);
+    setSnackState({ severity: 'info', message: 'Change was rejected', show: true });
   };
 
   const handleSnackState = () => {
@@ -113,7 +134,7 @@ const ApprovalCRQ = ({ history }) => {
         <Typography variant="h6">Change Request Approval</Typography>
       </Box>
       <Paper elevation={0}>
-        {!isLoading ? (
+        {state.showProgress ? null : (
           <Box p={3}>
             <Field label="Change Request Details" font="h6" />
             <Box mt={3} />
@@ -123,6 +144,7 @@ const ApprovalCRQ = ({ history }) => {
               <Grid item xs={12} sm={6}><Field label="Coordinator" value={crqData.coordinator} font="" /></Grid>
               <Grid item xs={12} sm={6}><Field label="Description" value={crqData.description} font="" /></Grid>
               <Grid item xs={12} sm={6}><Field label="Service CI" value={crqData.serviceCI} font="" /></Grid>
+              <Grid item xs={12} sm={6}><Field label="Change Reason" value={crqData.reason} font="" /></Grid>
               <Grid item xs={12}><Divider /></Grid>
               <Grid item xs={12} sm={6}><Field label="Impact" value={crqData.impact} font="" /></Grid>
               <Grid item xs={12} sm={6}><Field label="Risk Level" value={crqData.risk} font="" /></Grid>
@@ -130,18 +152,20 @@ const ApprovalCRQ = ({ history }) => {
               <Grid item xs={12} sm={6}><Field label="End Date" value={crqData.scheduleEnd} font="" /></Grid>
               <Grid item xs={12}>
                 <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Change Notes</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography>{crqData.notes}</Typography>
-                  </AccordionDetails>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography>Change Notes</Typography></AccordionSummary>
+                  <AccordionDetails><Typography color="primary">{crqData.notes}</Typography></AccordionDetails>
+                </Accordion>
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography>Work Info</Typography></AccordionSummary>
+                  <AccordionDetails><Typography color="primary">Here goes the Work Information</Typography></AccordionDetails>
+                </Accordion>
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography>Impacted Areas</Typography></AccordionSummary>
+                  <AccordionDetails><Typography color="primary">Here goes the Impacted Areas</Typography></AccordionDetails>
                 </Accordion>
               </Grid>
             </Grid>
           </Box>
-        ) : (
-          <Typography>Loading...</Typography>
         )}
       </Paper>
       <Box my={2} />
@@ -149,14 +173,18 @@ const ApprovalCRQ = ({ history }) => {
         <Grid item xs={12} sm={4}>
           <Button
             variant="outlined"
+            onClick={handleApproveButton}
             fullWidth
+            disabled={assessed}
           >Approve</Button>
         </Grid>
         <Grid item xs={12} sm={4}>
           <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 1, sm: 0 }}>
             <Button
               variant="outlined"
+              onClick={handleRejectButton}
               fullWidth
+              disabled={assessed}
             >Reject</Button></Box>
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -171,7 +199,7 @@ const ApprovalCRQ = ({ history }) => {
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}
-        autoHideDuration={4000}
+        autoHideDuration={snackState.duration || 4000}
         onClose={handleSnackState}
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}
       >{snackState.message}</Alert></Snackbar>
