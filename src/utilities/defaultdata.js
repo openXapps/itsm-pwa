@@ -4,7 +4,7 @@ import { settingsModel } from '../service/SettingsService';
  * Application meta data
  */
 export const application = {
-  version: '0.1.0',
+  version: 'beta.1',
 };
 
 /**
