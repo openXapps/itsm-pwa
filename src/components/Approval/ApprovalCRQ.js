@@ -14,10 +14,22 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
-import { getChangeRequest, changeRequestModel } from '../../service/ChangeService';
+import {
+  getChangeRequest,
+  changeRequestModel,
+  getChangeWorkInfo,
+  changeWorkInfoModel,
+} from '../../service/ChangeService';
+import useStyles from './ApprovalStyles';
 
 const Field = (props) => {
   const { label, value, font } = props;
@@ -36,13 +48,15 @@ const Field = (props) => {
 };
 
 const ApprovalCRQ = ({ history }) => {
+  const classes = useStyles();
   const [state, dispatch] = useContext(context);
-  const { 
+  const {
     // apid, 
     crqid } = useParams();
   // const [isLoading, setIsLoading] = useState(false);
   const [assessed, setAssessed] = useState(false);
   const [crqData, setCrqData] = useState(changeRequestModel);
+  const [crqWorkInfo, setCrqWorkInfo] = useState(changeWorkInfoModel);
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Login successful',
@@ -69,10 +83,10 @@ const ApprovalCRQ = ({ history }) => {
             // console.log('ApprovalCRQ: response...', response.json());
             if (!response.ok) {
               response.json().then(data => {
-                // console.log('ApprovalCRQ: response false data...', data);
+                // console.log('getChangeRequest: response false data...', data);
                 throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
               }).catch(error => {
-                // console.log('ApprovalCRQ: response false error...', error);
+                // console.log('getChangeRequest: response false error...', error);
                 // setIsLoading(false);
                 dispatch({ type: 'PROGRESS', payload: false });
                 setAssessed(true);
@@ -81,10 +95,35 @@ const ApprovalCRQ = ({ history }) => {
               });
             } else {
               return response.json().then(data => {
-                // console.log('ApprovalCRQ: approvals...', data);
+                // console.log('getChangeRequest: data...', data);
                 // setIsLoading(false);
                 dispatch({ type: 'PROGRESS', payload: false });
                 if (data.entries.length === 1) populateChange(data.entries);
+                setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
+              });
+            }
+          });
+        getChangeWorkInfo(crqid)
+          .then(response => {
+            // console.log('getChangeWorkInfo: response...', response.json());
+            if (!response.ok) {
+              response.json().then(data => {
+                // console.log('getChangeWorkInfo: response false data...', data);
+                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+              }).catch(error => {
+                // console.log('getChangeWorkInfo: response false error...', error);
+                // setIsLoading(false);
+                dispatch({ type: 'PROGRESS', payload: false });
+                setAssessed(true);
+                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+                setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
+              });
+            } else {
+              return response.json().then(data => {
+                // console.log('getChangeWorkInfo: data...', data);
+                // setIsLoading(false);
+                dispatch({ type: 'PROGRESS', payload: false });
+                if (data.entries.length > 0) populateWorkInfo(data.entries);
                 setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
               });
             }
@@ -112,6 +151,21 @@ const ApprovalCRQ = ({ history }) => {
       scheduleStart: userDate(data[0].values['Scheduled Start Date'], true),
       scheduleEnd: userDate(data[0].values['Scheduled End Date'], true),
     });
+  };
+
+  const populateWorkInfo = (data) => {
+    // console.log('populateWorkInfo: data', data);
+    let list = [];
+    data.map(v => {
+      list.push({
+        workLogType: v.values['Work Log Type'],
+        detailedDescription: v.values['Detailed Description'],
+        workLogSubmitter: v.values['Work Log Submitter'],
+        workLogSubmitDate: userDate(v.values['Work Log Submit Date'], true),
+      });
+      return true;
+    });
+    setCrqWorkInfo(list);
   };
 
   const handleApproveButton = () => {
@@ -157,7 +211,30 @@ const ApprovalCRQ = ({ history }) => {
                 </Accordion>
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography>Work Info</Typography></AccordionSummary>
-                  <AccordionDetails><Typography color="primary">Here goes the Work Information</Typography></AccordionDetails>
+                  <AccordionDetails>
+                    <TableContainer component={Paper}>
+                      <Table aria-label="simple table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Type</TableCell>
+                            <TableCell>Description</TableCell>
+                            <TableCell>Submitter</TableCell>
+                            <TableCell>Date</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {crqWorkInfo.map((v, i) => (
+                            <TableRow  key={i}>
+                              <TableCell className={classes.tableCell}>{v.workLogType}</TableCell>
+                              <TableCell>{v.detailedDescription}</TableCell>
+                              <TableCell>{v.workLogSubmitter}</TableCell>
+                              <TableCell>{v.workLogSubmitDate}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </AccordionDetails>
                 </Accordion>
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography>Impacted Areas</Typography></AccordionSummary>

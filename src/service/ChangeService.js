@@ -51,6 +51,16 @@ export const getChangeRequest = (changeId) => {
 };
 
 /**
+ * Change work info model
+ */
+ export const changeWorkInfoModel = [{
+  workLogType: '',
+  detailedDescription: '',
+  workLogSubmitter: '',
+  workLogSubmitDate: '',
+}];
+
+/**
  * Helper function to fetch a change work info
  * @param {string} changeId Change request number to search
  * @returns Promise of a change work info
@@ -59,20 +69,13 @@ export const getChangeRequest = (changeId) => {
   const { jwt } = getLocalSession().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
-    Infrastructure Change ID,
-    Change Request Status,
-    ASCHG,
-    Description,
-    ServiceCI,
-    Reason For Change,
-    Impact,
-    Risk Level,
+    Work Log Type,
     Detailed Description,
-    Scheduled Start Date,
-    Scheduled End Date
+    Work Log Submitter,
+    Work Log Submit Date
     `;
   const query = `'Infrastructure Change ID'="${changeId}"`;
-  const url = '/api/arsys/v1/entry/CHG:Infrastructure Change/?q=(' + query + ')&fields=values(' + fields + ')';
+  const url = '/api/arsys/v1/entry/CHG:WorkLog/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',
     headers: { 'Authorization': 'AR-JWT ' + jwt },
