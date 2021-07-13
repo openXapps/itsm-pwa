@@ -29,7 +29,7 @@ import {
   getChangeWorkInfo,
   changeWorkInfoModel,
 } from '../../service/ChangeService';
-import useStyles from './ApprovalStyles';
+// import useStyles from './ApprovalStyles';
 
 const Field = (props) => {
   const { label, value, font } = props;
@@ -48,7 +48,7 @@ const Field = (props) => {
 };
 
 const ApprovalCRQ = ({ history }) => {
-  const classes = useStyles();
+  // const classes = useStyles();
   const [state, dispatch] = useContext(context);
   const {
     // apid, 
@@ -212,7 +212,7 @@ const ApprovalCRQ = ({ history }) => {
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography>Work Info</Typography></AccordionSummary>
                   <AccordionDetails>
-                    <TableContainer component={Paper}>
+                    <TableContainer>
                       <Table aria-label="simple table">
                         <TableHead>
                           <TableRow>
@@ -224,8 +224,8 @@ const ApprovalCRQ = ({ history }) => {
                         </TableHead>
                         <TableBody>
                           {crqWorkInfo.map((v, i) => (
-                            <TableRow  key={i}>
-                              <TableCell className={classes.tableCell}>{v.workLogType}</TableCell>
+                            <TableRow key={i}>
+                              <TableCell>{v.workLogType}</TableCell>
                               <TableCell>{v.detailedDescription}</TableCell>
                               <TableCell>{v.workLogSubmitter}</TableCell>
                               <TableCell>{v.workLogSubmitDate}</TableCell>

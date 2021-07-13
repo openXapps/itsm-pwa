@@ -14,9 +14,6 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.warning.light,
     backgroundColor: theme.palette.success.dark,
   },
-  tableCell: {
-    color: theme.palette.primary.main,
-  }
 }));
 
 export default useStyles;

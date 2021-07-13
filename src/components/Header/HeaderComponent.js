@@ -33,7 +33,8 @@ const HeaderComponent = ({ history, location }) => {
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Logout successful',
-    show: false
+    show: false,
+    duration: 4000,
   });
 
   useEffect(() => {
@@ -116,7 +117,7 @@ const HeaderComponent = ({ history, location }) => {
                   )}
                   <MenuItem onClick={handleMenuClose} disabled={!state.isAuth}>{userName}</MenuItem>
                 </Menu>
-                <IconButton className={classes.menuButton} onClick={handleSettingsButton}>
+                <IconButton className={classes.menuButton} onClick={handleSettingsButton} disabled={!state.isAuth}>
                   <SettingsIcon />
                 </IconButton>
               </div>
@@ -127,7 +128,7 @@ const HeaderComponent = ({ history, location }) => {
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}
-        autoHideDuration={4000}
+        autoHideDuration={snackState.duration || 4000}
         onClose={handleSnackState}
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}
       >{snackState.message}</Alert></Snackbar>
