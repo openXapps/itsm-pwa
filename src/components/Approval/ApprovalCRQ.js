@@ -20,6 +20,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import { withStyles } from '@material-ui/core/styles';
 
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
@@ -28,6 +29,8 @@ import {
   changeRequestModel,
   getChangeWorkInfo,
   changeWorkInfoModel,
+  changeImpactedAreasModel,
+  getChangeImpactedAreas,
 } from '../../service/ChangeService';
 // import useStyles from './ApprovalStyles';
 
@@ -47,6 +50,12 @@ const Field = (props) => {
   );
 };
 
+const StyledTableCell = withStyles((theme) => ({
+  body: {
+    color: theme.palette.primary.main,
+  },
+}))(TableCell);
+
 const ApprovalCRQ = ({ history }) => {
   // const classes = useStyles();
   const [state, dispatch] = useContext(context);
@@ -57,6 +66,7 @@ const ApprovalCRQ = ({ history }) => {
   const [assessed, setAssessed] = useState(false);
   const [crqData, setCrqData] = useState(changeRequestModel);
   const [crqWorkInfo, setCrqWorkInfo] = useState(changeWorkInfoModel);
+  const [crqImpactedAreas, setCrqImpactedAreas] = useState(changeImpactedAreasModel);
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'Login successful',
@@ -113,10 +123,10 @@ const ApprovalCRQ = ({ history }) => {
               }).catch(error => {
                 // console.log('getChangeWorkInfo: response false error...', error);
                 // setIsLoading(false);
-                dispatch({ type: 'PROGRESS', payload: false });
+                // dispatch({ type: 'PROGRESS', payload: false });
                 setAssessed(true);
                 if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-                setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
+                // setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
               });
             } else {
               return response.json().then(data => {
@@ -124,7 +134,32 @@ const ApprovalCRQ = ({ history }) => {
                 // setIsLoading(false);
                 dispatch({ type: 'PROGRESS', payload: false });
                 if (data.entries.length > 0) populateWorkInfo(data.entries);
-                setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
+                // setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
+              });
+            }
+          });
+        getChangeImpactedAreas(crqid)
+          .then(response => {
+            // console.log('getChangeImpactedAreas: response...', response.json());
+            if (!response.ok) {
+              response.json().then(data => {
+                // console.log('getChangeImpactedAreas: response false data...', data);
+                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+              }).catch(error => {
+                // console.log('getChangeImpactedAreas: response false error...', error);
+                // setIsLoading(false);
+                // dispatch({ type: 'PROGRESS', payload: false });
+                setAssessed(true);
+                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+                // setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
+              });
+            } else {
+              return response.json().then(data => {
+                // console.log('getChangeImpactedAreas: data...', data);
+                // setIsLoading(false);
+                // dispatch({ type: 'PROGRESS', payload: false });
+                if (data.entries.length > 0) populateImpactedAreas(data.entries);
+                // setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
               });
             }
           });
@@ -168,6 +203,18 @@ const ApprovalCRQ = ({ history }) => {
     setCrqWorkInfo(list);
   };
 
+  const populateImpactedAreas = (data) => {
+    // console.log('populateImpactedAreas: data', data);
+    let list = [];
+    data.map(v => {
+      list.push({
+        company: v.values['Company'],
+      });
+      return true;
+    });
+    setCrqImpactedAreas(list);
+  };
+
   const handleApproveButton = () => {
     setAssessed(true);
     setSnackState({ severity: 'info', message: 'Change was approved', show: true });
@@ -181,6 +228,7 @@ const ApprovalCRQ = ({ history }) => {
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
   };
+
 
   return (
     <Container maxWidth="md">
@@ -213,7 +261,7 @@ const ApprovalCRQ = ({ history }) => {
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography>Work Info</Typography></AccordionSummary>
                   <AccordionDetails>
                     <TableContainer>
-                      <Table aria-label="simple table">
+                      <Table size="small" aria-label="simple table">
                         <TableHead>
                           <TableRow>
                             <TableCell>Type</TableCell>
@@ -225,10 +273,10 @@ const ApprovalCRQ = ({ history }) => {
                         <TableBody>
                           {crqWorkInfo.map((v, i) => (
                             <TableRow key={i}>
-                              <TableCell>{v.workLogType}</TableCell>
-                              <TableCell>{v.detailedDescription}</TableCell>
-                              <TableCell>{v.workLogSubmitter}</TableCell>
-                              <TableCell>{v.workLogSubmitDate}</TableCell>
+                              <StyledTableCell>{v.workLogType}</StyledTableCell>
+                              <StyledTableCell>{v.detailedDescription}</StyledTableCell>
+                              <StyledTableCell>{v.workLogSubmitter}</StyledTableCell>
+                              <StyledTableCell>{v.workLogSubmitDate}</StyledTableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -238,7 +286,24 @@ const ApprovalCRQ = ({ history }) => {
                 </Accordion>
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography>Impacted Areas</Typography></AccordionSummary>
-                  <AccordionDetails><Typography color="primary">Here goes the Impacted Areas</Typography></AccordionDetails>
+                  <AccordionDetails>
+                    <TableContainer>
+                      <Table size="small" aria-label="simple table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Company</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {crqImpactedAreas.map((v, i) => (
+                            <TableRow key={i}>
+                              <StyledTableCell>{v.company}</StyledTableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </AccordionDetails>
                 </Accordion>
               </Grid>
             </Grid>
