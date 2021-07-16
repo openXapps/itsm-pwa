@@ -46,8 +46,6 @@ export const getChangeRequest = (changeId) => {
     headers: { 'Authorization': 'AR-JWT ' + jwt },
     mode: 'cors',
   });
-  // console.log('getChangeRequest: response...', response);
-  // return response;
 };
 
 /**
@@ -81,8 +79,6 @@ export const getChangeRequest = (changeId) => {
     headers: { 'Authorization': 'AR-JWT ' + jwt },
     mode: 'cors',
   });
-  // console.log('getChangeWorkInfo: response...', response);
-  // return response;
 };
 
 /**
@@ -110,6 +106,34 @@ export const getChangeRequest = (changeId) => {
     headers: { 'Authorization': 'AR-JWT ' + jwt },
     mode: 'cors',
   });
-  // console.log('getChangeImpactedAreas: response...', response);
-  // return response;
+};
+
+/**
+ * Change associations model
+ */
+ export const changeAssociationsModel = [{
+  requestType: '',
+  requestDescription: '',
+}];
+
+/**
+ * Helper function to fetch a change associations
+ * @param {string} changeId Change request number to search
+ * @returns Promise of a change associations
+ */
+ export const getChangeAssociations = (changeId) => {
+  const { jwt } = getLocalSession().data;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const fields = `
+    Request Type01,
+    Request Description01
+    `;
+  // ((('Request ID02' = $Infrastructure Change ID$) OR ('Parent Request ID' = $Infrastructure Change ID$)) AND ('Request Type01' = $z1D_RequestTypeTblValue$) AND ($z1D_RequestTypeTblValue$ != $NULL$) AND ($z1D_RequestTypeTblValue$ != "ALL")) OR ((('Request ID02' = $Infrastructure Change ID$) OR ('Parent Request ID' = $Infrastructure Change ID$)) AND (($z1D_RequestTypeTblValue$ = $NULL$) OR ($z1D_RequestTypeTblValue$ = "ALL")))
+  const query = `'Request ID02'="${changeId}"`;
+  const url = '/api/arsys/v1/entry/CHG:Associations/?q=(' + query + ')&fields=values(' + fields + ')';
+  return fetch(host + url, {
+    method: 'GET',
+    headers: { 'Authorization': 'AR-JWT ' + jwt },
+    mode: 'cors',
+  });
 };
