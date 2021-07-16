@@ -249,9 +249,9 @@ const ApprovalCRQ = ({ history }) => {
       </Box>
       <Paper elevation={0}>
         {state.showProgress ? null : (
-          <Box p={3}>
+          <Box p={{ xs: 1, md: 3 }}>
             <Field label="Change Request Details" font="h6" />
-            <Box mt={3} />
+            <Box mt={{ xs: 1, md: 3 }} />
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}><Field label="Change Number" value={crqData.changeId} font="" /></Grid>
               <Grid item xs={12} sm={6}><Field label="Status" value={crqData.status} font="" /></Grid>

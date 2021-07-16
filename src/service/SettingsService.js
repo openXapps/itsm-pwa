@@ -26,14 +26,14 @@ export const settingsModel = {
  * @returns Promise of new entry
  */
 export const postARSettings = (data) => {
-  const session = getLocalSession().data;
+  const { jwt } = getLocalSession().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = 'requestId';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings?fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'POST',
     headers: {
-      'Authorization': 'AR-JWT ' + session.jwt,
+      'Authorization': 'AR-JWT ' + jwt,
       'Content-Type': 'application/json',
     },
     mode: 'cors',
@@ -47,13 +47,13 @@ export const postARSettings = (data) => {
  * @returns Promise of updated entry
  */
 export const putARSettings = (requestId, data) => {
-  const session = getLocalSession().data;
+  const { jwt } = getLocalSession().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + requestId;
   return fetch(host + url, {
     method: 'PUT',
     headers: {
-      'Authorization': 'AR-JWT ' + session.jwt,
+      'Authorization': 'AR-JWT ' + jwt,
       'Content-Type': 'application/json',
     },
     mode: 'cors',
