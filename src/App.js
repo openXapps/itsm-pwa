@@ -43,7 +43,7 @@ const App = () => {
           <Route path="/settings" component={SettingsComponent} />
           <Route path="/approval" exact component={ApprovalList} />
           <Route path="/approval/crq/:apid/:crqid" component={ApprovalCRQ} />
-          <Route path="/approval/req/:id" component={ApprovalREQ} />
+          <Route path="/approval/req/:apid/:reqid" component={ApprovalREQ} />
           <Route path="/asset" component={AssetList} />
           <Route component={Error404Component} />
         </Switch>
