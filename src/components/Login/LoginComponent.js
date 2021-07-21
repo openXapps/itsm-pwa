@@ -49,7 +49,6 @@ const LoginComponent = ({ history }) => {
             jwt: token,
             jwtDate: new Date(),
           });
-
           setLockLoginButton(true);
           dispatch({ type: 'AUTH', payload: true });
           setSnackState({ severity: 'success', message: 'Authentication successful', show: true });
@@ -80,6 +79,7 @@ const LoginComponent = ({ history }) => {
                 assets: data.entries[0].values.showAsset === 'true' ? true : false,
                 people: data.entries[0].values.showPeople === 'true' ? true : false,
               });
+              if (state.theme !== data.entries[0].values.theme) dispatch({ type: 'THEME', payload: data.entries[0].values.theme });
             } else {
               saveLocalStorage(storageObjects.settings, settingsModel);
               if (state.theme !== settingsModel.theme) dispatch({ type: 'THEME', payload: settingsModel.theme });

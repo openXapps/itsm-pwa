@@ -27,7 +27,7 @@ const HeaderComponent = ({ history, location }) => {
   const [state, dispatch] = useContext(context);
   const classes = useStyles();
   const user = getLocalSession().data.user;
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState('NO USER');
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
   const [snackState, setSnackState] = useState({
