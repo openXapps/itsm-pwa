@@ -14,28 +14,21 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import { Toolbar } from '@material-ui/core';
 
 import { context } from '../../context/StoreProvider';
 import {
   getServiceRequest,
   serviceRequestModel,
 } from '../../service/RequestService';
-
-const Field = (props) => {
-  const { label, value, font } = props;
-  return (
-    <Grid container spacing={1}>
-      <Grid item xs={value ? 4 : 12}>
-        <Typography variant={font || 'body1'}>{label}</Typography>
-      </Grid>
-      {value ? (
-        <Grid item xs={8}>
-          <Typography color="primary">{value}</Typography>
-        </Grid>
-      ) : null}
-    </Grid>
-  );
-};
+import StyledField from '../Shared/StyledField';
+import StyledTableCell from '../Shared/StyledTableCell';
 
 const ApprovalREQ = ({ history }) => {
   const [state, dispatch] = useContext(context);
@@ -78,14 +71,14 @@ const ApprovalREQ = ({ history }) => {
               });
             } else {
               return response.json().then(data => {
-                console.log('getServiceRequest: data...', data);
+                // console.log('getServiceRequest: data...', data);
                 dispatch({ type: 'PROGRESS', payload: false });
                 if (data.entries.length === 1) populateRequest(data.entries);
-                setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
+                setSnackState({ severity: 'success', message: 'Request details fetched', show: true, duration: 1000 });
               });
             }
           });
-      }, 1000);
+      }, 500);
     } else {
       setAssessed(true);
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
@@ -94,11 +87,12 @@ const ApprovalREQ = ({ history }) => {
 
   const populateRequest = (data) => {
     // console.log('populateRequest: data', data);
+    // let details = String(data[0].values['SR Type Field 1']).split('\n');
     setReqData({
       ...serviceRequestModel,
       requestId: data[0].values['Request Number'],
       summary: data[0].values['Summary'],
-      details: data[0].values['SR Type Field 1'],
+      details: String(data[0].values['SR Type Field 1']).split('\n'),
     });
   };
 
@@ -124,15 +118,36 @@ const ApprovalREQ = ({ history }) => {
       <Paper elevation={0}>
         {state.showProgress ? null : (
           <Box p={{ xs: 1, md: 3 }}>
-            <Field label="Service Request Details" font="h6" />
+            <StyledField label="Service Request Details" font="h6" />
             <Box mt={{ xs: 1, md: 3 }} />
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}><Field label="Request Number" value={reqData.requestId} font="" /></Grid>
-              <Grid item xs={12} sm={6}><Field label="Summary" value={reqData.summary} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Request Number" value={reqData.requestId} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Summary" value={reqData.summary} font="" /></Grid>
               <Grid item xs={12}>
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Request Content</Typography></AccordionSummary>
-                  <AccordionDetails><Typography color="primary">{reqData.details}</Typography></AccordionDetails>
+                  <AccordionDetails>
+                    <TableContainer>
+                      <Table size="small" aria-label="change request work info">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Questions</TableCell>
+                            <TableCell>Answers</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {reqData.details.map((v, i) => (
+                            v ? (
+                              <TableRow key={i}>
+                                <TableCell>{v.slice(0, v.indexOf(':'))}</TableCell>
+                                <StyledTableCell>{v.slice(v.indexOf(':') + 1)}</StyledTableCell>
+                              </TableRow>
+                            ) : (null)
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </AccordionDetails>
                 </Accordion>
               </Grid>
             </Grid>
@@ -167,6 +182,7 @@ const ApprovalREQ = ({ history }) => {
             >Back</Button></Box>
         </Grid>
       </Grid>
+      <Toolbar />
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}

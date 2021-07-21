@@ -20,7 +20,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { withStyles } from '@material-ui/core/styles';
+import { Toolbar } from '@material-ui/core';
 
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
@@ -34,28 +34,8 @@ import {
   getChangeAssociations,
   changeAssociationsModel,
 } from '../../service/ChangeService';
-
-const Field = (props) => {
-  const { label, value, font } = props;
-  return (
-    <Grid container spacing={1}>
-      <Grid item xs={value ? 4 : 12}>
-        <Typography variant={font || 'body1'}>{label}</Typography>
-      </Grid>
-      {value ? (
-        <Grid item xs={8}>
-          <Typography color="primary">{value}</Typography>
-        </Grid>
-      ) : null}
-    </Grid>
-  );
-};
-
-const StyledTableCell = withStyles((theme) => ({
-  body: {
-    color: theme.palette.primary.main,
-  },
-}))(TableCell);
+import StyledField from '../Shared/StyledField';
+import StyledTableCell from '../Shared/StyledTableCell';
 
 const ApprovalCRQ = ({ history }) => {
   const [state, dispatch] = useContext(context);
@@ -163,7 +143,7 @@ const ApprovalCRQ = ({ history }) => {
               });
             }
           });
-      }, 1000);
+      }, 500);
     } else {
       setAssessed(true);
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
@@ -250,20 +230,20 @@ const ApprovalCRQ = ({ history }) => {
       <Paper elevation={0}>
         {state.showProgress ? null : (
           <Box p={{ xs: 1, md: 3 }}>
-            <Field label="Change Request Details" font="h6" />
+            <StyledField label="Change Request Details" font="h6" />
             <Box mt={{ xs: 1, md: 3 }} />
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}><Field label="Change Number" value={crqData.changeId} font="" /></Grid>
-              <Grid item xs={12} sm={6}><Field label="Status" value={crqData.status} font="" /></Grid>
-              <Grid item xs={12} sm={6}><Field label="Coordinator" value={crqData.coordinator} font="" /></Grid>
-              <Grid item xs={12} sm={6}><Field label="Description" value={crqData.description} font="" /></Grid>
-              <Grid item xs={12} sm={6}><Field label="Service CI" value={crqData.serviceCI} font="" /></Grid>
-              <Grid item xs={12} sm={6}><Field label="Change Reason" value={crqData.reason} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Change Number" value={crqData.changeId} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Status" value={crqData.status} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Coordinator" value={crqData.coordinator} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Description" value={crqData.description} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Service CI" value={crqData.serviceCI} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Change Reason" value={crqData.reason} font="" /></Grid>
               <Grid item xs={12}><Divider /></Grid>
-              <Grid item xs={12} sm={6}><Field label="Impact" value={crqData.impact} font="" /></Grid>
-              <Grid item xs={12} sm={6}><Field label="Risk Level" value={crqData.risk} font="" /></Grid>
-              <Grid item xs={12} sm={6}><Field label="Start Date" value={crqData.scheduleStart} font="" /></Grid>
-              <Grid item xs={12} sm={6}><Field label="End Date" value={crqData.scheduleEnd} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Impact" value={crqData.impact} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Risk Level" value={crqData.risk} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="Start Date" value={crqData.scheduleStart} font="" /></Grid>
+              <Grid item xs={12} sm={6}><StyledField label="End Date" value={crqData.scheduleEnd} font="" /></Grid>
               <Grid item xs={12}>
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Change Notes</Typography></AccordionSummary>
@@ -373,6 +353,7 @@ const ApprovalCRQ = ({ history }) => {
             >Back</Button></Box>
         </Grid>
       </Grid>
+      <Toolbar />
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}

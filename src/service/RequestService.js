@@ -7,7 +7,7 @@ import { localEnvironment } from '../utilities/defaultdata';
 export const serviceRequestModel = {
   requestId: '',
   summary: '',
-  details: '',
+  details: [],
 };
 
 /**
