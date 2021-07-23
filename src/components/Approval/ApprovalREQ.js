@@ -23,10 +23,8 @@ import TableRow from '@material-ui/core/TableRow';
 import { Toolbar } from '@material-ui/core';
 
 import { context } from '../../context/StoreProvider';
-import {
-  getServiceRequest,
-  serviceRequestModel,
-} from '../../service/RequestService';
+import { getServiceRequest, serviceRequestModel } from '../../service/RequestService';
+import { postApproval } from '../../service/ApprovalService';
 import StyledField from '../Shared/StyledField';
 import StyledTableCell from '../Shared/StyledTableCell';
 
@@ -34,9 +32,7 @@ const ApprovalREQ = ({ history }) => {
   const [state, dispatch] = useContext(context);
   const [assessed, setAssessed] = useState(false);
   const [reqData, setReqData] = useState(serviceRequestModel);
-  const {
-    // apid, 
-    reqid } = useParams();
+  const { apid, reqid } = useParams();
   const [snackState, setSnackState] = useState({
     severity: 'success',
     message: 'some message',
@@ -97,8 +93,41 @@ const ApprovalREQ = ({ history }) => {
   };
 
   const handleApproveButton = () => {
-    setAssessed(true);
-    setSnackState({ severity: 'info', message: 'Request was approved', show: true });
+    if (state.isAuth) {
+      dispatch({ type: 'PROGRESS', payload: true });
+      const data = `{ "values": {
+        "signatureId":   "${apid}",
+        "applicationId": "${reqid}",
+        "justification": "Approved from PWA"
+      }}`;
+      postApproval(data)
+        .then(response => {
+          setAssessed(true);
+          if (!response.ok) {
+            response.json().then(data => {
+              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+            }).catch(error => {
+              dispatch({ type: 'PROGRESS', payload: false });
+              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+              setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
+            });
+          } else {
+            response.json().then(data => {
+              dispatch({ type: 'PROGRESS', payload: false });
+              if (data.values.status === 'Success') {
+                setSnackState({ severity: 'success', message: 'Request was approved', show: true, duration: 1000 });
+              } else {
+                setSnackState({ severity: 'error', message: 'Approval failed: ' + data.values.shortDescription, show: true, duration: 1000 });
+              }
+            }).catch(error => {
+              console.log('handleApproveButton: data error...', error);
+            });
+          }
+        });
+    } else {
+      setAssessed(true);
+      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
+    }
   };
 
   const handleRejectButton = () => {
@@ -116,43 +145,43 @@ const ApprovalREQ = ({ history }) => {
         <Typography variant="h6">Service Request Approval</Typography>
       </Box>
       <Paper elevation={0}>
-        {state.showProgress ? null : (
-          <Box p={{ xs: 1, md: 3 }}>
-            <StyledField label="Service Request Details" font="h6" />
-            <Box mt={{ xs: 1, md: 3 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}><StyledField label="Request Number" value={reqData.requestId} font="" /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="Summary" value={reqData.summary} font="" /></Grid>
-              <Grid item xs={12}>
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Request Content</Typography></AccordionSummary>
-                  <AccordionDetails>
-                    <TableContainer>
-                      <Table size="small" aria-label="change request work info">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Questions</TableCell>
-                            <TableCell>Answers</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {reqData.details.map((v, i) => (
-                            v ? (
-                              <TableRow key={i}>
-                                <TableCell>{v.slice(0, v.indexOf(':'))}</TableCell>
-                                <StyledTableCell>{v.slice(v.indexOf(':') + 1)}</StyledTableCell>
-                              </TableRow>
-                            ) : (null)
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </AccordionDetails>
-                </Accordion>
-              </Grid>
+        {/* {state.showProgress ? null : ( */}
+        <Box p={{ xs: 1, md: 3 }}>
+          <StyledField label="Service Request Details" font="h6" />
+          <Box mt={{ xs: 1, md: 3 }} />
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}><StyledField label="Request Number" value={reqData.requestId} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Summary" value={reqData.summary} font="" /></Grid>
+            <Grid item xs={12}>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Request Content</Typography></AccordionSummary>
+                <AccordionDetails>
+                  <TableContainer>
+                    <Table size="small" aria-label="change request work info">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Questions</TableCell>
+                          <TableCell>Answers</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {reqData.details.map((v, i) => (
+                          v ? (
+                            <TableRow key={i}>
+                              <TableCell>{v.slice(0, v.indexOf(':'))}</TableCell>
+                              <StyledTableCell>{v.slice(v.indexOf(':') + 1)}</StyledTableCell>
+                            </TableRow>
+                          ) : (null)
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
-          </Box>
-        )}
+          </Grid>
+        </Box>
+        {/* )} */}
       </Paper>
       <Box my={2} />
       <Grid container alignItems="center">

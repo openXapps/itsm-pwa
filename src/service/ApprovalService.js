@@ -40,3 +40,32 @@ export const getApprovals = (user) => {
     mode: 'cors',
   });
 };
+
+/**
+ * POST Approval model
+ */
+ export const postApprovalModel = {
+  requestId: '',
+  status: '',
+  shortDescription: '',
+};
+
+/**
+ * Helper function to submit an approval
+ * @returns Promise of new approval
+ */
+ export const postApproval = (data) => {
+  const { jwt } = getLocalSession().data;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const fields = 'requestId,status,shortDescription';
+  const url = '/api/arsys/v1/entry/SBSA:PWA:Approval?fields=values(' + fields + ')';
+  return fetch(host + url, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'AR-JWT ' + jwt,
+      'Content-Type': 'application/json',
+    },
+    mode: 'cors',
+    body: data
+  });
+};
