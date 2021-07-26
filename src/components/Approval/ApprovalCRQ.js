@@ -34,25 +34,19 @@ import {
   getChangeAssociations,
   changeAssociationsModel,
 } from '../../service/ChangeService';
+import { postApproval } from '../../service/ApprovalService';
 import StyledField from '../Shared/StyledField';
 import StyledTableCell from '../Shared/StyledTableCell';
 
 const ApprovalCRQ = ({ history }) => {
   const [state, dispatch] = useContext(context);
-  const {
-    // apid, 
-    crqid } = useParams();
-  const [assessed, setAssessed] = useState(false);
+  const { apid, crqid } = useParams();
+  const [assessed, setAssessed] = useState(true);
   const [crqData, setCrqData] = useState(changeRequestModel);
   const [crqWorkInfo, setCrqWorkInfo] = useState(changeWorkInfoModel);
   const [crqImpactedAreas, setCrqImpactedAreas] = useState(changeImpactedAreasModel);
   const [crqAssociations, setCrqAssociations] = useState(changeAssociationsModel);
-  const [snackState, setSnackState] = useState({
-    severity: 'success',
-    message: 'Login successful',
-    show: false,
-    duration: 4000,
-  });
+  const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
     handleDataLoad();
@@ -75,7 +69,6 @@ const ApprovalCRQ = ({ history }) => {
               }).catch(error => {
                 // console.log('getChangeRequest: response false error...', error);
                 dispatch({ type: 'PROGRESS', payload: false });
-                setAssessed(true);
                 if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
                 setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
               });
@@ -84,6 +77,7 @@ const ApprovalCRQ = ({ history }) => {
                 // console.log('getChangeRequest: data...', data);
                 dispatch({ type: 'PROGRESS', payload: false });
                 if (data.entries.length === 1) populateChange(data.entries);
+                setAssessed(false);
                 setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
               });
             }
@@ -102,7 +96,6 @@ const ApprovalCRQ = ({ history }) => {
             } else {
               return response.json().then(data => {
                 // console.log('getChangeWorkInfo: data...', data);
-                dispatch({ type: 'PROGRESS', payload: false });
                 if (data.entries.length > 0) populateWorkInfo(data.entries);
               });
             }
@@ -145,7 +138,6 @@ const ApprovalCRQ = ({ history }) => {
           });
       }, 500);
     } else {
-      setAssessed(true);
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
     }
   }
@@ -209,13 +201,49 @@ const ApprovalCRQ = ({ history }) => {
   };
 
   const handleApproveButton = () => {
-    setAssessed(true);
-    setSnackState({ severity: 'info', message: 'Change was approved', show: true });
+    doApproval('Approved');
   };
 
   const handleRejectButton = () => {
+    doApproval('Rejected');
+  };
+
+  const doApproval = (action) => {
     setAssessed(true);
-    setSnackState({ severity: 'info', message: 'Change was rejected', show: true });
+    if (state.isAuth) {
+      dispatch({ type: 'PROGRESS', payload: true });
+      const data = `{ "values": {
+        "approvalAction": "${action}",
+        "signatureId":   "${apid}",
+        "applicationId": "${crqid}",
+        "justification": "Approved from PWA"
+      }}`;
+      postApproval(data)
+        .then(response => {
+          if (!response.ok) {
+            response.json().then(data => {
+              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+            }).catch(error => {
+              dispatch({ type: 'PROGRESS', payload: false });
+              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+              setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
+            });
+          } else {
+            response.json().then(data => {
+              dispatch({ type: 'PROGRESS', payload: false });
+              if (data.values.status === 'Success') {
+                setSnackState({ severity: 'success', message: 'Change was ' + action, show: true, duration: 1000 });
+              } else {
+                setSnackState({ severity: 'error', message: 'Approval failed: ' + data.values.shortDescription, show: true, duration: 1000 });
+              }
+            }).catch(error => {
+              console.log('handleApproveButton: data error...', error);
+            });
+          }
+        });
+    } else {
+      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
+    }
   };
 
   const handleSnackState = () => {
@@ -228,102 +256,100 @@ const ApprovalCRQ = ({ history }) => {
         <Typography variant="h6">Change Request Approval</Typography>
       </Box>
       <Paper elevation={0}>
-        {state.showProgress ? null : (
-          <Box p={{ xs: 1, md: 3 }}>
-            <StyledField label="Change Request Details" font="h6" />
-            <Box mt={{ xs: 1, md: 3 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}><StyledField label="Change Number" value={crqData.changeId} font="" /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="Status" value={crqData.status} font="" /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="Coordinator" value={crqData.coordinator} font="" /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="Description" value={crqData.description} font="" /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="Service CI" value={crqData.serviceCI} font="" /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="Change Reason" value={crqData.reason} font="" /></Grid>
-              <Grid item xs={12}><Divider /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="Impact" value={crqData.impact} font="" /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="Risk Level" value={crqData.risk} font="" /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="Start Date" value={crqData.scheduleStart} font="" /></Grid>
-              <Grid item xs={12} sm={6}><StyledField label="End Date" value={crqData.scheduleEnd} font="" /></Grid>
-              <Grid item xs={12}>
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Change Notes</Typography></AccordionSummary>
-                  <AccordionDetails><Typography color="primary">{crqData.notes}</Typography></AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Work Info</Typography></AccordionSummary>
-                  <AccordionDetails>
-                    <TableContainer>
-                      <Table size="small" aria-label="change request work info">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Description</TableCell>
-                            <TableCell>Submitter</TableCell>
-                            <TableCell>Date</TableCell>
+        <Box p={{ xs: 1, md: 3 }}>
+          <StyledField label="Change Request Details" font="h6" />
+          <Box mt={{ xs: 1, md: 3 }} />
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}><StyledField label="Change Number" value={crqData.changeId} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Status" value={crqData.status} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Coordinator" value={crqData.coordinator} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Description" value={crqData.description} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Service CI" value={crqData.serviceCI} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Change Reason" value={crqData.reason} font="" /></Grid>
+            <Grid item xs={12}><Divider /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Impact" value={crqData.impact} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Risk Level" value={crqData.risk} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Start Date" value={crqData.scheduleStart} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="End Date" value={crqData.scheduleEnd} font="" /></Grid>
+            <Grid item xs={12}>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Change Notes</Typography></AccordionSummary>
+                <AccordionDetails><Typography color="primary">{crqData.notes}</Typography></AccordionDetails>
+              </Accordion>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Work Info</Typography></AccordionSummary>
+                <AccordionDetails>
+                  <TableContainer>
+                    <Table size="small" aria-label="change request work info">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Type</TableCell>
+                          <TableCell>Description</TableCell>
+                          <TableCell>Submitter</TableCell>
+                          <TableCell>Date</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {crqWorkInfo.map((v, i) => (
+                          <TableRow key={i}>
+                            <StyledTableCell>{v.workLogType}</StyledTableCell>
+                            <StyledTableCell>{v.detailedDescription}</StyledTableCell>
+                            <StyledTableCell>{v.workLogSubmitter}</StyledTableCell>
+                            <StyledTableCell>{v.workLogSubmitDate}</StyledTableCell>
                           </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {crqWorkInfo.map((v, i) => (
-                            <TableRow key={i}>
-                              <StyledTableCell>{v.workLogType}</StyledTableCell>
-                              <StyledTableCell>{v.detailedDescription}</StyledTableCell>
-                              <StyledTableCell>{v.workLogSubmitter}</StyledTableCell>
-                              <StyledTableCell>{v.workLogSubmitDate}</StyledTableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Impacted Areas</Typography></AccordionSummary>
-                  <AccordionDetails>
-                    <TableContainer>
-                      <Table size="small" aria-label="change request impacted areas">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Company</TableCell>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Impacted Areas</Typography></AccordionSummary>
+                <AccordionDetails>
+                  <TableContainer>
+                    <Table size="small" aria-label="change request impacted areas">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Company</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {crqImpactedAreas.map((v, i) => (
+                          <TableRow key={i}>
+                            <StyledTableCell>{v.company}</StyledTableCell>
                           </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {crqImpactedAreas.map((v, i) => (
-                            <TableRow key={i}>
-                              <StyledTableCell>{v.company}</StyledTableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Relationships</Typography></AccordionSummary>
-                  <AccordionDetails>
-                    <TableContainer>
-                      <Table size="small" aria-label="change request relationships">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Description</TableCell>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Relationships</Typography></AccordionSummary>
+                <AccordionDetails>
+                  <TableContainer>
+                    <Table size="small" aria-label="change request relationships">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Type</TableCell>
+                          <TableCell>Description</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {crqAssociations.map((v, i) => (
+                          <TableRow key={i}>
+                            <StyledTableCell>{v.requestType}</StyledTableCell>
+                            <StyledTableCell>{v.requestDescription}</StyledTableCell>
                           </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {crqAssociations.map((v, i) => (
-                            <TableRow key={i}>
-                              <StyledTableCell>{v.requestType}</StyledTableCell>
-                              <StyledTableCell>{v.requestDescription}</StyledTableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </AccordionDetails>
-                </Accordion>
-              </Grid>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
-          </Box>
-        )}
+          </Grid>
+        </Box>
       </Paper>
       <Box my={2} />
       <Grid container alignItems="center">
@@ -357,7 +383,7 @@ const ApprovalCRQ = ({ history }) => {
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}
-        autoHideDuration={snackState.duration || 4000}
+        autoHideDuration={snackState.duration}
         onClose={handleSnackState}
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}
       >{snackState.message}</Alert></Snackbar>

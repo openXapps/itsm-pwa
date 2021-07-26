@@ -30,15 +30,10 @@ import StyledTableCell from '../Shared/StyledTableCell';
 
 const ApprovalREQ = ({ history }) => {
   const [state, dispatch] = useContext(context);
-  const [assessed, setAssessed] = useState(false);
+  const [assessed, setAssessed] = useState(true);
   const [reqData, setReqData] = useState(serviceRequestModel);
   const { apid, reqid } = useParams();
-  const [snackState, setSnackState] = useState({
-    severity: 'success',
-    message: 'some message',
-    show: false,
-    duration: 4000,
-  });
+  const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
     handleDataLoad();
@@ -61,7 +56,6 @@ const ApprovalREQ = ({ history }) => {
               }).catch(error => {
                 // console.log('getServiceRequest: response false error...', error);
                 dispatch({ type: 'PROGRESS', payload: false });
-                setAssessed(true);
                 if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
                 setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
               });
@@ -70,13 +64,13 @@ const ApprovalREQ = ({ history }) => {
                 // console.log('getServiceRequest: data...', data);
                 dispatch({ type: 'PROGRESS', payload: false });
                 if (data.entries.length === 1) populateRequest(data.entries);
+                setAssessed(false);
                 setSnackState({ severity: 'success', message: 'Request details fetched', show: true, duration: 1000 });
               });
             }
           });
       }, 500);
     } else {
-      setAssessed(true);
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
     }
   }
@@ -93,16 +87,25 @@ const ApprovalREQ = ({ history }) => {
   };
 
   const handleApproveButton = () => {
+    doApproval('Approved');
+  };
+
+  const handleRejectButton = () => {
+    doApproval('Rejected');
+  };
+
+  const doApproval = (action) => {
+    setAssessed(true);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
       const data = `{ "values": {
+        "approvalAction": "${action}",
         "signatureId":   "${apid}",
         "applicationId": "${reqid}",
         "justification": "Approved from PWA"
       }}`;
       postApproval(data)
         .then(response => {
-          setAssessed(true);
           if (!response.ok) {
             response.json().then(data => {
               throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
@@ -115,7 +118,7 @@ const ApprovalREQ = ({ history }) => {
             response.json().then(data => {
               dispatch({ type: 'PROGRESS', payload: false });
               if (data.values.status === 'Success') {
-                setSnackState({ severity: 'success', message: 'Request was approved', show: true, duration: 1000 });
+                setSnackState({ severity: 'success', message: 'Request was ' + action, show: true, duration: 1000 });
               } else {
                 setSnackState({ severity: 'error', message: 'Approval failed: ' + data.values.shortDescription, show: true, duration: 1000 });
               }
@@ -125,14 +128,8 @@ const ApprovalREQ = ({ history }) => {
           }
         });
     } else {
-      setAssessed(true);
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
     }
-  };
-
-  const handleRejectButton = () => {
-    setAssessed(true);
-    setSnackState({ severity: 'info', message: 'Request was rejected', show: true });
   };
 
   const handleSnackState = () => {
@@ -215,7 +212,7 @@ const ApprovalREQ = ({ history }) => {
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}
-        autoHideDuration={snackState.duration || 4000}
+        autoHideDuration={snackState.duration}
         onClose={handleSnackState}
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}
       >{snackState.message}</Alert></Snackbar>

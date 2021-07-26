@@ -42,15 +42,6 @@ export const getApprovals = (user) => {
 };
 
 /**
- * POST Approval model
- */
- export const postApprovalModel = {
-  requestId: '',
-  status: '',
-  shortDescription: '',
-};
-
-/**
  * Helper function to submit an approval
  * @returns Promise of new approval
  */

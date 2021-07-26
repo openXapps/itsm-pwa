@@ -32,11 +32,7 @@ const ApprovalList = ({ history }) => {
   const [state, dispatch] = useContext(context);
   // const [isLoading, setIsLoading] = useState(false);
   const [approvals, setApprovals] = useState([]);
-  const [snackState, setSnackState] = useState({
-    severity: 'success',
-    message: 'Approvals fetched',
-    show: false
-  });
+  const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
     handleReload();
@@ -62,7 +58,7 @@ const ApprovalList = ({ history }) => {
                 // setIsLoading(false);
                 dispatch({ type: 'PROGRESS', payload: false });
                 if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-                setSnackState({ severity: 'error', message: error.message, show: true });
+                setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
               });
             } else {
               return response.json().then(data => {
@@ -71,13 +67,13 @@ const ApprovalList = ({ history }) => {
                 dispatch({ type: 'PROGRESS', payload: false });
                 populateApprovals(data.entries);
                 // setApprovals(data.entries);
-                setSnackState({ severity: 'success', message: 'Approvals fetched', show: true });
+                setSnackState({ severity: 'success', message: 'Approvals fetched', show: true, duration: 1000 });
               });
             }
           });
-      }, 1000);
+      }, 500);
     } else {
-      setSnackState({ severity: 'info', message: 'Please login first', show: true });
+      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
     }
   }
 
@@ -184,7 +180,7 @@ const ApprovalList = ({ history }) => {
           horizontal: 'center',
         }}
         open={snackState.show}
-        autoHideDuration={4000}
+        autoHideDuration={snackState.duration}
         onClose={handleSnackState}
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}>
           {snackState.message}
