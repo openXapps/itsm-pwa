@@ -277,33 +277,6 @@ const ApprovalCRQ = ({ history }) => {
                 <AccordionDetails><Typography color="primary">{crqData.notes}</Typography></AccordionDetails>
               </Accordion>
               <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Work Info</Typography></AccordionSummary>
-                <AccordionDetails>
-                  <TableContainer>
-                    <Table size="small" aria-label="change request work info">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Type</TableCell>
-                          <TableCell>Description</TableCell>
-                          <TableCell>Submitter</TableCell>
-                          <TableCell>Date</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {crqWorkInfo.map((v, i) => (
-                          <TableRow key={i}>
-                            <StyledTableCell>{v.workLogType}</StyledTableCell>
-                            <StyledTableCell>{v.detailedDescription}</StyledTableCell>
-                            <StyledTableCell>{v.workLogSubmitter}</StyledTableCell>
-                            <StyledTableCell>{v.workLogSubmitDate}</StyledTableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Impacted Areas</Typography></AccordionSummary>
                 <AccordionDetails>
                   <TableContainer>
@@ -340,6 +313,33 @@ const ApprovalCRQ = ({ history }) => {
                           <TableRow key={i}>
                             <StyledTableCell>{v.requestType}</StyledTableCell>
                             <StyledTableCell>{v.requestDescription}</StyledTableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Work Info</Typography></AccordionSummary>
+                <AccordionDetails>
+                  <TableContainer>
+                    <Table size="small" aria-label="change request work info">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Type</TableCell>
+                          <TableCell>Description</TableCell>
+                          <TableCell>Submitter</TableCell>
+                          <TableCell>Date</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {crqWorkInfo.map((v, i) => (
+                          <TableRow key={i}>
+                            <StyledTableCell>{v.workLogType}</StyledTableCell>
+                            <StyledTableCell>{v.detailedDescription}</StyledTableCell>
+                            <StyledTableCell>{v.workLogSubmitter}</StyledTableCell>
+                            <StyledTableCell>{v.workLogSubmitDate}</StyledTableCell>
                           </TableRow>
                         ))}
                       </TableBody>

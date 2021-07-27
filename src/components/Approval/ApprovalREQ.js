@@ -23,6 +23,7 @@ import TableRow from '@material-ui/core/TableRow';
 import { Toolbar } from '@material-ui/core';
 
 import { context } from '../../context/StoreProvider';
+import { userDate } from '../../utilities/datetime';
 import { getServiceRequest, serviceRequestModel } from '../../service/RequestService';
 import { postApproval } from '../../service/ApprovalService';
 import StyledField from '../Shared/StyledField';
@@ -82,6 +83,9 @@ const ApprovalREQ = ({ history }) => {
       ...serviceRequestModel,
       requestId: data[0].values['Request Number'],
       summary: data[0].values['Summary'],
+      firstName: data[0].values['First Name'],
+      lastName: data[0].values['Last Name'],
+      submitDate: userDate(data[0].values['Submit Date'], true),
       details: String(data[0].values['SR Type Field 1']).split('\n'),
     });
   };
@@ -149,6 +153,8 @@ const ApprovalREQ = ({ history }) => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}><StyledField label="Request Number" value={reqData.requestId} font="" /></Grid>
             <Grid item xs={12} sm={6}><StyledField label="Summary" value={reqData.summary} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Requester" value={reqData.firstName + ' ' + reqData.lastName} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Request Date" value={reqData.submitDate} font="" /></Grid>
             <Grid item xs={12}>
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Request Content</Typography></AccordionSummary>

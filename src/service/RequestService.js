@@ -7,6 +7,9 @@ import { localEnvironment } from '../utilities/defaultdata';
 export const serviceRequestModel = {
   requestId: '',
   summary: '',
+  firstName: '',
+  lastName: '',
+  submitDate: '',
   details: [],
 };
 
@@ -21,6 +24,9 @@ export const getServiceRequest = (requestId) => {
   const fields = `
     Request Number,
     Summary,
+    First Name,
+    Last Name,
+    Submit Date,
     SR Type Field 1
     `;
   const query = `'Request Number'="${requestId}"`;
