@@ -20,7 +20,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { Toolbar } from '@material-ui/core';
+import TextField from '@material-ui/core/TextField';
+import Toolbar from '@material-ui/core/Toolbar';
 
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
@@ -34,6 +35,7 @@ const ApprovalREQ = ({ history }) => {
   const [assessed, setAssessed] = useState(true);
   const [reqData, setReqData] = useState(serviceRequestModel);
   const { apid, reqid } = useParams();
+  const [justification, setJustification] = useState('');
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
@@ -90,6 +92,10 @@ const ApprovalREQ = ({ history }) => {
     });
   };
 
+  const onJustificationChange = (e) => {
+    if (e.target.value) setJustification(e.target.value);
+  };
+
   const handleApproveButton = () => {
     doApproval('Approved');
   };
@@ -102,11 +108,12 @@ const ApprovalREQ = ({ history }) => {
     setAssessed(true);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
+      const justificationNote = justification ? justification : 'Approved from PWA';
       const data = `{ "values": {
         "approvalAction": "${action}",
         "signatureId":   "${apid}",
         "applicationId": "${reqid}",
-        "justification": "Approved from PWA"
+        "justification": "${justificationNote}"
       }}`;
       postApproval(data)
         .then(response => {
@@ -171,10 +178,10 @@ const ApprovalREQ = ({ history }) => {
                         {reqData.details.map((v, i) => (
                           v ? (
                             <TableRow key={i}>
-                              <TableCell>{v.slice(0, v.indexOf(':'))}</TableCell>
+                              <TableCell>{v.indexOf(':') > 0 ? (v.slice(0, v.indexOf(':'))) : ''}</TableCell>
                               <StyledTableCell>{v.slice(v.indexOf(':') + 1)}</StyledTableCell>
                             </TableRow>
-                          ) : (null)
+                          ) : null
                         ))}
                       </TableBody>
                     </Table>
@@ -186,7 +193,16 @@ const ApprovalREQ = ({ history }) => {
         </Box>
         {/* )} */}
       </Paper>
-      <Box my={2} />
+      <Box my={2}>
+        <TextField
+          label="Justification"
+          placeholder="Approved from PWA"
+          variant="outlined"
+          fullWidth
+          value={justification}
+          onChange={onJustificationChange}
+        />
+      </Box>
       <Grid container alignItems="center">
         <Grid item xs={12} sm={4}>
           <Button

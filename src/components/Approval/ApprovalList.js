@@ -166,7 +166,11 @@ const ApprovalList = ({ history }) => {
               );
             })
           ) : (
-            state.showProgress ? null : (
+            state.showProgress ? (
+              <Box mt={3}>
+                <Typography variant="h6">Loading...</Typography>
+              </Box>
+            ) : (
               <Box mt={3}>
                 <Typography variant="h6">No approvals found. Click Reload to get approvals.</Typography>
               </Box>

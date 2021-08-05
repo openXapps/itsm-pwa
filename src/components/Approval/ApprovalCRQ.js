@@ -20,7 +20,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { Toolbar } from '@material-ui/core';
+import TextField from '@material-ui/core/TextField';
+import Toolbar from '@material-ui/core/Toolbar';
 
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
@@ -46,6 +47,7 @@ const ApprovalCRQ = ({ history }) => {
   const [crqWorkInfo, setCrqWorkInfo] = useState(changeWorkInfoModel);
   const [crqImpactedAreas, setCrqImpactedAreas] = useState(changeImpactedAreasModel);
   const [crqAssociations, setCrqAssociations] = useState(changeAssociationsModel);
+  const [justification, setJustification] = useState('');
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
@@ -200,6 +202,10 @@ const ApprovalCRQ = ({ history }) => {
     setCrqAssociations(list);
   };
 
+  const onJustificationChange = (e) => {
+    if (e.target.value) setJustification(e.target.value);
+  };
+
   const handleApproveButton = () => {
     doApproval('Approved');
   };
@@ -212,11 +218,12 @@ const ApprovalCRQ = ({ history }) => {
     setAssessed(true);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
+      const justificationNote = justification ? justification : 'Approved from PWA';
       const data = `{ "values": {
         "approvalAction": "${action}",
         "signatureId":   "${apid}",
         "applicationId": "${crqid}",
-        "justification": "Approved from PWA"
+        "justification": "${justificationNote}"
       }}`;
       postApproval(data)
         .then(response => {
@@ -351,7 +358,16 @@ const ApprovalCRQ = ({ history }) => {
           </Grid>
         </Box>
       </Paper>
-      <Box my={2} />
+      <Box my={2}>
+        <TextField
+          label="Justification"
+          placeholder="Approved from PWA"
+          variant="outlined"
+          fullWidth
+          value={justification}
+          onChange={onJustificationChange}
+        />
+      </Box>
       <Grid container alignItems="center">
         <Grid item xs={12} sm={4}>
           <Button
