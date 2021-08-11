@@ -177,7 +177,7 @@ const ApprovalREQ = ({ history }) => {
                       <TableBody>
                         {reqData.details.map((v, i) => (
                           v ? (
-                            <TableRow key={i}>
+                            <TableRow key={i} style={{ verticalAlign: 'top' }}>
                               <TableCell>{v.indexOf(':') > 0 ? (v.slice(0, v.indexOf(':'))) : ''}</TableCell>
                               <StyledTableCell>{v.slice(v.indexOf(':') + 1)}</StyledTableCell>
                             </TableRow>

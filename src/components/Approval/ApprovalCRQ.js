@@ -170,7 +170,7 @@ const ApprovalCRQ = ({ history }) => {
         workLogType: v.values['Work Log Type'],
         detailedDescription: v.values['Detailed Description'],
         workLogSubmitter: v.values['Work Log Submitter'],
-        workLogSubmitDate: userDate(v.values['Work Log Submit Date'], true),
+        workLogSubmitDate: userDate(v.values['Work Log Submit Date'], false),
       });
       return true;
     });
@@ -336,17 +336,17 @@ const ApprovalCRQ = ({ history }) => {
                         <TableRow>
                           <TableCell>Type</TableCell>
                           <TableCell>Description</TableCell>
-                          <TableCell>Submitter</TableCell>
-                          <TableCell>Date</TableCell>
+                          {/* <TableCell>Submitter</TableCell>
+                          <TableCell>Date</TableCell> */}
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {crqWorkInfo.map((v, i) => (
-                          <TableRow key={i}>
+                          <TableRow key={i} style={{ verticalAlign: 'top' }}>
                             <StyledTableCell>{v.workLogType}</StyledTableCell>
                             <StyledTableCell>{v.detailedDescription}</StyledTableCell>
-                            <StyledTableCell>{v.workLogSubmitter}</StyledTableCell>
-                            <StyledTableCell>{v.workLogSubmitDate}</StyledTableCell>
+                            {/* <StyledTableCell>{v.workLogSubmitter}</StyledTableCell>
+                            <StyledTableCell>{v.workLogSubmitDate}</StyledTableCell> */}
                           </TableRow>
                         ))}
                       </TableBody>
