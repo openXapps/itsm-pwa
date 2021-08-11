@@ -17,9 +17,12 @@ import { context } from './context/StoreProvider';
 import { themes } from './service/ThemeService';
 
 // App components
-import HeaderComponent from './components/Header/HeaderComponent';
-import LandingComponent from './components/Landing/LandingComponent';
+// import HeaderComponent from './components/Header/HeaderComponentAR';
+import HeaderComponent from './components/Header/HeaderComponentRSSO';
+// import LandingComponent from './components/Landing/LandingComponentAR';
+import LandingComponent from './components/Landing/LandingComponentRSSO';
 import LoginComponent from './components/Login/LoginComponent';
+import RSSOComponent from './components/RSSO/RSSOComponent';
 import SettingsComponent from './components/Settings/SettingsComponent';
 import ApprovalList from './components/Approval/ApprovalList';
 import ApprovalCRQ from './components/Approval/ApprovalCRQ';
@@ -40,6 +43,7 @@ const App = () => {
         <Switch>
           <Route path="/" exact component={LandingComponent} />
           <Route path="/login" component={LoginComponent} />
+          <Route path="/rsso" component={RSSOComponent} />
           <Route path="/settings" component={SettingsComponent} />
           <Route path="/approval" exact component={ApprovalList} />
           <Route path="/approval/crq/:apid/:crqid" component={ApprovalCRQ} />

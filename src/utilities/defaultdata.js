@@ -13,6 +13,7 @@ export const application = {
 export const storageObjects = {
   session: 'sb-itsm-session',
   settings: 'sb-itsm-settings',
+  rsso: 'sb-itsm-rsso',
 };
 
 /**
@@ -27,6 +28,9 @@ export const defaultStorage = {
   },
   // sb-itsm-settings
   settings: settingsModel,
+  rsso: {
+    token: '',
+  },
 };
 
 /**
@@ -37,6 +41,9 @@ export const localEnvironment = {
   ARPROTOCOL: process.env.REACT_APP_ARPROTOCOL,
   ARHOST: process.env.REACT_APP_ARHOST,
   ARPORT: process.env.REACT_APP_ARPORT,
+  RSSOCLIENTID: process.env.REACT_APP_RSSO_CLIENT_ID,
+  RSSOSECRET: process.env.REACT_APP_RSSO_SECRET,
+  RSSOCLIENTNAME: process.env.REACT_APP_RSSO_CLIENT_NAME,
 };
 
 /**
