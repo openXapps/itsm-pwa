@@ -29,6 +29,9 @@ const HeaderComponent = ({ history, location }) => {
     show: false,
     duration: 2000,
   });
+  
+  console.log('HeaderComponent: history....', history);
+  console.log('HeaderComponent: location...', location);
 
   useEffect(() => {
     // Need to validate auth state
@@ -37,18 +40,11 @@ const HeaderComponent = ({ history, location }) => {
 
   // Button handlers
   const handleLoginButton = () => {
-    /**
-     * https://ditsmweb1.standardbank.co.za/rsso/oauth2/authorize
-     * ?response_type=code
-     * &client_id=7e0cc824-393f-4770-8629-b3b545cd82b2
-     * &client_secret=MIIEvwIBADANBgkqhkiG9w0BAQEFAASC...poVLgt19imeq5V9JZ3mdo9iIUjxvQ==
-     * &redirect_uri=https://ditsmweb1.standardbank.co.za/remedy-app/test.html
-     */
     let oAuthURL = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/rsso/oauth2/authorize?response_type=code';
     oAuthURL += '&client_id=' + localEnvironment.RSSOCLIENTID;
     oAuthURL += '&client_secret=' + localEnvironment.RSSOSECRET;
-    // oAuthURL += '&redirect_uri=' + localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/pwa/rsso';
-    oAuthURL += '&redirect_uri=http://localhost:3000/rsso';
+    oAuthURL += '&redirect_uri=' + localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/pwa';
+    // oAuthURL += '&redirect_uri=http://localhost:3000/rsso';
     window.open(oAuthURL, '_self');
     // history.push('/rsso');
   };

@@ -14,13 +14,16 @@ import Alert from '@material-ui/lab/Alert';
 // import { storageObjects } from '../../utilities/defaultdata';
 // import { saveLocalStorage, getLocalSession } from '../../utilities/localstorage';
 
-const RSSOComponent = ({ history }) => {
+const RSSOComponent = ({ history, location }) => {
   // const [state, dispatch] = useContext(context);
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'XX', show: false, duration: 2000 });
 
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
   };
+
+  console.log('RSSOComponent: history....', history);
+  console.log('RSSOComponent: location...', location);
 
   return (
     <Container maxWidth="sm">

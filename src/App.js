@@ -37,11 +37,12 @@ const App = () => {
   return (
     <ThemeProvider theme={appTheme}>
       <CssBaseline />
-      <BrowserRouter>
+      <BrowserRouter basename={'/pwa'}>
         <HeaderComponent />
         <Toolbar />
         <Switch>
           <Route path="/" exact component={LandingComponent} />
+          <Route path="/:code" exact component={LandingComponent} />
           <Route path="/login" component={LoginComponent} />
           <Route path="/rsso" component={RSSOComponent} />
           <Route path="/settings" component={SettingsComponent} />
