@@ -6,7 +6,6 @@ import { storageObjects, localEnvironment, defaultStorage } from '../utilities/d
 
 /**
  * Helper function to get a JWT from Remedy
- * @param {string} url Remedy URL to call
  * @param {string} username Remedy user login name
  * @param {string} password Remedy user login password
  * @returns Return a Promise

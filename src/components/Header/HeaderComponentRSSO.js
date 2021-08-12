@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import AppBar from '@material-ui/core/AppBar';
@@ -17,11 +17,13 @@ import Alert from '@material-ui/lab/Alert';
 import useStyles from './HeaderStyles';
 import { context } from '../../context/StoreProvider';
 import { application, localEnvironment } from '../../utilities/defaultdata';
+import { useQuery } from '../../hooks/useQuery';
+import { getJWT } from '../../service/RSSOService';
 // import { getLocalSession } from '../../utilities/localstorage';
-import { useEffect } from 'react';
 
 const HeaderComponent = ({ history, location }) => {
   const classes = useStyles();
+  const code = useQuery(location.search).get('code');
   const [state, dispatch] = useContext(context);
   const [snackState, setSnackState] = useState({
     severity: 'success',
@@ -29,14 +31,39 @@ const HeaderComponent = ({ history, location }) => {
     show: false,
     duration: 2000,
   });
-  
-  console.log('HeaderComponent: history....', history);
+
+  // console.log('HeaderComponent: history....', history);
   console.log('HeaderComponent: location...', location);
 
   useEffect(() => {
-    // Need to validate auth state
+    // Need to move to the landing route
+    // Checks is the route contains a code parameter then fetch a auth token
+    if (code) {
+      console.log('HeaderComponent: code.......', code);
+      getJWT(code)
+      .then(response => {
+        console.log('HeaderComponent: JWT response...', response);
+        if (!response.ok) throw new Error(response.statusText);
+        return response.text();
+      }).then(token => {
+        console.log('HeaderComponent: JWT token......', token);
+        // saveLocalStorage(storageObjects.session, {
+        //   user: fields.username,
+        //   jwt: token,
+        //   jwtDate: new Date(),
+        // });
+        // setLockLoginButton(true);
+        // dispatch({ type: 'AUTH', payload: true });
+        setSnackState({ severity: 'success', message: 'Authentication successful', show: true });
+      }).catch(error => {
+        console.log('HeaderComponent: JWT error...', error);
+        // setLockLoginButton(false);
+        // dispatch({ type: 'AUTH', payload: false });
+        setSnackState({ severity: 'error', message: 'Authentication failed', show: true });
+      });
+    }
     return () => { };
-  }, []);
+  }, [code]);
 
   // Button handlers
   const handleLoginButton = () => {
@@ -44,7 +71,7 @@ const HeaderComponent = ({ history, location }) => {
     oAuthURL += '&client_id=' + localEnvironment.RSSOCLIENTID;
     oAuthURL += '&client_secret=' + localEnvironment.RSSOSECRET;
     oAuthURL += '&redirect_uri=' + localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/pwa';
-    // oAuthURL += '&redirect_uri=http://localhost:3000/rsso';
+    // oAuthURL += '&redirect_uri=http://localhost:3000';
     window.open(oAuthURL, '_self');
     // history.push('/rsso');
   };

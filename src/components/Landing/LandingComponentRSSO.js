@@ -1,5 +1,5 @@
 import {
-  useEffect,
+  // useEffect,
   useState,
   useContext
 } from 'react';
@@ -23,20 +23,12 @@ const LandingComponent = ({ history }) => {
   const [state,] = useContext(context);
   const classes = useStyles();
   const settings = getLocalSettings().data;
-  const [snackState, setSnackState] = useState({
-    severity: 'info',
-    message: 'Not active session, please login',
-    show: false
-  });
+  const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 4000 });
 
-  useEffect(() => {
-    if (!state.isAuth) setSnackState({
-      severity: 'info',
-      message: 'Not active session, please login',
-      show: true
-    });
-    return () => { };
-  }, [state.isAuth]);
+  // useEffect(() => {
+  //   if (!state.isAuth) setSnackState({ ...snackState, message: 'Not active session, please login', show: true });
+  //   return () => { };
+  // }, [state.isAuth]);
 
   const handleGoToModule = (e) => {
     const moduleId = parseInt(e.currentTarget.dataset.moduleId);
@@ -74,7 +66,7 @@ const LandingComponent = ({ history }) => {
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}
-        autoHideDuration={4000}
+        autoHideDuration={snackState.duration}
         onClose={handleSnackState}
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}>
           {snackState.message}
