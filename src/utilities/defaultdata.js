@@ -1,5 +1,3 @@
-import { settingsModel } from '../service/SettingsService';
-
 /**
  * Application meta data
  */
@@ -20,6 +18,13 @@ export const storageObjects = {
  * Default data for app local storage
  */
 export const defaultStorage = {
+  // sb-itsm-rsso
+  rsso: {
+    accessToken: '',
+    refreshToken: '',
+    expiresIn: 0,
+    tokenDate: '',
+  },
   // sb-itsm-session
   session: {
     user: '',
@@ -27,10 +32,19 @@ export const defaultStorage = {
     jwtDate: '',
   },
   // sb-itsm-settings
-  settings: settingsModel,
-  rsso: {
-    token: '',
-  },
+  settings: {
+    settingsId: '',
+    theme: 'light',
+    // theme: 'dark',
+    // theme: 'concrete',
+    // theme: 'monday',
+    approvals: true,
+    incidents: false,
+    changes: false,
+    problems: false,
+    assets: true,
+    people: false,
+  }
 };
 
 /**
@@ -43,17 +57,16 @@ export const localEnvironment = {
   ARPORT: process.env.REACT_APP_ARPORT,
   RSSOCLIENTID: process.env.REACT_APP_RSSO_CLIENT_ID,
   RSSOSECRET: process.env.REACT_APP_RSSO_SECRET,
-  RSSOCLIENTNAME: process.env.REACT_APP_RSSO_CLIENT_NAME,
 };
 
 /**
  * Modules to show on landing route
  */
 export const modules = [
-  { name: 'approvals', label: 'My Approvals', img: './img/itsm-apr-alpha.png', path: '/approval' },
-  { name: 'incidents', label: 'My Incidents', img: './img/itsm-inc-alpha.png', path: '/incident' },
-  { name: 'changes', label: 'My Changes', img: './img/itsm-chg-alpha.png', path: '/change' },
-  { name: 'problems', label: 'My Investigations', img: './img/itsm-pbm-alpha.png', path: '/problem' },
-  { name: 'assets', label: 'My Assets', img: './img/itsm-ast-alpha.png', path: '/asset' },
-  { name: 'people', label: 'My People', img: './img/itsm-ppl-alpha.png', path: '/people' },
+  { name: 'approvals', label: 'My Approvals', img: 'img/itsm-apr-alpha.png', path: '/approval' },
+  { name: 'incidents', label: 'My Incidents', img: 'img/itsm-inc-alpha.png', path: '/incident' },
+  { name: 'changes', label: 'My Changes', img: 'img/itsm-chg-alpha.png', path: '/change' },
+  { name: 'problems', label: 'My Investigations', img: 'img/itsm-pbm-alpha.png', path: '/problem' },
+  { name: 'assets', label: 'My Assets', img: 'img/itsm-ast-alpha.png', path: '/asset' },
+  { name: 'people', label: 'My People', img: 'img/itsm-ppl-alpha.png', path: '/people' },
 ];

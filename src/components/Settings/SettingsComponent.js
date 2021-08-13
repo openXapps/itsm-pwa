@@ -26,11 +26,10 @@ import {
   putARSettings,
   postARSettings,
   getARSettings,
-  settingsModel
 } from '../../service/SettingsService';
 import { themeList } from '../../service/ThemeService';
 import { getLocalSettings, saveLocalStorage } from '../../utilities/localstorage';
-import { storageObjects } from '../../utilities/defaultdata';
+import { storageObjects, defaultStorage } from '../../utilities/defaultdata';
 import { modules } from '../../utilities/defaultdata';
 
 /**
@@ -44,7 +43,7 @@ people: boolean,
  */
 
 const initialFieldData = () => {
-  let result = settingsModel;
+  let result = defaultStorage.settings;
   const settings = getLocalSettings();
   if (settings.statusOK) result = settings.data;
   return result;

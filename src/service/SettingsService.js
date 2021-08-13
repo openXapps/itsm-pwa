@@ -7,19 +7,19 @@ import { localEnvironment } from '../utilities/defaultdata';
 /**
  * Default settings model
  */
-export const settingsModel = {
-  settingsId: '',
-  theme: 'light',
-  // theme: 'dark',
-  // theme: 'concrete',
-  // theme: 'monday',
-  approvals: true,
-  incidents: false,
-  changes: false,
-  problems: false,
-  assets: true,
-  people: false,
-}
+// export const settingsModel = {
+//   settingsId: '',
+//   theme: 'light',
+//   // theme: 'dark',
+//   // theme: 'concrete',
+//   // theme: 'monday',
+//   approvals: true,
+//   incidents: false,
+//   changes: false,
+//   problems: false,
+//   assets: true,
+//   people: false,
+// }
 
 /**
  * Helper function to create user settings

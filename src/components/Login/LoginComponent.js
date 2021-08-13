@@ -12,8 +12,8 @@ import Alert from '@material-ui/lab/Alert';
 
 import { context } from '../../context/StoreProvider';
 import { getJWT } from '../../service/AuthService';
-import { getARSettings, settingsModel } from '../../service/SettingsService';
-import { storageObjects } from '../../utilities/defaultdata';
+import { getARSettings } from '../../service/SettingsService';
+import { storageObjects, defaultStorage } from '../../utilities/defaultdata';
 import { saveLocalStorage, getLocalSession } from '../../utilities/localstorage';
 
 const initialFieldData = {
@@ -81,8 +81,8 @@ const LoginComponent = ({ history }) => {
               });
               if (state.theme !== data.entries[0].values.theme) dispatch({ type: 'THEME', payload: data.entries[0].values.theme });
             } else {
-              saveLocalStorage(storageObjects.settings, settingsModel);
-              if (state.theme !== settingsModel.theme) dispatch({ type: 'THEME', payload: settingsModel.theme });
+              saveLocalStorage(storageObjects.settings, defaultStorage.settings);
+              if (state.theme !== defaultStorage.settings.theme) dispatch({ type: 'THEME', payload: defaultStorage.settings.theme });
             }
           }).catch(error => {
             // console.log('LoginComponent: settings error...', error);

@@ -49,7 +49,6 @@ export const logout = async (flushUser, token) => {
 
 /**
  * Helper function to validate JWT against Remedy
- * @param {string} Token to test
  * @returns boolean whether JWT is still valid
  */
 export const hasValidJWT = () => {

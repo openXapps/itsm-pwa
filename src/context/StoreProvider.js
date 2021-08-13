@@ -2,7 +2,7 @@ import React from 'react';
 
 import StoreReducer from './StoreReducer';
 import { initialUse, getLocalSettings } from '../utilities/localstorage';
-import { hasValidJWT } from '../service/AuthService';
+import { hasValidJWT } from '../service/RSSOService';
 
 /**
  * Initial state

@@ -24,29 +24,11 @@ export const isLocalStorage = () => {
 };
 
 /**
-* Write initial storage on first time usage
- */
-export const initialUse = () => {
-  const session = getLocalSession();
-  const settings = getLocalSettings();
-
-  // No session exist
-  if (!session.statusOK) {
-    saveLocalStorage(storageObjects.session, defaultStorage.session);
-  }
-
-  // No settings exist
-  if (!settings.statusOK) {
-    saveLocalStorage(storageObjects.settings, defaultStorage.settings);
-  }
-};
-
-/**
  * Overwrite item to local storage
  * @param {string} obj Local storage identifier
  * @param {any} data Data object to store
  */
-export const saveLocalStorage = (obj, data) => {
+ export const saveLocalStorage = (obj, data) => {
   try {
     localStorage.setItem(obj, JSON.stringify(data));
   } catch (error) {
@@ -55,7 +37,25 @@ export const saveLocalStorage = (obj, data) => {
 };
 
 /**
- * Get SESSION from local storage
+* Write initial storage on first time usage
+ */
+export const initialUse = () => {
+  // const session = getLocalSession();
+  const rsso = getLocalRSSO();
+  const settings = getLocalSettings();
+
+  // No RSSO exist
+  if (!rsso.statusOK) saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
+
+  // No session exist
+  // if (!session.statusOK) saveLocalStorage(storageObjects.session, defaultStorage.session);
+
+  // No settings exist
+  if (!settings.statusOK) saveLocalStorage(storageObjects.settings, defaultStorage.settings);
+};
+
+/**
+ * Get SESSION from local storage (Remedy API Auth)
  * @returns Returns an object {statusOk: boolean, data: any}
  */
 export const getLocalSession = () => {
@@ -81,7 +81,33 @@ export const getLocalSession = () => {
 };
 
 /**
- * Get SETTINGS from local storage
+ * Get RSSO from local storage (Remedy Single Sign-On)
+ * @returns Returns an object {statusOk: boolean, data: any}
+ */
+export const getLocalRSSO = () => {
+  let response = {
+    statusOK: false,
+    data: defaultStorage.rsso,
+  };
+  try {
+    const rsso = JSON.parse(localStorage.getItem(storageObjects.rsso));
+    if (rsso) {
+      response = {
+        statusOK: true,
+        data: rsso
+      };
+    } else {
+      throw new Error('No items found in localStorage');
+    }
+  } catch (err) {
+    // Life goes on ...
+    // console.log(err);
+  }
+  return response;
+};
+
+/**
+ * Get SETTINGS from local storage (Look and Feel)
  * @returns Returns an object {statusOk: boolean, data: any}
  */
 export const getLocalSettings = () => {
