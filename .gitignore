@@ -8,6 +8,7 @@
 # testing
 /coverage
 /sandbox/test.html
+/sandbox/src.zip
 
 # production
 /build

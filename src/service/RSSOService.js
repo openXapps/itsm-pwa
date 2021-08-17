@@ -1,6 +1,8 @@
 import { getLocalRSSO } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
+// https://docs.bmc.com/docs/ars2002/enabling-oauth-authorization-for-remedy-ar-system-rest-apis-909638148.html#EnablingOAuthauthorizationforRemedyARSystemRESTAPIs-TouseRemedySSOOAuth2.0authorizationinyourapplication
+
 /**
  * Helper function to get a JWT from RSSO
  * @param {string} code Azure code
@@ -31,16 +33,18 @@ export const revokeJWT = () => {
   const { accessToken } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const url = '/rsso/oauth2/revoke';
-  // const redirect = encodeURIComponent(host + '/pwa');
-  const body = `token=${accessToken}&token_type_hint=access_token`;
-  console.log('revokeJWT: POST...', host + url + '?' + body);
+  // const url = '/rsso/logout';
+  const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
+  const body = `token=${accessToken}&token_type_hint=access_token&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
+  // console.log('revokeJWT: POST...', host + url + '?' + body);
+  // console.log('revokeJWT: POST...', host + url);
   return fetch(host + url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization': 'Basic ' + accessToken
     },
-    body: body
+    body: body,
   });
 }
 

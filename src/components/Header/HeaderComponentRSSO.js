@@ -36,14 +36,20 @@ const HeaderComponent = ({ history, location }) => {
   const handleLogoutButton = () => {
     revokeJWT()
       .then(response => {
-        console.log('HeaderComponent: revokeJWT response...', response);
-        if (!response.ok) throw new Error(response.statusText);
-        saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
-        if (state.isAuth) dispatch({ type: 'AUTH', payload: false });
-        setSnackState({ severity: 'success', message: 'Logout successful', show: true });
-      }).catch(error => {
-        console.log('HeaderComponent: revokeJWT error...', error);
-        setSnackState({ severity: 'error', message: 'Logout failed', show: true });
+        console.log('handleLogoutButton: revokeJWT response...', response);
+        //
+        if (!response.ok) {
+          response.json().then(data => {
+            console.log('handleLogoutButton: response false data...', data);
+            throw new Error(`Logout failed: ${data.error}`);
+          }).catch(error => {
+            console.log('handleLogoutButton: response false err...', error);
+            setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
+          });
+        } else {
+          if (state.isAuth) dispatch({ type: 'AUTH', payload: false });
+          setSnackState({ severity: 'success', message: 'Logout successful', show: true, duration: 2000 });
+        }
       });
   };
   const handleSettingsButton = () => {
