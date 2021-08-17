@@ -21,9 +21,10 @@ export const defaultStorage = {
   // sb-itsm-rsso
   rsso: {
     accessToken: '',
-    refreshToken: '',
+    tokenType: '',
     expiresIn: 0,
     tokenDate: '',
+    refreshToken: '',
   },
   // sb-itsm-session
   session: {

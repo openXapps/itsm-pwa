@@ -37,7 +37,6 @@ const HeaderComponent = ({ history, location }) => {
     revokeJWT()
       .then(response => {
         console.log('handleLogoutButton: revokeJWT response...', response);
-        //
         if (!response.ok) {
           response.json().then(data => {
             console.log('handleLogoutButton: response false data...', data);
@@ -48,6 +47,7 @@ const HeaderComponent = ({ history, location }) => {
           });
         } else {
           if (state.isAuth) dispatch({ type: 'AUTH', payload: false });
+          saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
           setSnackState({ severity: 'success', message: 'Logout successful', show: true, duration: 2000 });
         }
       });

@@ -15,7 +15,7 @@ import { useQuery } from '../../hooks/useQuery';
 import { context } from '../../context/StoreProvider';
 import { modules, storageObjects, defaultStorage } from '../../utilities/defaultdata';
 import { saveLocalStorage, getLocalSettings } from '../../utilities/localstorage';
-import { getJWT } from '../../service/RSSOService';
+import { getJWT, hasValidJWT } from '../../service/RSSOService';
 
 const LandingComponent = ({ history, location }) => {
   const [state, dispatch] = useContext(context);
@@ -29,28 +29,31 @@ const LandingComponent = ({ history, location }) => {
     // Checks is the route contains a code parameter then fetch a auth token
     if (code) {
       console.log('HeaderComponent: code.......', code);
-      getJWT(code)
-        .then(response => {
-          console.log('HeaderComponent: getJWT response...', response);
-          if (!response.ok) throw new Error(response.statusText);
-          return response.json();
-        }).then(token => {
-          console.log('HeaderComponent: getJWT token......', token);
-          saveLocalStorage(storageObjects.rsso, {
-            accessToken: token.access_token,
-            refreshToken: token.refresh_token,
-            expiresIn: token.expires_in,
-            tokenDate: new Date(),
+      if (!hasValidJWT()) {
+        getJWT(code)
+          .then(response => {
+            console.log('HeaderComponent: getJWT response...', response);
+            if (!response.ok) throw new Error(response.statusText);
+            return response.json();
+          }).then(token => {
+            console.log('HeaderComponent: getJWT token......', token);
+            saveLocalStorage(storageObjects.rsso, {
+              accessToken: token.access_token,
+              tokenType: token.token_type,
+              expiresIn: token.expires_in,
+              tokenDate: new Date(),
+              refreshToken: token.refresh_token,
+            });
+            dispatch({ type: 'AUTH', payload: true });
+            // setSnackState({ severity: 'success', message: 'Login successful', show: true });
+            history.push('/');
+          }).catch(error => {
+            console.log('HeaderComponent: getJWT error...', error);
+            saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
+            dispatch({ type: 'AUTH', payload: false });
+            setSnackState({ severity: 'error', message: 'Login failed', show: true });
           });
-          dispatch({ type: 'AUTH', payload: true });
-          // setSnackState({ severity: 'success', message: 'Login successful', show: true });
-          history.push('/');
-        }).catch(error => {
-          console.log('HeaderComponent: getJWT error...', error);
-          saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
-          dispatch({ type: 'AUTH', payload: false });
-          setSnackState({ severity: 'error', message: 'Login failed', show: true });
-        });
+      }
     }
     return () => { };
   }, [code, dispatch, history]);

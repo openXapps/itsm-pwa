@@ -14,14 +14,33 @@ export const getJWT = (code) => {
   const redirect = encodeURIComponent(host + '/pwa');
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
   const body = `grant_type=authorization_code&code=${code}&redirect_uri=${redirect}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
-  console.log('getJWT: POST...', host + url + '?' + body);
+  // console.log('getJWT: POST...', host + url + '?' + body);
   return fetch(host + url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'charset': 'UTF-8'
     },
     body: body
+  });
+}
+
+/**
+ * Helper function to refresh a JWT from RSSO
+ * @returns Promised response of a RSSO token refresh
+ */
+ export const refreshJWT = () => {
+  const { refreshToken } = getLocalRSSO().data;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const url = '/rsso/oauth2/v1.1/token';
+  const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
+  const body = `grant_type=refresh_token&refresh_token=${refreshToken}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
+  // console.log('revokeJWT: POST...', host + url + '?' + body);
+  return fetch(host + url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: body,
   });
 }
 
@@ -33,11 +52,9 @@ export const revokeJWT = () => {
   const { accessToken } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const url = '/rsso/oauth2/revoke';
-  // const url = '/rsso/logout';
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
   const body = `token=${accessToken}&token_type_hint=access_token&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
   // console.log('revokeJWT: POST...', host + url + '?' + body);
-  // console.log('revokeJWT: POST...', host + url);
   return fetch(host + url, {
     method: 'POST',
     headers: {
@@ -76,11 +93,11 @@ export const hasJWTExpired = (tokenDate, expiresIn) => {
   let response = true;
   console.log('hasJWTExpired: testing JWT date:expires...', tokenDate, expiresIn);
   if (tokenDate) {
-    const d1 = new Date();
-    const d2 = new Date(tokenDate);
-    // Converting to minutes - threshold is 60 minutes
-    console.log('hasJWTExpired: age...', ((d1.getTime() - d2.getTime()) / (expiresIn)));
-    response = false;
+    const d1 = new Date().getTime();
+    const d2 = new Date(tokenDate).getTime();
+    let dif = ((d1 - d2) / 1000);
+    console.log('hasJWTExpired: dif...', dif);
+    if (dif < expiresIn) response = false;
   }
   // console.log('hasJWTExpired: response...', response);
   return response
