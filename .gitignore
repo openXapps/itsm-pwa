@@ -9,6 +9,7 @@
 /coverage
 /sandbox/test.html
 /sandbox/src.zip
+/sandbox/backups
 
 # production
 /build
