@@ -1,5 +1,5 @@
-import { getLocalRSSO } from '../utilities/localstorage';
-import { localEnvironment } from '../utilities/defaultdata';
+import { getLocalRSSO, getLocalSettings, saveLocalStorage } from '../utilities/localstorage';
+import { localEnvironment, storageObjects } from '../utilities/defaultdata';
 
 // https://docs.bmc.com/docs/ars2002/enabling-oauth-authorization-for-remedy-ar-system-rest-apis-909638148.html#EnablingOAuthauthorizationforRemedyARSystemRESTAPIs-TouseRemedySSOOAuth2.0authorizationinyourapplication
 
@@ -28,7 +28,7 @@ export const getJWT = (code) => {
  * Helper function to refresh a JWT from RSSO
  * @returns Promised response of a RSSO token refresh
  */
- export const refreshJWT = () => {
+export const refreshJWT = () => {
   const { refreshToken } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const url = '/rsso/oauth2/v1.1/token';
@@ -75,8 +75,8 @@ export const hasValidJWT = () => {
   if (rsso.statusOK) {
     if (rsso.data.tokenDate && rsso.data.accessToken) {
       if (!hasJWTExpired(rsso.data.tokenDate, rsso.data.expiresIn)) {
-        // if (testJWT(rsso.data.jwt)) response = true;
-        response = true;
+        if (testJWT(rsso.data.accessToken)) response = true;
+        // response = true;
       }
     }
   }
@@ -105,56 +105,54 @@ export const hasJWTExpired = (tokenDate, expiresIn) => {
 
 /**
  * Helper function to test a JWT validity
- * @param {string} jwt Token to be used for testing connection
+ * @param {string} token Token to be used for testing connection
  * @returns A boolean to indicate whether the test was successful or not
  */
-// export const testJWT = async (jwt, user) => {
-//   const settings = getLocalSettings().data;
-//   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
-//   const query = `'submitter'="${user}"`;
-//   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
-//   // const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + (
-//   //   settings.settingsId ? (settings.settingsId) : ('?q=(' + query + ')')
-//   // ) + '&fields=values(' + fields + ')';
-//   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings?q=(' + query + ')&fields=values(' + fields + ')';
-//   // console.log('testJWT: url...', url);
+export const testJWT = async (token) => {
+  const settings = getLocalSettings().data;
+  const { tokenType } = getLocalRSSO().data;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const query = `'submitter'=$USER$`;
+  const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
+  const url = `/api/arsys/v1/entry/SBSA:PWA:UserSettings?q=(${query})&fields=values(${fields})`;
+  // console.log('testJWT: url...', url);
 
-//   const response = await fetch(host + url, {
-//     method: 'GET',
-//     headers: { 'Authorization': 'AR-JWT ' + jwt },
-//     mode: 'cors',
-//   });
-//   // response.json().then(data => { console.log('testJWT: response...', data) });
+  const response = await fetch(host + url, {
+    method: 'GET',
+    headers: { 'Authorization': tokenType + ' ' + token },
+    mode: 'cors',
+  });
+  // response.json().then(data => { console.log('testJWT: response...', data) });
 
-//   if (response.ok) {
-//     response.json().then(data => {
-//       if (data.entries.length > 0) {
-//         if (!settings.settingsId) {
-//           saveSettings(data.entries[0].values);
-//         } else {
-//           if (settings.settingsId !== data.entries[0].values.requestId) {
-//             saveSettings(data.entries[0].values);
-//           }
-//         }
-//       }
-//     });
-//   }
-//   return response.ok;
-// };
+  if (response.ok) {
+    response.json().then(data => {
+      if (data.entries.length > 0) {
+        if (!settings.settingsId) {
+          saveSettings(data.entries[0].values);
+        } else {
+          if (settings.settingsId !== data.entries[0].values.requestId) {
+            saveSettings(data.entries[0].values);
+          }
+        }
+      }
+    });
+  }
+  return response.ok;
+};
 
 /**
  * Internal helper function to save settings into storage
  * @param {any} data Seetings object to save
  */
-// function saveSettings(data) {
-//   saveLocalStorage(storageObjects.settings, {
-//     settingsId: data.requestId,
-//     theme: data.theme,
-//     approvals: data.showApproval === 'true' ? true : false,
-//     incidents: data.showIncident === 'true' ? true : false,
-//     changes: data.showChange === 'true' ? true : false,
-//     problems: data.showProblem === 'true' ? true : false,
-//     assets: data.showAsset === 'true' ? true : false,
-//     people: data.showPeople === 'true' ? true : false,
-//   });
-// }
+function saveSettings(data) {
+  saveLocalStorage(storageObjects.settings, {
+    settingsId: data.requestId,
+    theme: data.theme,
+    approvals: data.showApproval === 'true' ? true : false,
+    incidents: data.showIncident === 'true' ? true : false,
+    changes: data.showChange === 'true' ? true : false,
+    problems: data.showProblem === 'true' ? true : false,
+    assets: data.showAsset === 'true' ? true : false,
+    people: data.showPeople === 'true' ? true : false,
+  });
+}

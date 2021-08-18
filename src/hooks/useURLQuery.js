@@ -3,6 +3,6 @@
  * @param {any} locationSearch React Router DOM unmutable location object
  * @returns Provides a new URLSearchParams object
  */
-export const useQuery = (locationSearch) => {
+export const useURLQuery = (locationSearch) => {
   return new URLSearchParams(locationSearch);
 };

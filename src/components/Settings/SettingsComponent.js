@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useState,
-  useContext,
-} from 'react';
+import { useEffect, useState, useContext } from 'react';
 
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
@@ -15,32 +11,16 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
-// import TextField from '@material-ui/core/TextField';
-// import Autocomplete from '@material-ui/lab/Autocomplete';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
 import useStyles from './SettingsStyles';
 import { context } from '../../context/StoreProvider';
-import {
-  putARSettings,
-  postARSettings,
-  getARSettings,
-} from '../../service/SettingsService';
+import { putARSettings, postARSettings, getARSettings } from '../../service/SettingsService';
 import { themeList } from '../../service/ThemeService';
 import { getLocalSettings, saveLocalStorage } from '../../utilities/localstorage';
 import { storageObjects, defaultStorage } from '../../utilities/defaultdata';
 import { modules } from '../../utilities/defaultdata';
-
-/**
-theme: string,
-approvals: boolean,
-incidents: boolean,
-changes: boolean,
-problems: boolean,
-assets: boolean,
-people: boolean,
- */
 
 const initialFieldData = () => {
   let result = defaultStorage.settings;
@@ -56,7 +36,7 @@ const SettingsComponent = ({ history }) => {
   const [settingsId, setSettingsId] = useState(getLocalSettings().data.settingsId);
   const [isSaved, setIsSaved] = useState(fields.settingsId ? true : false);
   const [criticalErr, setCriticalErr] = useState({ status: false, message: '' });
-  const [snackState, setSnackState] = useState({ severity: 'info', message: 'X', show: false });
+  const [snackState, setSnackState] = useState({ severity: 'info', message: 'X', show: false, duration: 2000 });
 
   useEffect(() => {
     if (!settingsId) {
@@ -82,7 +62,7 @@ const SettingsComponent = ({ history }) => {
           }
         }).catch(err => {
           setCriticalErr({ status: true, message: err.message })
-          setSnackState({ severity: 'error', message: err.message, show: true });
+          setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
         });
     }
     return () => { };
@@ -111,11 +91,11 @@ const SettingsComponent = ({ history }) => {
       "showPeople":   "${fields.people}"
     }}`;
     if (criticalErr.status) {
-      setSnackState({ severity: 'error', message: criticalErr.message, show: true });
+      setSnackState({ severity: 'error', message: criticalErr.message, show: true, duration: 3000 });
       return;
     }
     if (!fields.theme) {
-      setSnackState({ severity: 'error', message: 'Must have a theme', show: true });
+      setSnackState({ severity: 'error', message: 'Must have a theme', show: true, duration: 2000 });
       return;
     }
     dispatch({ type: 'THEME', payload: fields.theme });
@@ -132,10 +112,10 @@ const SettingsComponent = ({ history }) => {
           setFields({ ...fields, settingsId: data.values.requestId });
           setSettingsId(data.values.requestId);
           setIsSaved(true);
-          setSnackState({ severity: 'success', message: 'Settings created', show: true });
+          setSnackState({ severity: 'success', message: 'Settings created', show: true, duration: 2000 });
         }).catch(err => {
           // console.log('SettingsComponent: submit ERR...', err);
-          setSnackState({ severity: 'error', message: err.message, show: true });
+          setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
         });
     } else {
       putARSettings(settingsId, data)
@@ -144,10 +124,10 @@ const SettingsComponent = ({ history }) => {
           if (response.status !== 204) throw new Error('ERR ' + response.status + ' : ' + response.statusText);
           saveLocalStorage(storageObjects.settings, fields);
           setIsSaved(true);
-          setSnackState({ severity: 'success', message: 'Settings updated', show: true });
+          setSnackState({ severity: 'success', message: 'Settings updated', show: true, duration: 2000 });
         }).catch(err => {
           // console.log('SettingsComponent: update ERR...', err);
-          setSnackState({ severity: 'error', message: err.message, show: true });
+          setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
         });
     }
   };
@@ -219,7 +199,7 @@ const SettingsComponent = ({ history }) => {
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}
-        autoHideDuration={4000}
+        autoHideDuration={snackState.duration}
         onClose={handleSnackState}
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}>
           {snackState.message}

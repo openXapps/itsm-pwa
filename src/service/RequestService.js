@@ -1,4 +1,4 @@
-import { getLocalSession } from '../utilities/localstorage';
+import { getLocalRSSO } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 /**
@@ -19,7 +19,7 @@ export const serviceRequestModel = {
  * @returns Promise of a service request
  */
 export const getServiceRequest = (requestId) => {
-  const { jwt } = getLocalSession().data;
+  const { accessToken, tokenType } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Request Number,
@@ -33,7 +33,7 @@ export const getServiceRequest = (requestId) => {
   const url = '/api/arsys/v1/entry/SRM:Request/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',
-    headers: { 'Authorization': 'AR-JWT ' + jwt },
+    headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
   });
 };

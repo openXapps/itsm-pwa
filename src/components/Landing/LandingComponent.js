@@ -11,7 +11,7 @@ import Divider from '@material-ui/core/Divider';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 import useStyles from './LandingStyles';
-import { useQuery } from '../../hooks/useQuery';
+import { useURLQuery } from '../../hooks/useURLQuery';
 import { context } from '../../context/StoreProvider';
 import { modules, storageObjects, defaultStorage } from '../../utilities/defaultdata';
 import { saveLocalStorage, getLocalSettings } from '../../utilities/localstorage';
@@ -20,23 +20,25 @@ import { getJWT, hasValidJWT } from '../../service/RSSOService';
 const LandingComponent = ({ history, location }) => {
   const [state, dispatch] = useContext(context);
   const classes = useStyles();
-  const code = useQuery(location.search).get('code');
+  // If redirect from OAuth2 with code parameter, then source the code value
+  const code = useURLQuery(location.search).get('code');
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 4000 });
 
   // console.log('LandingComponent: location...', location);
 
   useEffect(() => {
-    // Checks is the route contains a code parameter then fetch a auth token
+    // Checks if URL location contains a code parameter and if so, then fetchs token
     if (code) {
-      console.log('HeaderComponent: code.......', code);
+      // console.log('HeaderComponent: code.......', code);
+      // Before we fetch a new token, first validated the existing token
       if (!hasValidJWT()) {
         getJWT(code)
           .then(response => {
-            console.log('HeaderComponent: getJWT response...', response);
+            // console.log('HeaderComponent: getJWT response...', response);
             if (!response.ok) throw new Error(response.statusText);
             return response.json();
           }).then(token => {
-            console.log('HeaderComponent: getJWT token......', token);
+            // console.log('HeaderComponent: getJWT token......', token);
             saveLocalStorage(storageObjects.rsso, {
               accessToken: token.access_token,
               tokenType: token.token_type,
@@ -45,10 +47,10 @@ const LandingComponent = ({ history, location }) => {
               refreshToken: token.refresh_token,
             });
             dispatch({ type: 'AUTH', payload: true });
-            // setSnackState({ severity: 'success', message: 'Login successful', show: true });
-            history.push('/');
+            setSnackState({ severity: 'success', message: 'Login successful', show: true });
+            history.replace('/');
           }).catch(error => {
-            console.log('HeaderComponent: getJWT error...', error);
+            // console.log('HeaderComponent: getJWT error...', error);
             saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
             dispatch({ type: 'AUTH', payload: false });
             setSnackState({ severity: 'error', message: 'Login failed', show: true });
@@ -57,11 +59,6 @@ const LandingComponent = ({ history, location }) => {
     }
     return () => { };
   }, [code, dispatch, history]);
-
-  // useEffect(() => {
-  //   if (!state.isAuth) setSnackState({ ...snackState, message: 'Not active session, please login', show: true });
-  //   return () => { };
-  // }, [state.isAuth]);
 
   const handleGoToModule = (e) => {
     const moduleId = parseInt(e.currentTarget.dataset.moduleId);
@@ -85,7 +82,7 @@ const LandingComponent = ({ history, location }) => {
                   {state.isAuth ? (
                     <><Divider orientation="vertical" flexItem />
                       <Box p={1}>
-                        <IconButton edge="end" onClick={handleGoToModule} data-module-id={i}>
+                        <IconButton edge="end" onClick={handleGoToModule} data-module-id={i} title={v.label}>
                           <KeyboardArrowRightIcon />
                         </IconButton >
                       </Box></>

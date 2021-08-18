@@ -1,4 +1,4 @@
-import { getLocalSession } from '../utilities/localstorage';
+import { getLocalRSSO } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 /**
@@ -16,13 +16,12 @@ export const approvalModel = {
 
 /**
  * Helper function to fetch approvals
- * @param {string} user Remedy login ID
  * @returns Promise of approvals
  */
-export const getApprovals = (user) => {
-  const session = getLocalSession().data;
+export const getApprovals = () => {
+  const { accessToken, tokenType } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
-  const query = `'Approvers' LIKE "%${user}%" AND (('Approval Status' = 0) OR ('Approval Status' = 3) OR ('Approval Status' = 4))`;
+  const query = `('Approvers' LIKE $USER$) AND (('Approval Status' = 0) OR ('Approval Status' = 3) OR ('Approval Status' = 4))`;
   // const query = `('Approval Status' = 0 OR 'Approval Status' = 3 OR 'Approval Status' = 4)`;
   // const query = `'Signature ID' = "000000000002059"`;
   const fields = `
@@ -33,10 +32,10 @@ export const getApprovals = (user) => {
     14516,
     Create-Date-Sig
     `;
-  const url = '/api/arsys/v1/entry/AP:Detail-Signature/?q=(' + query + ')&fields=values(' + fields + ')';
+  const url = `/api/arsys/v1/entry/AP:Detail-Signature/?q=(${query})&fields=values(${fields})`;
   return fetch(host + url, {
     method: 'GET',
-    headers: { 'Authorization': 'AR-JWT ' + session.jwt },
+    headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
   });
 };
@@ -45,15 +44,15 @@ export const getApprovals = (user) => {
  * Helper function to submit an approval
  * @returns Promise of new approval
  */
- export const postApproval = (data) => {
-  const { jwt } = getLocalSession().data;
+export const postApproval = (data) => {
+  const { accessToken, tokenType } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = 'requestId,status,shortDescription';
-  const url = '/api/arsys/v1/entry/SBSA:PWA:Approval?fields=values(' + fields + ')';
+  const url = `/api/arsys/v1/entry/SBSA:PWA:Approval?fields=values(${fields})`;
   return fetch(host + url, {
     method: 'POST',
     headers: {
-      'Authorization': 'AR-JWT ' + jwt,
+      'Authorization': tokenType + ' ' + accessToken,
       'Content-Type': 'application/json',
     },
     mode: 'cors',

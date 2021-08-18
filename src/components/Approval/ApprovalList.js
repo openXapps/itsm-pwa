@@ -24,13 +24,11 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
 import { getApprovals } from '../../service/ApprovalService';
-import { getLocalSession } from '../../utilities/localstorage';
 import useStyles from './ApprovalStyles';
 
 const ApprovalList = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
-  // const [isLoading, setIsLoading] = useState(false);
   const [approvals, setApprovals] = useState([]);
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
@@ -43,10 +41,9 @@ const ApprovalList = ({ history }) => {
   const handleReload = () => {
     // console.log('ApprovalList: state...', state);
     if (state.isAuth) {
-      // setIsLoading(true);
       dispatch({ type: 'PROGRESS', payload: true });
       setTimeout(() => {
-        getApprovals(getLocalSession().data.user)
+        getApprovals()
           .then(response => {
             // console.log('ApprovalList: response...', response.json());
             if (!response.ok) {
@@ -55,7 +52,6 @@ const ApprovalList = ({ history }) => {
                 throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
               }).catch(error => {
                 // console.log('ApprovalList: response false error...', error);
-                // setIsLoading(false);
                 dispatch({ type: 'PROGRESS', payload: false });
                 if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
                 setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
@@ -63,10 +59,8 @@ const ApprovalList = ({ history }) => {
             } else {
               return response.json().then(data => {
                 // console.log('ApprovalList: approvals...', data);
-                // setIsLoading(false);
                 dispatch({ type: 'PROGRESS', payload: false });
                 populateApprovals(data.entries);
-                // setApprovals(data.entries);
                 setSnackState({ severity: 'success', message: 'Approvals fetched', show: true, duration: 1000 });
               });
             }
@@ -172,7 +166,7 @@ const ApprovalList = ({ history }) => {
               </Box>
             ) : (
               <Box mt={3}>
-                <Typography variant="h6">No approvals found. Click Reload to get approvals.</Typography>
+                <Typography variant="h6">No approvals found. Click Reload to try again.</Typography>
               </Box>
             )
           )}

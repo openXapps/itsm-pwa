@@ -1,4 +1,4 @@
-import { getLocalSession } from '../utilities/localstorage';
+import { getLocalRSSO } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 /**
@@ -24,7 +24,7 @@ export const changeRequestModel = {
  * @returns Promise of a change request
  */
 export const getChangeRequest = (changeId) => {
-  const { jwt } = getLocalSession().data;
+  const { accessToken, tokenType } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Infrastructure Change ID,
@@ -43,7 +43,7 @@ export const getChangeRequest = (changeId) => {
   const url = '/api/arsys/v1/entry/CHG:Infrastructure Change/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',
-    headers: { 'Authorization': 'AR-JWT ' + jwt },
+    headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
   });
 };
@@ -64,7 +64,7 @@ export const getChangeRequest = (changeId) => {
  * @returns Promise of a change work info
  */
  export const getChangeWorkInfo = (changeId) => {
-  const { jwt } = getLocalSession().data;
+  const { accessToken, tokenType } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Work Log Type,
@@ -76,7 +76,7 @@ export const getChangeRequest = (changeId) => {
   const url = '/api/arsys/v1/entry/CHG:WorkLog/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',
-    headers: { 'Authorization': 'AR-JWT ' + jwt },
+    headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
   });
 };
@@ -94,7 +94,7 @@ export const getChangeRequest = (changeId) => {
  * @returns Promise of a change impacted areas
  */
  export const getChangeImpactedAreas = (changeId) => {
-  const { jwt } = getLocalSession().data;
+  const { accessToken, tokenType } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Company
@@ -103,7 +103,7 @@ export const getChangeRequest = (changeId) => {
   const url = '/api/arsys/v1/entry/CHG:Impacted Areas/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',
-    headers: { 'Authorization': 'AR-JWT ' + jwt },
+    headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
   });
 };
@@ -122,7 +122,7 @@ export const getChangeRequest = (changeId) => {
  * @returns Promise of a change associations
  */
  export const getChangeAssociations = (changeId) => {
-  const { jwt } = getLocalSession().data;
+  const { accessToken, tokenType } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Request Type01,
@@ -133,7 +133,7 @@ export const getChangeRequest = (changeId) => {
   const url = '/api/arsys/v1/entry/CHG:Associations/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',
-    headers: { 'Authorization': 'AR-JWT ' + jwt },
+    headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
   });
 };

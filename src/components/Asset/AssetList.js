@@ -22,19 +22,14 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { context } from '../../context/StoreProvider';
 import { getAssets, assetModel } from '../../service/AssetService';
-import { getLocalSession } from '../../utilities/localstorage';
 import useStyles from './AssetStyles';
 
 const AssetList = ({ history }) => {
   const classes = useStyles();
-  const [state,] = useContext(context);
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, dispatch] = useContext(context);
+  // const [isLoading, setIsLoading] = useState(false);
   const [assets, setAssets] = useState([assetModel]);
-  const [snackState, setSnackState] = useState({
-    severity: 'success',
-    message: 'Assets fetched',
-    show: false
-  });
+  const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 2000 });
 
   useEffect(() => {
     if (state.isAuth) handleReload();
@@ -45,8 +40,8 @@ const AssetList = ({ history }) => {
   const handleReload = () => {
     // console.log('AssetList: state...', state);
     if (state.isAuth) {
-      setIsLoading(true);
-      getAssets(getLocalSession().data.user)
+      dispatch({ type: 'PROGRESS', payload: true });
+      getAssets()
         .then(response => {
           // console.log('AssetList: response...', response.json());
           if (!response.ok) {
@@ -55,21 +50,21 @@ const AssetList = ({ history }) => {
               throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
             }).catch(err => {
               // console.log('AssetList: response false err...', err);
-              setIsLoading(false);
-              setSnackState({ severity: 'error', message: err.message, show: true });
+              dispatch({ type: 'PROGRESS', payload: true });
+              setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
             });
           } else {
             return response.json().then(data => {
               // console.log('AssetList: assets...', data);
-              setIsLoading(false);
+              dispatch({ type: 'PROGRESS', payload: true });
               populateAssets(data.entries);
               // setAssets(data.entries);
-              setSnackState({ severity: 'success', message: 'Assets fetched', show: true });
+              setSnackState({ severity: 'success', message: 'Assets fetched', show: true, duration: 2000 });
             });
           }
         });
     } else {
-      setSnackState({ severity: 'info', message: 'Please login first', show: true });
+      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 3000 });
     }
   }
 
@@ -118,42 +113,41 @@ const AssetList = ({ history }) => {
       </Box>
       <Box width="100%" mt={3}>
         <List disablePadding>
-          {!isLoading ? (
-            assets.length > 0 ? (
-              assets.map((v, i) => {
-                return (
-                  <div key={i}>
-                    <ListItem disableGutters>
-                      <ListItemText
-                        primary={v.model + ' ' + v.item}
-                        secondary={'Serial: ' + v.serial}
-                      /><ListItemSecondaryAction>
-                        <IconButton edge="end"
-                          onClick={handleAssetDetailsButton}
-                        ><MoreVertIcon /></IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <Divider />
-                  </div>
-                );
-              })
+          {assets.length > 0 ? (
+            assets.map((v, i) => {
+              return (
+                <div key={i}>
+                  <ListItem disableGutters>
+                    <ListItemText
+                      primary={v.model + ' ' + v.item}
+                      secondary={'Serial: ' + v.serial}
+                    /><ListItemSecondaryAction>
+                      <IconButton edge="end"
+                        onClick={handleAssetDetailsButton}
+                      ><MoreVertIcon /></IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <Divider />
+                </div>
+              );
+            })
+          ) : (
+            state.showProgress ? (
+              <Box mt={3}>
+                <Typography variant="h6">Loading...</Typography>
+              </Box>
             ) : (
               <Box mt={3}>
-                <Typography variant="h6">No assets found. Click Reload to get assets.</Typography>
+                <Typography variant="h6">No assets found. Click Reload to try again.</Typography>
               </Box>
             )
-          ) : (
-            <Box>Loading...</Box>
           )}
         </List>
       </Box>
       <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}
-        autoHideDuration={4000}
+        autoHideDuration={snackState.duration}
         onClose={handleSnackState}
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}>
           {snackState.message}
