@@ -31,7 +31,7 @@ const LandingComponent = ({ history, location }) => {
     if (code) {
       // console.log('HeaderComponent: code.......', code);
       // Before we fetch a new token, first validated the existing token
-      if (!hasValidJWT()) {
+      if (!hasValidJWT(true)) {
         getJWT(code)
           .then(response => {
             // console.log('HeaderComponent: getJWT response...', response);

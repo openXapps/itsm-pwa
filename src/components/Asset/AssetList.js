@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useState,
-  useContext,
-  // Fragment,
-} from 'react';
+import { useEffect, useState, useContext } from 'react';
 // import clsx from 'clsx';
 
 import Typography from '@material-ui/core/Typography';
@@ -27,7 +22,6 @@ import useStyles from './AssetStyles';
 const AssetList = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
-  // const [isLoading, setIsLoading] = useState(false);
   const [assets, setAssets] = useState([assetModel]);
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 2000 });
 
@@ -41,28 +35,30 @@ const AssetList = ({ history }) => {
     // console.log('AssetList: state...', state);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
-      getAssets()
-        .then(response => {
-          // console.log('AssetList: response...', response.json());
-          if (!response.ok) {
-            response.json().then(data => {
-              // console.log('AssetList: response false data...', data);
-              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-            }).catch(err => {
-              // console.log('AssetList: response false err...', err);
-              dispatch({ type: 'PROGRESS', payload: true });
-              setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
-            });
-          } else {
-            return response.json().then(data => {
-              // console.log('AssetList: assets...', data);
-              dispatch({ type: 'PROGRESS', payload: true });
-              populateAssets(data.entries);
-              // setAssets(data.entries);
-              setSnackState({ severity: 'success', message: 'Assets fetched', show: true, duration: 2000 });
-            });
-          }
-        });
+      setTimeout(() => {
+        getAssets()
+          .then(response => {
+            // console.log('AssetList: response...', response.json());
+            if (!response.ok) {
+              response.json().then(data => {
+                // console.log('AssetList: response false data...', data);
+                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+              }).catch(err => {
+                // console.log('AssetList: response false err...', err);
+                dispatch({ type: 'PROGRESS', payload: false });
+                setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
+              });
+            } else {
+              return response.json().then(data => {
+                // console.log('AssetList: assets...', data);
+                dispatch({ type: 'PROGRESS', payload: false });
+                populateAssets(data.entries);
+                // setAssets(data.entries);
+                setSnackState({ severity: 'success', message: 'Assets fetched', show: true, duration: 2000 });
+              });
+            }
+          });
+      }, 500);
     } else {
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 3000 });
     }

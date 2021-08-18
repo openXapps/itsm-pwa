@@ -67,16 +67,20 @@ export const revokeJWT = () => {
 
 /**
  * Helper function to validate JWT against Remedy
+ * @param {boolean} includeTest Should an API test be performed
  * @returns boolean whether JWT is still valid
  */
-export const hasValidJWT = () => {
+export const hasValidJWT = (includeTest) => {
   let response = false;
   const rsso = getLocalRSSO();
   if (rsso.statusOK) {
     if (rsso.data.tokenDate && rsso.data.accessToken) {
       if (!hasJWTExpired(rsso.data.tokenDate, rsso.data.expiresIn)) {
-        if (testJWT(rsso.data.accessToken)) response = true;
-        // response = true;
+        if (includeTest) {
+          if (testJWT(rsso.data.accessToken)) response = true;
+        } else {
+          response = true;
+        }
       }
     }
   }
