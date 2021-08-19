@@ -139,7 +139,7 @@ const SettingsComponent = ({ history }) => {
   return (
     <Container maxWidth="sm">
       <Box mt={2} />
-      <Typography variant="h6">Application Settings ({settingsId})</Typography>
+      <Typography variant="h6">Application Settings</Typography>
       <Box my={2} />
       <Paper component="form" elevation={0} autoComplete="off">
         <Box p={3}>
