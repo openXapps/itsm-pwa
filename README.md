@@ -1,6 +1,19 @@
-# Getting Started with Create React App
+# Progressive Web Application for BMC Remedy ITSM
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a lab project, built by Standard Bank South Africa staff for internal use.
+
+## Files **not** included
+
+The following file you have to supply after cloning the repository:
+
+**.env.local** - Environment variable file containing:
+```
+REACT_APP_ARPROTOCOL=<http or https>
+REACT_APP_ARHOST=<Remedy Server host name for API endpoints>
+REACT_APP_ARPORT=<Remedy Server port number for API endpoints>
+REACT_APP_RSSO_CLIENT_ID=<RSSO client ID>
+REACT_APP_RSSO_SECRET=<RSSO client secret>
+```
 
 ## Available Scripts
 
@@ -9,7 +22,7 @@ In the project directory, you can run:
 ### `npm start`
 
 Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Open [http://localhost:3000/pwa](http://localhost:3000/pwa) to view it in the browser.
 
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
@@ -44,27 +57,3 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
