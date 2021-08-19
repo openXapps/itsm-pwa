@@ -37,13 +37,13 @@ const HeaderComponent = ({ history, location }) => {
   const handleLogoutButton = () => {
     revokeJWT()
       .then(response => {
-        console.log('handleLogoutButton: revokeJWT response...', response);
+        // console.log('handleLogoutButton: revokeJWT response...', response);
         if (!response.ok) {
           response.json().then(data => {
-            console.log('handleLogoutButton: response false data...', data);
+            // console.log('handleLogoutButton: response false data...', data);
             throw new Error(`Logout failed: ${data.error}`);
           }).catch(error => {
-            console.log('handleLogoutButton: response false err...', error);
+            // console.log('handleLogoutButton: response false err...', error);
             setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
           });
         } else {
@@ -67,7 +67,7 @@ const HeaderComponent = ({ history, location }) => {
       <AppBar position="fixed" color="inherit">
         <Container maxWidth="md" disableGutters>
           <Toolbar disableGutters>
-            <img className={classes.logo} alt="SB Logo" src="logo192.png" />
+            <img className={classes.logo} alt="SB Logo" src="./logo192.png" />
             <Typography variant="h6" className={classes.title}
             >Standard Bank ITSM <span className={classes.appVersion}><Hidden xsDown>v.{application.version}</Hidden></span>
             </Typography>

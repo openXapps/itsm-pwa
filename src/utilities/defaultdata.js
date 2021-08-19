@@ -2,7 +2,7 @@
  * Application meta data
  */
 export const application = {
-  version: 'beta.1',
+  version: '1.0',
 };
 
 /**

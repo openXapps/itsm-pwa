@@ -95,12 +95,12 @@ export const hasValidJWT = (includeTest) => {
  */
 export const hasJWTExpired = (tokenDate, expiresIn) => {
   let response = true;
-  console.log('hasJWTExpired: testing JWT date:expires...', tokenDate, expiresIn);
+  // console.log('hasJWTExpired: testing JWT date:expires...', tokenDate, expiresIn);
   if (tokenDate) {
     const d1 = new Date().getTime();
     const d2 = new Date(tokenDate).getTime();
     let dif = ((d1 - d2) / 1000);
-    console.log('hasJWTExpired: dif...', dif);
+    // console.log('hasJWTExpired: dif...', dif);
     if (dif < expiresIn) response = false;
   }
   // console.log('hasJWTExpired: response...', response);
