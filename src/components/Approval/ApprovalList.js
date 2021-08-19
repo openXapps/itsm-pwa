@@ -65,7 +65,7 @@ const ApprovalList = ({ history }) => {
               });
             }
           });
-      }, 500);
+      }, 300);
     } else {
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
     }

@@ -5,9 +5,24 @@ export const themeList = [
   'monday',
 ];
 
+// https://uigradients.com
+
 export const themes =
 {
   dark: {
+    overrides: {
+      MuiCssBaseline: {
+        '@global': {
+          body: {
+            // background: 'linear-gradient(to right, #141e30, #243b55)', // Royal
+            // background: 'linear-gradient(to right, #485563, #29323c)', // ServQuick
+            background: 'linear-gradient(to right, #000000, #434343)', // Deep Space
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+          },
+        },
+      },
+    },
     palette: {
       type: 'dark',
       primary: {
@@ -23,11 +38,34 @@ export const themes =
     },
   },
   light: {
+    overrides: {
+      MuiCssBaseline: {
+        '@global': {
+          body: {
+            background: 'linear-gradient(to right, #ffd89b, #6492b1)', // Jupiter
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+          },
+        },
+      },
+    },
     palette: {
       type: 'light',
     },
   },
   concrete: {
+    overrides: {
+      MuiCssBaseline: {
+        '@global': {
+          body: {
+            // background: 'linear-gradient(to right, #4b79a1, #283e51)', // Dark Skies
+            background: 'linear-gradient(to right, #a3a1ad, #928dab)', // Steel Gray
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+          },
+        },
+      },
+    },
     palette: {
       type: 'light',
       primary: {
@@ -43,6 +81,18 @@ export const themes =
     },
   },
   monday: {
+    overrides: {
+      MuiCssBaseline: {
+        '@global': {
+          body: {
+            // background: 'linear-gradient(to right, #1e3c72, #2a5298)', // Joomla
+            background: 'linear-gradient(to right, #7ab9e2, #748ba2)', // Nighthawk
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+          },
+        },
+      },
+    },
     palette: {
       type: 'light',
       primary: {

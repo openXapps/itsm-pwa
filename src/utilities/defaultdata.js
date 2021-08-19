@@ -60,14 +60,17 @@ export const localEnvironment = {
   RSSOSECRET: process.env.REACT_APP_RSSO_SECRET,
 };
 
+// const imgPath = 'pwa/img';
+const imgPath = 'img';
+
 /**
  * Modules to show on landing route
  */
 export const modules = [
-  { name: 'approvals', label: 'My Approvals', img: 'img/itsm-apr-alpha.png', path: '/approval' },
-  { name: 'incidents', label: 'My Incidents', img: 'img/itsm-inc-alpha.png', path: '/incident' },
-  { name: 'changes', label: 'My Changes', img: 'img/itsm-chg-alpha.png', path: '/change' },
-  { name: 'problems', label: 'My Investigations', img: 'img/itsm-pbm-alpha.png', path: '/problem' },
-  { name: 'assets', label: 'My Assets', img: 'img/itsm-ast-alpha.png', path: '/asset' },
-  { name: 'people', label: 'My People', img: 'img/itsm-ppl-alpha.png', path: '/people' },
+  { name: 'approvals', label: 'My Approvals', img: imgPath + '/itsm-apr-alpha.png', path: '/approval' },
+  { name: 'incidents', label: 'My Incidents', img: imgPath + '/itsm-inc-alpha.png', path: '/incident' },
+  { name: 'changes', label: 'My Changes', img: imgPath + '/itsm-chg-alpha.png', path: '/change' },
+  { name: 'problems', label: 'My Investigations', img: imgPath + '/itsm-pbm-alpha.png', path: '/problem' },
+  { name: 'assets', label: 'My Assets', img: imgPath + '/itsm-ast-alpha.png', path: '/asset' },
+  { name: 'people', label: 'My People', img: imgPath + '/itsm-ppl-alpha.png', path: '/people' },
 ];
