@@ -29,11 +29,12 @@ import Error404Component from './components/Error/Error404Component';
 const App = () => {
   const [state] = React.useContext(context);
   const appTheme = createMuiTheme(themes[state.theme]);
+  const root = process.env.PUBLIC_URL;
 
   return (
     <ThemeProvider theme={appTheme}>
       <CssBaseline />
-      <BrowserRouter basename={'/pwa'}>
+      <BrowserRouter basename={root}>
         <HeaderComponent />
         <Toolbar />
         <Switch>

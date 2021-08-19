@@ -14,11 +14,9 @@ export const themes =
       MuiCssBaseline: {
         '@global': {
           body: {
-            // background: 'linear-gradient(to right, #141e30, #243b55)', // Royal
-            // background: 'linear-gradient(to right, #485563, #29323c)', // ServQuick
-            background: 'linear-gradient(to right, #000000, #434343)', // Deep Space
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed",
+            // background: 'linear-gradient(to right, #141e30, #243b55) no-repeat fixed', // Royal
+            // background: 'linear-gradient(to right, #485563, #29323c) no-repeat fixed', // ServQuick
+            background: 'linear-gradient(145deg, #000000, #434343) no-repeat fixed', // Deep Space
           },
         },
       },
@@ -42,9 +40,7 @@ export const themes =
       MuiCssBaseline: {
         '@global': {
           body: {
-            background: 'linear-gradient(to right, #ffd89b, #6492b1)', // Jupiter
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed",
+            background: 'linear-gradient(145deg, #ffd89b, #6492b1) no-repeat fixed', // Jupiter
           },
         },
       },
@@ -58,10 +54,8 @@ export const themes =
       MuiCssBaseline: {
         '@global': {
           body: {
-            // background: 'linear-gradient(to right, #4b79a1, #283e51)', // Dark Skies
-            background: 'linear-gradient(to right, #a3a1ad, #928dab)', // Steel Gray
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed",
+            // background: 'linear-gradient(to right, #4b79a1, #283e51) no-repeat fixed', // Dark Skies
+            background: 'linear-gradient(145deg, #ffffff, #656179) no-repeat fixed', // Steel Gray
           },
         },
       },
@@ -85,10 +79,8 @@ export const themes =
       MuiCssBaseline: {
         '@global': {
           body: {
-            // background: 'linear-gradient(to right, #1e3c72, #2a5298)', // Joomla
-            background: 'linear-gradient(to right, #7ab9e2, #748ba2)', // Nighthawk
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed",
+            // background: 'linear-gradient(to right, #1e3c72, #2a5298) no-repeat fixed', // Joomla
+            background: 'linear-gradient(145deg, #7ab9e2, #748ba2) no-repeat fixed', // Nighthawk
           },
         },
       },

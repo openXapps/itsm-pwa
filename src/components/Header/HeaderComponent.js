@@ -28,6 +28,7 @@ const HeaderComponent = ({ history, location }) => {
   // Button handlers
   const handleLoginButton = () => {
     let url = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/rsso/oauth2/authorize?response_type=code';
+    // url += '&scope=Openid';
     url += '&client_id=' + localEnvironment.RSSOCLIENTID;
     url += '&client_secret=' + encodeURIComponent(localEnvironment.RSSOSECRET);
     url += '&redirect_uri=' + encodeURIComponent(localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/pwa');
