@@ -9,9 +9,8 @@ export const application = {
  * Local storage object types
  */
 export const storageObjects = {
-  session: 'sb-itsm-session',
-  settings: 'sb-itsm-settings',
   rsso: 'sb-itsm-rsso',
+  settings: 'sb-itsm-settings',
 };
 
 /**
@@ -25,12 +24,6 @@ export const defaultStorage = {
     expiresIn: 0,
     tokenDate: '',
     refreshToken: '',
-  },
-  // sb-itsm-session
-  session: {
-    user: '',
-    jwt: '',
-    jwtDate: '',
   },
   // sb-itsm-settings
   settings: {
