@@ -40,44 +40,14 @@ export const isLocalStorage = () => {
 * Write initial storage on first time usage
  */
 export const initialUse = () => {
-  // const session = getLocalSession();
   const rsso = getLocalRSSO();
   const settings = getLocalSettings();
 
   // No RSSO exist
   if (!rsso.statusOK) saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
 
-  // No session exist
-  // if (!session.statusOK) saveLocalStorage(storageObjects.session, defaultStorage.session);
-
   // No settings exist
   if (!settings.statusOK) saveLocalStorage(storageObjects.settings, defaultStorage.settings);
-};
-
-/**
- * Get SESSION from local storage (Remedy API Auth)
- * @returns Returns an object {statusOk: boolean, data: any}
- */
-export const getLocalSession = () => {
-  let response = {
-    statusOK: false,
-    data: defaultStorage.session,
-  };
-  try {
-    const session = JSON.parse(localStorage.getItem(storageObjects.session));
-    if (session) {
-      response = {
-        statusOK: true,
-        data: session
-      };
-    } else {
-      throw new Error('No items found in localStorage');
-    }
-  } catch (err) {
-    // Life goes on ...
-    // console.log(err);
-  }
-  return response;
 };
 
 /**
