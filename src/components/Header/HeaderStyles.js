@@ -19,15 +19,15 @@ const useStyles = makeStyles((theme) => ({
   appVersion: {
     fontSize: 12,
   },
-  menuButton: {
-    // marginLeft: theme.spacing(1),
-    [theme.breakpoints.down('xs')]: {
-      marginRight: theme.spacing(1),
-    },
-  },
-  drawerSize: {
-    width: 250,
-  },
+  // menuButton: {
+  // marginLeft: theme.spacing(1),
+  //   [theme.breakpoints.down('xs')]: {
+  //     marginRight: theme.spacing(0),
+  //   },
+  // },
+  // drawerSize: {
+  //   width: 250,
+  // },
 }));
 
 export default useStyles;
