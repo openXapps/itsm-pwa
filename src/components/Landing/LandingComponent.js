@@ -74,11 +74,12 @@ const LandingComponent = ({ history, location }) => {
       {modules.map((v, i) => {
         return (
           getLocalSettings().data[v.name] ? (
-            <Box mt={{ xs: 1, sm: 2 }} key={i}>
-              <Paper elevation={0}>
+            <Box mt={{ xs: 2, sm: 3 }} mx={{ xs: 2, md: 3 }} key={i}>
+              <Paper elevation={10}>
                 <Box display="flex" p={{ xs: 1, md: 2 }} alignItems="center">
                   <img className={classes.image} src={v.img} alt={v.label} />
-                  <Typography className={classes.title} variant="h5">{v.label}</Typography>
+                  <Typography className={classes.title} variant="h5"
+                  >{v.label} <span className={classes.counters}>({Math.floor(Math.random() * 10)})</span></Typography>
                   {state.isAuth ? (
                     <><Divider orientation="vertical" flexItem />
                       <Box p={1}>

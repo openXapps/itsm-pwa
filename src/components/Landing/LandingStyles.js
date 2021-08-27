@@ -13,6 +13,12 @@ const useStyles = makeStyles((theme) => ({
       height: 80,
     },
   },
+  counters: {
+    fontSize: 16,
+    [theme.breakpoints.down('xs')]: {
+      fontSize: 12,
+    },
+  }
 }));
 
 export default useStyles;
