@@ -24,6 +24,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
 import { getApprovals } from '../../service/ApprovalService';
+import { hasValidJWT } from '../../service/RSSOService';
 import useStyles from './ApprovalStyles';
 
 const ApprovalList = ({ history }) => {
@@ -33,7 +34,12 @@ const ApprovalList = ({ history }) => {
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
-    handleReload();
+    if (hasValidJWT(false)) {
+      handleReload();
+    } else {
+      dispatch({ type: 'AUTH', payload: false });
+      setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
+    }
     return () => true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -124,6 +130,7 @@ const ApprovalList = ({ history }) => {
         <Button
           variant="outlined"
           onClick={handleReload}
+          disabled={!state.isAuth}
         >Reload</Button>
         <Button
           style={{ marginLeft: '8px' }}
