@@ -26,22 +26,37 @@ export const getJWT = (code) => {
 
 /**
  * Helper function to refresh a JWT from RSSO
- * @returns Promised response of a RSSO token refresh
+ * If the refresh is successful then update local
+ * session cache
+ * @returns RSSO token refresh response boolean
  */
-export const refreshJWT = () => {
+export const refreshJWT = async () => {
   const { refreshToken } = getLocalRSSO().data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const url = '/rsso/oauth2/v1.1/token';
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
   const body = `grant_type=refresh_token&refresh_token=${refreshToken}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
   // console.log('revokeJWT: POST...', host + url + '?' + body);
-  return fetch(host + url, {
+  const response = await fetch(host + url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: body,
   });
+
+  if (response.ok) {
+    response.json().then(token => {
+      saveLocalStorage(storageObjects.rsso, {
+        accessToken: token.access_token,
+        tokenType: token.token_type,
+        expiresIn: token.expires_in,
+        tokenDate: new Date(),
+        refreshToken: token.refresh_token,
+      });
+    });
+  }
+  return response.ok;
 }
 
 /**
@@ -72,15 +87,25 @@ export const revokeJWT = () => {
  */
 export const hasValidJWT = (includeTest) => {
   let response = false;
-  const rsso = getLocalRSSO();
-  if (rsso.statusOK) {
-    if (rsso.data.tokenDate && rsso.data.accessToken) {
-      if (!hasJWTExpired(rsso.data.tokenDate, rsso.data.expiresIn)) {
+  const {statusOK, data} = getLocalRSSO();
+  // Local cache found
+  if (statusOK) {
+    // Has local RSSO cache
+    if (data.accessToken && data.refreshToken && data.tokenDate) {
+      // Has the current cache token expired
+      if (!hasJWTExpired(data.tokenDate, data.expiresIn)) {
+        // Should we run an API test
         if (includeTest) {
-          if (testJWT(rsso.data.accessToken)) response = true;
+          // Was the API test successful
+          if (testJWT(data.accessToken)) response = true;
         } else {
+          // Not testing the API - hope you know what you doing
           response = true;
         }
+        // Token has expired
+      } else {
+        // Try to refresh
+        if (refreshJWT()) response = true;
       }
     }
   }

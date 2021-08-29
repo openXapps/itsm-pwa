@@ -47,14 +47,19 @@ const LandingComponent = ({ history, location }) => {
               refreshToken: token.refresh_token,
             });
             dispatch({ type: 'AUTH', payload: true });
-            setSnackState({ severity: 'success', message: 'Login successful', show: true });
+            setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 2000 });
             history.replace('/');
           }).catch(error => {
             // console.log('HeaderComponent: getJWT error...', error);
             saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
             dispatch({ type: 'AUTH', payload: false });
-            setSnackState({ severity: 'error', message: 'Login failed', show: true });
+            setSnackState({ severity: 'error', message: 'Login failed', show: true, duration: 3000 });
           });
+      }
+    } else {
+      if (!hasValidJWT(true) && state.isAuth) {
+        dispatch({ type: 'AUTH', payload: false });
+        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
       }
     }
     return () => { };

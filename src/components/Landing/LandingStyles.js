@@ -9,6 +9,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   image: {
+    height: 128,
     [theme.breakpoints.down('xs')]: {
       height: 80,
     },

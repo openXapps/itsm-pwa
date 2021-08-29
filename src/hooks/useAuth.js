@@ -1,3 +1,9 @@
+/**
+ * THIS HOOK IS NOT USED AT THE MOMENT.
+ * IT WAS A CONCEPT I HAD TO MANAGE AUTH
+ * STATE
+ */
+
 import { useState } from 'react';
 import { useContext } from 'react';
 
