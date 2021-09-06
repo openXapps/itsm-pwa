@@ -9,9 +9,9 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   image: {
-    height: 128,
+    height: 96,
     [theme.breakpoints.down('xs')]: {
-      height: 80,
+      height: 64,
     },
   },
   counters: {

@@ -1,4 +1,4 @@
-import { getLocalRSSO } from '../utilities/localstorage';
+import { getLocalStorage } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 /**
@@ -19,7 +19,7 @@ export const serviceRequestModel = {
  * @returns Promise of a service request
  */
 export const getServiceRequest = (requestId) => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Request Number,

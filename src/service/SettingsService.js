@@ -1,4 +1,4 @@
-import { getLocalRSSO } from '../utilities/localstorage';
+import { getLocalStorage } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 // https://docs.bmc.com/docs/ars1902/end-points-in-ar-rest-api-851893757.html
@@ -9,7 +9,7 @@ import { localEnvironment } from '../utilities/defaultdata';
  * @returns Promise of new entry
  */
 export const postARSettings = (data) => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = 'requestId';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings?fields=values(' + fields + ')';
@@ -31,7 +31,7 @@ export const postARSettings = (data) => {
  * @returns Promise of updated entry
  */
 export const putARSettings = (requestId, data) => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + requestId;
   return fetch(host + url, {
@@ -51,7 +51,7 @@ export const putARSettings = (requestId, data) => {
  * @returns Promise of existing entry
  */
 export const getARSettings = () => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const query = `'submitter' = $USER$`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';

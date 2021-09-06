@@ -24,81 +24,64 @@ export const isLocalStorage = () => {
 };
 
 /**
- * Overwrite item to local storage
- * @param {string} obj Local storage identifier
- * @param {any} data Data object to store
+ * Write local storage object
+ * @param {string} item Local storage item to write
+ * @param {any} data Local storage object to write
  */
- export const saveLocalStorage = (obj, data) => {
+export const saveLocalStorage = (item, data) => {
   try {
-    localStorage.setItem(obj, JSON.stringify(data));
+    localStorage.setItem(item, JSON.stringify(data));
   } catch (error) {
     console.log(error);
   }
 };
 
 /**
+ * Get local storage object
+ * @param {string} item Local storage item to get
+ * @returns Returns an object {statusOk: boolean, data: any}
+ */
+export const getLocalStorage = (item) => {
+  let result = {
+    statusOK: false,
+    data: defaultStorage[item],
+  };
+  try {
+    const response = JSON.parse(localStorage.getItem(storageObjects[item]));
+    if (response) {
+      result = {
+        statusOK: true,
+        data: response
+      };
+    } else {
+      throw new Error('No items found in localStorage');
+    }
+  } catch (err) {
+    // Life goes on ...
+    // console.log(err);
+  }
+  return result;
+};
+
+/**
 * Write initial storage on first time usage
  */
 export const initialUse = () => {
-  const rsso = getLocalRSSO();
-  const settings = getLocalSettings();
+  const rsso = getLocalStorage('rsso');
+  const settings = getLocalStorage('settings');
+
+  // v1.1 changes
+  if (settings.statusOK && !settings.data.appVersion) {
+    saveLocalStorage(storageObjects.settings, {
+      ...settings.data,
+      appVersion: defaultStorage.settings.appVersion,
+    });
+  }
 
   // No RSSO exist
   if (!rsso.statusOK) saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
 
   // No settings exist
   if (!settings.statusOK) saveLocalStorage(storageObjects.settings, defaultStorage.settings);
-};
-
-/**
- * Get RSSO from local storage (Remedy Single Sign-On)
- * @returns Returns an object {statusOk: boolean, data: any}
- */
-export const getLocalRSSO = () => {
-  let response = {
-    statusOK: false,
-    data: defaultStorage.rsso,
-  };
-  try {
-    const rsso = JSON.parse(localStorage.getItem(storageObjects.rsso));
-    if (rsso) {
-      response = {
-        statusOK: true,
-        data: rsso
-      };
-    } else {
-      throw new Error('No items found in localStorage');
-    }
-  } catch (err) {
-    // Life goes on ...
-    // console.log(err);
-  }
-  return response;
-};
-
-/**
- * Get SETTINGS from local storage (Look and Feel)
- * @returns Returns an object {statusOk: boolean, data: any}
- */
-export const getLocalSettings = () => {
-  let response = {
-    statusOK: false,
-    data: defaultStorage.settings,
-  };
-  try {
-    const settings = JSON.parse(localStorage.getItem(storageObjects.settings));
-    if (settings) {
-      response = {
-        statusOK: true,
-        data: settings
-      };
-    } else {
-      throw new Error('No items found in localStorage');
-    }
-  } catch (err) {
-    // Life goes on ...
-    // console.log(err);
-  }
-  return response;
 };
 

@@ -1,4 +1,4 @@
-import { getLocalRSSO } from '../utilities/localstorage';
+import { getLocalStorage } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 /**
@@ -24,7 +24,7 @@ export const changeRequestModel = {
  * @returns Promise of a change request
  */
 export const getChangeRequest = (changeId) => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Infrastructure Change ID,
@@ -64,7 +64,7 @@ export const getChangeRequest = (changeId) => {
  * @returns Promise of a change work info
  */
  export const getChangeWorkInfo = (changeId) => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Work Log Type,
@@ -94,7 +94,7 @@ export const getChangeRequest = (changeId) => {
  * @returns Promise of a change impacted areas
  */
  export const getChangeImpactedAreas = (changeId) => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Company
@@ -122,7 +122,7 @@ export const getChangeRequest = (changeId) => {
  * @returns Promise of a change associations
  */
  export const getChangeAssociations = (changeId) => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = `
     Request Type01,

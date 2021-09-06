@@ -1,4 +1,4 @@
-import { getLocalRSSO } from '../utilities/localstorage';
+import { getLocalStorage } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 /**
@@ -20,7 +20,7 @@ export const assetModel = {
  * @returns Promise of assets
  */
 export const getAssets = () => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const query = `'DatasetId' = "BMC.ASSET" AND 'Login Name' = $USER$`;
   // 240001003 = Manufacturer Name+

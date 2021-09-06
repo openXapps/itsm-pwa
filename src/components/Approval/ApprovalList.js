@@ -24,17 +24,18 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
 import { getApprovals } from '../../service/ApprovalService';
-import { hasValidJWT } from '../../service/RSSOService';
+import useAuth from '../../hooks/useAuth';
 import useStyles from './ApprovalStyles';
 
 const ApprovalList = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
+  const { validateToken } = useAuth();
   const [approvals, setApprovals] = useState([]);
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
-    if (hasValidJWT(false)) {
+    if (validateToken(false)) {
       handleReload();
     } else {
       dispatch({ type: 'AUTH', payload: false });

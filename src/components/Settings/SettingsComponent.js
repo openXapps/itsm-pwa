@@ -15,34 +15,40 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
 import useStyles from './SettingsStyles';
+// import useAuth from '../../hooks/useAuth';
 import { context } from '../../context/StoreProvider';
 import { putARSettings, postARSettings, getARSettings } from '../../service/SettingsService';
 import { themeList } from '../../service/ThemeService';
-import { getLocalSettings, saveLocalStorage } from '../../utilities/localstorage';
+import { getLocalStorage, saveLocalStorage } from '../../utilities/localstorage';
 import { storageObjects, defaultStorage } from '../../utilities/defaultdata';
 import { modules } from '../../utilities/defaultdata';
 
 const initialFieldData = () => {
   let result = defaultStorage.settings;
-  const settings = getLocalSettings();
+  const settings = getLocalStorage('settings');
   if (settings.statusOK) result = settings.data;
   return result;
 };
 
 const SettingsComponent = ({ history }) => {
-  const [, dispatch] = useContext(context);
+  const [state, dispatch] = useContext(context);
   const classes = useStyles();
+  // const isTokenValid = useAuth(false);
   const [fields, setFields] = useState(initialFieldData());
-  const [settingsId, setSettingsId] = useState(getLocalSettings().data.settingsId);
-  const [isSaved, setIsSaved] = useState(fields.settingsId ? true : false);
+  const [settingsId, setSettingsId] = useState(getLocalStorage('settings').data.settingsId);
+  const [isSaved, setIsSaved] = useState(false);
   const [criticalErr, setCriticalErr] = useState({ status: false, message: '' });
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'X', show: false, duration: 2000 });
 
+  // console.log('SettingsComponent render...');
+
   useEffect(() => {
-    if (!settingsId) {
+    // console.log('SettingsComponent: useEffect settingsId...', settingsId);
+    if (settingsId) {
+      dispatch({ type: 'PROGRESS', payload: true });
       getARSettings()
         .then(response => {
-          console.log('SettingsComponent: useEffect.response...', response);
+          // console.log('SettingsComponent: useEffect.response...', response);
           if (!response.ok) throw new Error('Critical ERR ' + response.status + ' : ' + response.statusText);
           return response.json();
         }).then(data => {
@@ -59,14 +65,15 @@ const SettingsComponent = ({ history }) => {
               assets: data.entries[0].values.showAsset === 'true' ? true : false,
               people: data.entries[0].values.showPeople === 'true' ? true : false,
             });
+            setSnackState({ severity: 'info', message: 'Settings fetched', show: true, duration: 2000 });
           }
         }).catch(err => {
           setCriticalErr({ status: true, message: err.message })
           setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
-        });
+        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
     }
     return () => { };
-  }, [settingsId]);
+  }, [settingsId, dispatch]);
 
   const handleFieldChange = ({ target: { name, value } }) => {
     // console.log('SettingsComponent: on change name........', name);
@@ -98,7 +105,8 @@ const SettingsComponent = ({ history }) => {
       setSnackState({ severity: 'error', message: 'Must have a theme', show: true, duration: 2000 });
       return;
     }
-    dispatch({ type: 'THEME', payload: fields.theme });
+    if (state.theme !== fields.theme) dispatch({ type: 'THEME', payload: fields.theme });
+    dispatch({ type: 'PROGRESS', payload: true });
     if (!settingsId) {
       postARSettings(data)
         .then((response) => {
@@ -108,13 +116,19 @@ const SettingsComponent = ({ history }) => {
         }).then(data => {
           // console.log('SettingsComponent: submit JSON...', data);
           if (!data.values.requestId) throw new Error('Settings ID error on submit');
-          saveLocalStorage(storageObjects.settings, { ...fields, settingsId: data.values.requestId });
+          saveLocalStorage(storageObjects.settings, {
+            ...fields,
+            settingsId: data.values.requestId,
+            appVersion: defaultStorage.settings.appVersion,
+          });
           setFields({ ...fields, settingsId: data.values.requestId });
           setSettingsId(data.values.requestId);
           setIsSaved(true);
+          dispatch({ type: 'PROGRESS', payload: false });
           setSnackState({ severity: 'success', message: 'Settings created', show: true, duration: 2000 });
         }).catch(err => {
           // console.log('SettingsComponent: submit ERR...', err);
+          dispatch({ type: 'PROGRESS', payload: false });
           setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
         });
     } else {
@@ -122,11 +136,17 @@ const SettingsComponent = ({ history }) => {
         .then((response) => {
           // console.log('SettingsComponent: update RES...', response);
           if (response.status !== 204) throw new Error('ERR ' + response.status + ' : ' + response.statusText);
-          saveLocalStorage(storageObjects.settings, fields);
+          // console.log('SettingsComponent: putARSettings fields...', fields);
+          saveLocalStorage(storageObjects.settings, {
+            ...fields,
+            appVersion: defaultStorage.settings.appVersion,
+          });
           setIsSaved(true);
+          dispatch({ type: 'PROGRESS', payload: false });
           setSnackState({ severity: 'success', message: 'Settings updated', show: true, duration: 2000 });
         }).catch(err => {
           // console.log('SettingsComponent: update ERR...', err);
+          dispatch({ type: 'PROGRESS', payload: false });
           setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
         });
     }
@@ -166,7 +186,7 @@ const SettingsComponent = ({ history }) => {
             >
               {themeList.map((v, i) => {
                 return (
-                  <MenuItem key={i} value={v}>{v}</MenuItem>
+                  <MenuItem key={i} value={v.themeId}>{v.themeAlias}</MenuItem>
                 );
               })}
             </Select>

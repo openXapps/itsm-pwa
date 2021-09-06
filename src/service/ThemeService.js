@@ -1,8 +1,8 @@
 export const themeList = [
-  'light',
-  'dark',
-  'concrete',
-  'monday',
+  {themeId: 'light', themeAlias: 'Sunny Day'},
+  {themeId: 'dark', themeAlias: 'Darth Vader'},
+  {themeId: 'concrete', themeAlias: 'Concrete Jungle'},
+  {themeId: 'monday', themeAlias: 'Monday Blues'},
 ];
 
 // https://uigradients.com
