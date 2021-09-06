@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
@@ -11,59 +11,45 @@ import Divider from '@material-ui/core/Divider';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 import useStyles from './LandingStyles';
-import { useURLQuery } from '../../hooks/useURLQuery';
+import useURLQuery from '../../hooks/useURLQuery';
+// import useAuth from '../../hooks/useAuth';
 import { context } from '../../context/StoreProvider';
-import { modules, storageObjects, defaultStorage } from '../../utilities/defaultdata';
-import { saveLocalStorage, getLocalSettings } from '../../utilities/localstorage';
-import { getJWT, hasValidJWT } from '../../service/RSSOService';
+import { modules } from '../../utilities/defaultdata';
+import { getLocalStorage } from '../../utilities/localstorage';
+import { getTokenWithCode, validateToken } from '../../service/RSSOService';
 
 const LandingComponent = ({ history, location }) => {
   const [state, dispatch] = useContext(context);
   const classes = useStyles();
-  // If redirect from OAuth2 with code parameter, then source the code value
   const code = useURLQuery(location.search).get('code');
+  // console.log('LandingComponent: code...', code);
+  // const isTokenValid = useAuth(true);
+  // console.log('LandingComponent: useAuth isTokenValid...', isTokenValid);
+  // If redirect from OAuth2 with code parameter, then source the code value
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 4000 });
 
-  // console.log('LandingComponent: location...', location);
+  // console.log('LandingComponent: render...');
 
   useEffect(() => {
     // Checks if URL location contains a code parameter and if so, then fetchs token
     if (code) {
-      // console.log('HeaderComponent: code.......', code);
-      // Before we fetch a new token, first validated the existing token
-      if (!hasValidJWT(true)) {
-        getJWT(code)
-          .then(response => {
-            // console.log('HeaderComponent: getJWT response...', response);
-            if (!response.ok) throw new Error(response.statusText);
-            return response.json();
-          }).then(token => {
-            // console.log('HeaderComponent: getJWT token......', token);
-            saveLocalStorage(storageObjects.rsso, {
-              accessToken: token.access_token,
-              tokenType: token.token_type,
-              expiresIn: token.expires_in,
-              tokenDate: new Date(),
-              refreshToken: token.refresh_token,
-            });
-            dispatch({ type: 'AUTH', payload: true });
-            setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 2000 });
-            history.replace('/');
-          }).catch(error => {
-            // console.log('HeaderComponent: getJWT error...', error);
-            saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
-            dispatch({ type: 'AUTH', payload: false });
-            setSnackState({ severity: 'error', message: 'Login failed', show: true, duration: 3000 });
-          });
+      if (getTokenWithCode(code)) {
+        dispatch({ type: 'AUTH', payload: true })
+        setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 2000 });
+      } else {
+        dispatch({ type: 'AUTH', payload: false })
+        setSnackState({ severity: 'error', message: 'Login failed', show: true, duration: 3000 });
       }
+      history.replace('/');
     } else {
-      if (!hasValidJWT(true) && state.isAuth) {
-        dispatch({ type: 'AUTH', payload: false });
-        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
-      }
+      // console.log('LandingComponent: effect calling validateToken...');
+      validateToken(true).then(response => {
+        if (response && !state.isAuth) dispatch({ type: 'AUTH', payload: true });
+      });
     }
+
     return () => { };
-  }, [code, dispatch, history]);
+  }, [code, history, state.isAuth, dispatch]);
 
   const handleGoToModule = (e) => {
     const moduleId = parseInt(e.currentTarget.dataset.moduleId);
@@ -78,13 +64,13 @@ const LandingComponent = ({ history, location }) => {
     <Container maxWidth="md" disableGutters>
       {modules.map((v, i) => {
         return (
-          getLocalSettings().data[v.name] ? (
+          getLocalStorage('settings').data[v.name] ? (
             <Box mt={{ xs: 2, sm: 3 }} mx={{ xs: 2, md: 3 }} key={i}>
               <Paper elevation={10}>
                 <Box display="flex" p={{ xs: 1, md: 2 }} alignItems="center">
                   <img className={classes.image} src={v.img} alt={v.label} />
                   <Typography className={classes.title} variant="h5"
-                  >{v.label} <span className={classes.counters}>({Math.floor(Math.random() * 10)})</span></Typography>
+                  >{v.label} {state.isAuth && <span className={classes.counters}>({Math.floor(Math.random() * 10)})</span>}</Typography>
                   {state.isAuth ? (
                     <><Divider orientation="vertical" flexItem />
                       <Box p={1}>

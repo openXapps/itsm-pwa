@@ -1,11 +1,4 @@
 /**
- * Application meta data
- */
-export const application = {
-  version: '1.0',
-};
-
-/**
  * Local storage object types
  */
 export const storageObjects = {
@@ -27,6 +20,7 @@ export const defaultStorage = {
   },
   // sb-itsm-settings
   settings: {
+    appVersion: '1.1',
     settingsId: '',
     theme: 'light',
     // theme: 'dark',

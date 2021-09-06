@@ -93,7 +93,11 @@ const ApprovalREQ = ({ history }) => {
   };
 
   const onJustificationChange = (e) => {
-    if (e.target.value) setJustification(e.target.value);
+    if (e.target.value) {
+      setJustification(e.target.value);
+    } else {
+      setJustification('');
+    }
   };
 
   const handleApproveButton = () => {
@@ -119,6 +123,7 @@ const ApprovalREQ = ({ history }) => {
         .then(response => {
           if (!response.ok) {
             response.json().then(data => {
+              console.log('postApproval: data error...', data);
               throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
             }).catch(error => {
               dispatch({ type: 'PROGRESS', payload: false });
@@ -127,6 +132,7 @@ const ApprovalREQ = ({ history }) => {
             });
           } else {
             response.json().then(data => {
+              console.log('postApproval: data ok...', data);
               dispatch({ type: 'PROGRESS', payload: false });
               if (data.values.status === 'Success') {
                 setSnackState({ severity: 'success', message: 'Request was ' + action, show: true, duration: 1000 });
@@ -134,7 +140,7 @@ const ApprovalREQ = ({ history }) => {
                 setSnackState({ severity: 'error', message: 'Approval failed: ' + data.values.shortDescription, show: true, duration: 1000 });
               }
             }).catch(error => {
-              console.log('handleApproveButton: data error...', error);
+              console.log('postApproval: data error...', error);
             });
           }
         });
@@ -196,7 +202,7 @@ const ApprovalREQ = ({ history }) => {
       <Box my={2}>
         <TextField
           label="Justification"
-          placeholder="Approved from PWA"
+          placeholder="Approved from App"
           variant="outlined"
           fullWidth
           value={justification}

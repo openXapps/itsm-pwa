@@ -16,16 +16,18 @@ import Alert from '@material-ui/lab/Alert';
 
 import useStyles from './HeaderStyles';
 import { context } from '../../context/StoreProvider';
-import { application, localEnvironment, storageObjects, defaultStorage } from '../../utilities/defaultdata';
-import { saveLocalStorage } from '../../utilities/localstorage';
-import { revokeJWT } from '../../service/RSSOService';
+import { localEnvironment, storageObjects, defaultStorage } from '../../utilities/defaultdata';
+import { saveLocalStorage, getLocalStorage } from '../../utilities/localstorage';
+import { revokeToken } from '../../service/RSSOService';
 
 const HeaderComponent = ({ history, location }) => {
   const classes = useStyles();
+  const { appVersion } = getLocalStorage('settings').data;
   const [state, dispatch] = useContext(context);
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 2000 });
 
-  // Button handlers
+  // console.log('HeaderComponent render...');
+
   const handleLoginButton = () => {
     let url = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/rsso/oauth2/authorize?response_type=code';
     // url += '&scope=Openid';
@@ -34,28 +36,32 @@ const HeaderComponent = ({ history, location }) => {
     url += '&redirect_uri=' + encodeURIComponent(localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/pwa');
     window.open(url, '_self');
   };
+
   const handleLogoutButton = () => {
-    revokeJWT()
-      .then(response => {
-        // console.log('handleLogoutButton: revokeJWT response...', response);
-        if (!response.ok) {
-          response.json().then(data => {
-            // console.log('handleLogoutButton: response false data...', data);
-            throw new Error(`Logout failed: ${data.error}`);
-          }).catch(error => {
-            // console.log('handleLogoutButton: response false err...', error);
-            setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
-          });
-        } else {
-          if (state.isAuth) dispatch({ type: 'AUTH', payload: false });
-          saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
-          setSnackState({ severity: 'success', message: 'Logout successful', show: true, duration: 2000 });
-        }
-      });
+    if (revokeToken()) {
+      if (state.isAuth) dispatch({ type: 'AUTH', payload: false });
+      saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
+      setSnackState({ severity: 'success', message: 'Logout successful', show: true, duration: 2000 });
+    } else {
+      setSnackState({ severity: 'error', message: 'Logout failed', show: true, duration: 2000 });
+    }
   };
+
   const handleSettingsButton = () => {
     history.push('/settings');
   };
+
+  // Temp button to mock auth cache
+  // const handleMockAuthBotton = () => {
+  //   saveLocalStorage(storageObjects.rsso, {
+  //     accessToken: "002a28f20b93c2578957b7d60f0f776c",
+  //     expiresIn: 60,
+  //     refreshToken: "b4d1fb9b17f504f5141b6235ecc75d6e",
+  //     tokenDate: "2021-08-31T06:49:58.790Z",
+  //     tokenType: "Bearer",
+  //   });
+  //   dispatch({ type: 'AUTH', payload: true });
+  // }
 
   // State handlers
   const handleSnackState = () => {
@@ -69,11 +75,12 @@ const HeaderComponent = ({ history, location }) => {
           <Toolbar disableGutters>
             <img className={classes.logo} alt="SB Logo" src="./logo192.png" />
             <Typography variant="h6" className={classes.title}
-            >IT Service Management <span className={classes.appVersion}><Hidden xsDown>v.{application.version}</Hidden></span>
+            >IT Service Management <span className={classes.appVersion}><Hidden xsDown>v.{appVersion}</Hidden></span>
             </Typography>
             {state.showProgress ? (<Box mr={1}><CircularProgress /></Box>) : null}
             {location.pathname === '/' ? (
               <div>
+                {/* <Button color="inherit" onClick={handleMockAuthBotton}>Mock Auth</Button> */}
                 {state.isAuth ? (
                   <Button color="inherit" onClick={handleLogoutButton}>Logout</Button>
                 ) : (

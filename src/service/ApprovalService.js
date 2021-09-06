@@ -1,4 +1,4 @@
-import { getLocalRSSO } from '../utilities/localstorage';
+import { getLocalStorage } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 /**
@@ -19,7 +19,7 @@ export const approvalModel = {
  * @returns Promise of approvals
  */
 export const getApprovals = () => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const query = `('Approvers' LIKE $USER$) AND (('Approval Status' = 0) OR ('Approval Status' = 3) OR ('Approval Status' = 4))`;
   // const query = `('Approval Status' = 0 OR 'Approval Status' = 3 OR 'Approval Status' = 4)`;
@@ -45,7 +45,7 @@ export const getApprovals = () => {
  * @returns Promise of new approval
  */
 export const postApproval = (data) => {
-  const { accessToken, tokenType } = getLocalRSSO().data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
   const fields = 'requestId,status,shortDescription';
   const url = `/api/arsys/v1/entry/SBSA:PWA:Approval?fields=values(${fields})`;
@@ -54,6 +54,7 @@ export const postApproval = (data) => {
     headers: {
       'Authorization': tokenType + ' ' + accessToken,
       'Content-Type': 'application/json',
+      'X-Requested-By': 'XMLHttpRequest',
     },
     mode: 'cors',
     body: data

@@ -5,10 +5,10 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import {
-  createMuiTheme,
+  // createMuiTheme,
   // Fixes forward Ref issue - NOT FOR PRODUCTION USE
   // https://material-ui.com/customization/theming/#unstable-createmuistrictmodetheme-options-args-theme
-  // unstable_createMuiStrictModeTheme as createMuiTheme,
+  unstable_createMuiStrictModeTheme as createMuiTheme,
 } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
 
