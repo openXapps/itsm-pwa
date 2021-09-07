@@ -79,34 +79,25 @@ export const refreshToken = async () => {
 
 /**
  * Function to revoke a token from RSSO
+ * @param {string} hint What token to revoke (access_token or refresh_token)
  * @returns Boolean of true if token was recoved
  */
-export const revokeToken = async () => {
-  let result = false;
+export const revokeToken = (hint) => {
   const { accessToken } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const url = '/rsso/oauth2/revoke';
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
-  const body = `token=${accessToken}&token_type_hint=access_token&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
+  const body = `token=${accessToken}&token_type_hint=${hint}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
 
-  await fetch(host + url, {
+  return fetch(host + url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization': 'Basic ' + accessToken
     },
     body: body,
-  }).then(response => {
-    if (response.ok) {
-      result = true;
-      saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
-    }
-  }).catch(error => {
-    console.log(error);
   });
-
-  return result;
-}
+};
 
 /**
  * Function to validate whether token expired or not
@@ -175,12 +166,12 @@ export const validateToken = async (runApiTest) => {
       if (!hasTokenExpired()) {
         if (runApiTest) {
           // console.log('validateToken: running API test...');
-          if (await testToken()) result = true;
+          if ((await testToken()).valueOf()) result = true;
         } else result = true;
       } // Removed refreshToken for now
     }
   }
-  
+
   return result;
 };
 

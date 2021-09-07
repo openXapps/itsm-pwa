@@ -22,16 +22,12 @@ const LandingComponent = ({ history, location }) => {
   const [state, dispatch] = useContext(context);
   const classes = useStyles();
   const code = useURLQuery(location.search).get('code');
-  // console.log('LandingComponent: code...', code);
-  // const isTokenValid = useAuth(true);
-  // console.log('LandingComponent: useAuth isTokenValid...', isTokenValid);
-  // If redirect from OAuth2 with code parameter, then source the code value
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 4000 });
 
   // console.log('LandingComponent: render...');
 
   useEffect(() => {
-    // Checks if URL location contains a code parameter and if so, then fetchs token
+    // Checks if URL location contains a code parameter and if so, then fetch token
     if (code) {
       if (getTokenWithCode(code)) {
         dispatch({ type: 'AUTH', payload: true })
@@ -47,7 +43,7 @@ const LandingComponent = ({ history, location }) => {
         if (response && !state.isAuth) dispatch({ type: 'AUTH', payload: true });
       });
     }
-
+    // Effect clean-up
     return () => { };
   }, [code, history, state.isAuth, dispatch]);
 
