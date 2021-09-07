@@ -38,13 +38,18 @@ const HeaderComponent = ({ history, location }) => {
   };
 
   const handleLogoutButton = () => {
-    if (revokeToken()) {
-      if (state.isAuth) dispatch({ type: 'AUTH', payload: false });
+    dispatch({ type: 'PROGRESS', payload: true });
+    revokeToken('refresh_token'); // Doesn't do anything, token still remains in RSSO
+    revokeToken('access_token').then(response => {
+      console.log('revokeToken: response...', response);
+      if (!response.ok) throw new Error('Logout error');
       saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
+      if (state.isAuth) dispatch({ type: 'AUTH', payload: false });
       setSnackState({ severity: 'success', message: 'Logout successful', show: true, duration: 2000 });
-    } else {
+    }).catch(error => {
+      console.log('revokeToken: error...', error);
       setSnackState({ severity: 'error', message: 'Logout failed', show: true, duration: 2000 });
-    }
+    }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
   };
 
   const handleSettingsButton = () => {
