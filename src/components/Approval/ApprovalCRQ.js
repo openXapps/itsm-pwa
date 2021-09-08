@@ -16,10 +16,10 @@ import Alert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
 import TextField from '@material-ui/core/TextField';
 import Toolbar from '@material-ui/core/Toolbar';
 
@@ -35,11 +35,14 @@ import {
   getChangeAssociations,
   changeAssociationsModel,
 } from '../../service/ChangeService';
+import { validateToken } from '../../service/RSSOService';
 import { postApproval } from '../../service/ApprovalService';
+import { RowTitle, RowContent } from '../Shared/StyledTableCell';
 import StyledField from '../Shared/StyledField';
-import StyledTableCell from '../Shared/StyledTableCell';
+import useStyles from './ApprovalStyles';
 
 const ApprovalCRQ = ({ history }) => {
+  const classes = useStyles();
   const [state, dispatch] = useContext(context);
   const { apid, crqid } = useParams();
   const [assessed, setAssessed] = useState(true);
@@ -51,7 +54,15 @@ const ApprovalCRQ = ({ history }) => {
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
-    handleDataLoad();
+    validateToken(false).then(response => {
+      if (response) {
+        handleDataLoad();
+      } else {
+        dispatch({ type: 'AUTH', payload: false });
+        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
+      }
+    });
+    // Effect clean-up
     return () => true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -60,87 +71,83 @@ const ApprovalCRQ = ({ history }) => {
     // // console.log('ApprovalCRQ: state...', state);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
-      setTimeout(() => {
-        getChangeRequest(crqid)
-          .then(response => {
-            // console.log('ApprovalCRQ: response...', response.json());
-            if (!response.ok) {
-              response.json().then(data => {
-                // console.log('getChangeRequest: response false data...', data);
-                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-              }).catch(error => {
-                // console.log('getChangeRequest: response false error...', error);
-                dispatch({ type: 'PROGRESS', payload: false });
-                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-                setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
-              });
-            } else {
-              return response.json().then(data => {
-                // console.log('getChangeRequest: data...', data);
-                dispatch({ type: 'PROGRESS', payload: false });
-                if (data.entries.length === 1) populateChange(data.entries);
-                setAssessed(false);
-                setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
-              });
-            }
-          });
-        getChangeWorkInfo(crqid)
-          .then(response => {
-            // console.log('getChangeWorkInfo: response...', response.json());
-            if (!response.ok) {
-              response.json().then(data => {
-                // console.log('getChangeWorkInfo: response false data...', data);
-                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-              }).catch(error => {
-                // console.log('getChangeWorkInfo: response false error...', error);
-                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-              });
-            } else {
-              return response.json().then(data => {
-                // console.log('getChangeWorkInfo: data...', data);
-                if (data.entries.length > 0) populateWorkInfo(data.entries);
-              });
-            }
-          });
-        getChangeImpactedAreas(crqid)
-          .then(response => {
-            // console.log('getChangeImpactedAreas: response...', response.json());
-            if (!response.ok) {
-              response.json().then(data => {
-                // console.log('getChangeImpactedAreas: response false data...', data);
-                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-              }).catch(error => {
-                // console.log('getChangeImpactedAreas: response false error...', error);
-                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-              });
-            } else {
-              return response.json().then(data => {
-                // console.log('getChangeImpactedAreas: data...', data);
-                if (data.entries.length > 0) populateImpactedAreas(data.entries);
-              });
-            }
-          });
-        getChangeAssociations(crqid)
-          .then(response => {
-            // console.log('getChangeAssociations: response...', response.json());
-            if (!response.ok) {
-              response.json().then(data => {
-                // console.log('getChangeAssociations: response false data...', data);
-                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-              }).catch(error => {
-                // console.log('getChangeAssociations: response false error...', error);
-                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-              });
-            } else {
-              return response.json().then(data => {
-                // console.log('getChangeAssociations: data...', data);
-                if (data.entries.length > 0) populateAssociations(data.entries);
-              });
-            }
-          });
-      }, 500);
+      getChangeRequest(crqid)
+        .then(response => {
+          // console.log('ApprovalCRQ: response...', response.json());
+          if (!response.ok) {
+            response.json().then(data => {
+              // console.log('getChangeRequest: response false data...', data);
+              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+            }).catch(error => {
+              // console.log('getChangeRequest: response false error...', error);
+              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+              setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
+            });
+          } else {
+            return response.json().then(data => {
+              // console.log('getChangeRequest: data...', data);
+              if (data.entries.length === 1) populateChange(data.entries);
+              setAssessed(false);
+              setSnackState({ severity: 'success', message: 'Change details fetched', show: true, duration: 1000 });
+            });
+          }
+        });
+      getChangeWorkInfo(crqid)
+        .then(response => {
+          // console.log('getChangeWorkInfo: response...', response.json());
+          if (!response.ok) {
+            response.json().then(data => {
+              // console.log('getChangeWorkInfo: response false data...', data);
+              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+            }).catch(error => {
+              // console.log('getChangeWorkInfo: response false error...', error);
+              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+            });
+          } else {
+            return response.json().then(data => {
+              // console.log('getChangeWorkInfo: data...', data);
+              if (data.entries.length > 0) populateWorkInfo(data.entries);
+            });
+          }
+        });
+      getChangeImpactedAreas(crqid)
+        .then(response => {
+          // console.log('getChangeImpactedAreas: response...', response.json());
+          if (!response.ok) {
+            response.json().then(data => {
+              // console.log('getChangeImpactedAreas: response false data...', data);
+              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+            }).catch(error => {
+              // console.log('getChangeImpactedAreas: response false error...', error);
+              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+            });
+          } else {
+            return response.json().then(data => {
+              // console.log('getChangeImpactedAreas: data...', data);
+              if (data.entries.length > 0) populateImpactedAreas(data.entries);
+            });
+          }
+        });
+      getChangeAssociations(crqid)
+        .then(response => {
+          // console.log('getChangeAssociations: response...', response.json());
+          if (!response.ok) {
+            response.json().then(data => {
+              // console.log('getChangeAssociations: response false data...', data);
+              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+            }).catch(error => {
+              // console.log('getChangeAssociations: response false error...', error);
+              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+            });
+          } else {
+            return response.json().then(data => {
+              // console.log('getChangeAssociations: data...', data);
+              if (data.entries.length > 0) populateAssociations(data.entries);
+            });
+          }
+        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
     } else {
-      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
+      setSnackState({ severity: 'info', message: 'Session expired', show: true, duration: 2000 });
     }
   }
 
@@ -217,7 +224,6 @@ const ApprovalCRQ = ({ history }) => {
   const doApproval = (action) => {
     setAssessed(true);
     if (state.isAuth) {
-      dispatch({ type: 'PROGRESS', payload: true });
       const justificationNote = justification ? justification : 'Approved from PWA';
       const data = `{ "values": {
         "approvalAction": "${action}",
@@ -225,19 +231,18 @@ const ApprovalCRQ = ({ history }) => {
         "applicationId": "${crqid}",
         "justification": "${justificationNote}"
       }}`;
+      dispatch({ type: 'PROGRESS', payload: true });
       postApproval(data)
         .then(response => {
           if (!response.ok) {
             response.json().then(data => {
               throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
             }).catch(error => {
-              dispatch({ type: 'PROGRESS', payload: false });
               if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
               setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
             });
           } else {
             response.json().then(data => {
-              dispatch({ type: 'PROGRESS', payload: false });
               if (data.values.status === 'Success') {
                 setSnackState({ severity: 'success', message: 'Change was ' + action, show: true, duration: 1000 });
               } else {
@@ -247,7 +252,7 @@ const ApprovalCRQ = ({ history }) => {
               console.log('handleApproveButton: data error...', error);
             });
           }
-        });
+        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
     } else {
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
     }
@@ -258,143 +263,147 @@ const ApprovalCRQ = ({ history }) => {
   };
 
   return (
-    <Container maxWidth="md">
-      <Box py={2}>
-        <Typography variant="h6">Change Request Approval</Typography>
-      </Box>
-      <Paper elevation={0}>
-        <Box p={{ xs: 1, md: 3 }}>
-          <StyledField label="Change Request Details" font="h6" />
-          <Box mt={{ xs: 1, md: 3 }} />
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}><StyledField label="Change Number" value={crqData.changeId} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Status" value={crqData.status} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Coordinator" value={crqData.coordinator} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Description" value={crqData.description} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Service CI" value={crqData.serviceCI} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Change Reason" value={crqData.reason} font="" /></Grid>
-            <Grid item xs={12}><Divider /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Impact" value={crqData.impact} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Risk Level" value={crqData.risk} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Start Date" value={crqData.scheduleStart} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="End Date" value={crqData.scheduleEnd} font="" /></Grid>
-            <Grid item xs={12}>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Change Notes</Typography></AccordionSummary>
-                <AccordionDetails><Typography color="primary">{crqData.notes}</Typography></AccordionDetails>
-              </Accordion>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Impacted Areas</Typography></AccordionSummary>
-                <AccordionDetails>
-                  <TableContainer>
-                    <Table size="small" aria-label="change request impacted areas">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Company</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {crqImpactedAreas.map((v, i) => (
-                          <TableRow key={i}>
-                            <StyledTableCell>{v.company}</StyledTableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Relationships</Typography></AccordionSummary>
-                <AccordionDetails>
-                  <TableContainer>
-                    <Table size="small" aria-label="change request relationships">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Type</TableCell>
-                          <TableCell>Description</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {crqAssociations.map((v, i) => (
-                          <TableRow key={i}>
-                            <StyledTableCell>{v.requestType}</StyledTableCell>
-                            <StyledTableCell>{v.requestDescription}</StyledTableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Work Info</Typography></AccordionSummary>
-                <AccordionDetails>
-                  <TableContainer>
-                    <Table size="small" aria-label="change request work info">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Type</TableCell>
-                          <TableCell>Description</TableCell>
-                          {/* <TableCell>Submitter</TableCell>
+    <>
+      <Container maxWidth="md" disableGutters>
+        <Box mx={{ xs: 1, md: 3 }}>
+          <Box py={2}>
+            <Typography variant="h6">Change Request Approval</Typography>
+          </Box>
+          <Paper elevation={0}>
+            <Box p={{ xs: 1, md: 3 }}>
+              <StyledField label="Change Request Details" />
+              <Box mt={{ xs: 1, md: 3 }} />
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}><StyledField label="Change Number" value={crqData.changeId} /></Grid>
+                <Grid item xs={12} sm={6}><StyledField label="Status" value={crqData.status} /></Grid>
+                <Grid item xs={12} sm={6}><StyledField label="Coordinator" value={crqData.coordinator} /></Grid>
+                <Grid item xs={12} sm={6}><StyledField label="Description" value={crqData.description} /></Grid>
+                <Grid item xs={12} sm={6}><StyledField label="Service CI" value={crqData.serviceCI} /></Grid>
+                <Grid item xs={12} sm={6}><StyledField label="Change Reason" value={crqData.reason} /></Grid>
+                <Grid item xs={12}><Divider /></Grid>
+                <Grid item xs={12} sm={6}><StyledField label="Impact" value={crqData.impact} /></Grid>
+                <Grid item xs={12} sm={6}><StyledField label="Risk Level" value={crqData.risk} /></Grid>
+                <Grid item xs={12} sm={6}><StyledField label="Start Date" value={crqData.scheduleStart} /></Grid>
+                <Grid item xs={12} sm={6}><StyledField label="End Date" value={crqData.scheduleEnd} /></Grid>
+                <Grid item xs={12}>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}><div className={classes.accordionSummary}>Change Notes</div></AccordionSummary>
+                    <AccordionDetails><div className={classes.notes}>{crqData.notes}</div></AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}><div className={classes.accordionSummary}>Impacted Areas</div></AccordionSummary>
+                    <AccordionDetails>
+                      <TableContainer>
+                        <Table size='small' aria-label="change request impacted areas">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Company</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {crqImpactedAreas.map((v, i) => (
+                              <TableRow key={i}>
+                                <RowContent>{v.company}</RowContent>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}><div className={classes.accordionSummary}>Relationships</div></AccordionSummary>
+                    <AccordionDetails>
+                      <TableContainer>
+                        <Table size='small' aria-label="change request relationships">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Type</TableCell>
+                              <TableCell>Description</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {crqAssociations.map((v, i) => (
+                              <TableRow key={i}>
+                                <TableCell>{v.requestType}</TableCell>
+                                <RowContent>{v.requestDescription}</RowContent>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}><div className={classes.accordionSummary}>Work Info</div></AccordionSummary>
+                    <AccordionDetails>
+                      <TableContainer>
+                        <Table size='small' aria-label="change request work info">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Type</TableCell>
+                              <TableCell>Description</TableCell>
+                              {/* <TableCell>Submitter</TableCell>
                           <TableCell>Date</TableCell> */}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {crqWorkInfo.map((v, i) => (
-                          <TableRow key={i} style={{ verticalAlign: 'top' }}>
-                            <StyledTableCell>{v.workLogType}</StyledTableCell>
-                            <StyledTableCell>{v.detailedDescription}</StyledTableCell>
-                            {/* <StyledTableCell>{v.workLogSubmitter}</StyledTableCell>
-                            <StyledTableCell>{v.workLogSubmitDate}</StyledTableCell> */}
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </AccordionDetails>
-              </Accordion>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {crqWorkInfo.map((v, i) => (
+                              <TableRow key={i} style={{ verticalAlign: 'top' }}>
+                                <RowTitle>{v.workLogType}</RowTitle>
+                                <RowContent>{v.detailedDescription}</RowContent>
+                                {/* <RowContent>{v.workLogSubmitter}</RowContent>
+                            <RowContent>{v.workLogSubmitDate}</RowContent> */}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </AccordionDetails>
+                  </Accordion>
+                </Grid>
+              </Grid>
+            </Box>
+          </Paper>
+          <Box my={2}>
+            <TextField
+              label="Justification"
+              placeholder="Approved from PWA"
+              variant="outlined"
+              fullWidth
+              value={justification}
+              onChange={onJustificationChange}
+            />
+          </Box>
+          <Grid container alignItems="center">
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="outlined"
+                onClick={handleApproveButton}
+                fullWidth
+                disabled={assessed}
+              >Approve</Button>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 1, sm: 0 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleRejectButton}
+                  fullWidth
+                  disabled={assessed}
+                >Reject</Button></Box>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 1, sm: 0 }}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => history.goBack()}
+                >Back</Button></Box>
             </Grid>
           </Grid>
         </Box>
-      </Paper>
-      <Box my={2}>
-        <TextField
-          label="Justification"
-          placeholder="Approved from PWA"
-          variant="outlined"
-          fullWidth
-          value={justification}
-          onChange={onJustificationChange}
-        />
-      </Box>
-      <Grid container alignItems="center">
-        <Grid item xs={12} sm={4}>
-          <Button
-            variant="outlined"
-            onClick={handleApproveButton}
-            fullWidth
-            disabled={assessed}
-          >Approve</Button>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 1, sm: 0 }}>
-            <Button
-              variant="outlined"
-              onClick={handleRejectButton}
-              fullWidth
-              disabled={assessed}
-            >Reject</Button></Box>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Box pl={{ xs: 0, sm: 1 }} pt={{ xs: 1, sm: 0 }}>
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={() => history.goBack()}
-            >Back</Button></Box>
-        </Grid>
-      </Grid>
+      </Container>
       <Toolbar />
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
@@ -403,7 +412,7 @@ const ApprovalCRQ = ({ history }) => {
         onClose={handleSnackState}
       ><Alert elevation={6} onClose={handleSnackState} severity={snackState.severity}
       >{snackState.message}</Alert></Snackbar>
-    </Container>
+    </>
   );
 };
 

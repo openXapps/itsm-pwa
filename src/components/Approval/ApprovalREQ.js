@@ -16,21 +16,24 @@ import Alert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
 import TextField from '@material-ui/core/TextField';
 import Toolbar from '@material-ui/core/Toolbar';
 
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
+import { validateToken } from '../../service/RSSOService';
 import { getServiceRequest, serviceRequestModel } from '../../service/RequestService';
 import { postApproval } from '../../service/ApprovalService';
 import StyledField from '../Shared/StyledField';
-import StyledTableCell from '../Shared/StyledTableCell';
+import { RowTitle, RowContent } from '../Shared/StyledTableCell';
+import useStyles from './ApprovalStyles';
 
 const ApprovalREQ = ({ history }) => {
+  const classes = useStyles();
   const [state, dispatch] = useContext(context);
   const [assessed, setAssessed] = useState(true);
   const [reqData, setReqData] = useState(serviceRequestModel);
@@ -39,7 +42,15 @@ const ApprovalREQ = ({ history }) => {
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
-    handleDataLoad();
+    validateToken(false).then(response => {
+      if (response) {
+        handleDataLoad();
+      } else {
+        dispatch({ type: 'AUTH', payload: false });
+        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
+      }
+    });
+    // Effect clean-up
     return () => true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -48,33 +59,29 @@ const ApprovalREQ = ({ history }) => {
     // // console.log('ApprovalCRQ: state...', state);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
-      setTimeout(() => {
-        getServiceRequest(reqid)
-          .then(response => {
-            // console.log('getServiceRequest: response...', response.json());
-            if (!response.ok) {
-              response.json().then(data => {
-                // console.log('getServiceRequest: response false data...', data);
-                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-              }).catch(error => {
-                // console.log('getServiceRequest: response false error...', error);
-                dispatch({ type: 'PROGRESS', payload: false });
-                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-                setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
-              });
-            } else {
-              return response.json().then(data => {
-                // console.log('getServiceRequest: data...', data);
-                dispatch({ type: 'PROGRESS', payload: false });
-                if (data.entries.length === 1) populateRequest(data.entries);
-                setAssessed(false);
-                setSnackState({ severity: 'success', message: 'Request details fetched', show: true, duration: 1000 });
-              });
-            }
-          });
-      }, 500);
+      getServiceRequest(reqid)
+        .then(response => {
+          // console.log('getServiceRequest: response...', response.json());
+          if (!response.ok) {
+            response.json().then(data => {
+              // console.log('getServiceRequest: response false data...', data);
+              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+            }).catch(error => {
+              // console.log('getServiceRequest: response false error...', error);
+              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+              setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
+            });
+          } else {
+            return response.json().then(data => {
+              // console.log('getServiceRequest: data...', data);
+              if (data.entries.length === 1) populateRequest(data.entries);
+              setAssessed(false);
+              setSnackState({ severity: 'success', message: 'Request details fetched', show: true, duration: 1000 });
+            });
+          }
+        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
     } else {
-      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
+      setSnackState({ severity: 'info', message: 'Session expired', show: true, duration: 2000 });
     }
   }
 
@@ -126,14 +133,12 @@ const ApprovalREQ = ({ history }) => {
               console.log('postApproval: data error...', data);
               throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
             }).catch(error => {
-              dispatch({ type: 'PROGRESS', payload: false });
               if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
               setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
             });
           } else {
             response.json().then(data => {
               console.log('postApproval: data ok...', data);
-              dispatch({ type: 'PROGRESS', payload: false });
               if (data.values.status === 'Success') {
                 setSnackState({ severity: 'success', message: 'Request was ' + action, show: true, duration: 1000 });
               } else {
@@ -143,7 +148,7 @@ const ApprovalREQ = ({ history }) => {
               console.log('postApproval: data error...', error);
             });
           }
-        });
+        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
     } else {
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
     }
@@ -155,25 +160,30 @@ const ApprovalREQ = ({ history }) => {
 
   return (
     <Container maxWidth="md">
-      <Box py={2}>
-        <Typography variant="h6">Service Request Approval</Typography>
+      <Box my={3} display="flex" flexWrap="nowrap" alignItems="center">
+        <Box flexGrow={1}>
+          <Typography className={classes.header} variant="h6">Service Request Approval</Typography>
+        </Box>
+        <Button
+          variant="outlined"
+          onClick={() => history.goBack()}
+        >Back</Button>
       </Box>
       <Paper elevation={0}>
-        {/* {state.showProgress ? null : ( */}
         <Box p={{ xs: 1, md: 3 }}>
-          <StyledField label="Service Request Details" font="h6" />
+          <StyledField label="Service Request Details" />
           <Box mt={{ xs: 1, md: 3 }} />
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}><StyledField label="Request Number" value={reqData.requestId} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Summary" value={reqData.summary} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Requester" value={reqData.firstName + ' ' + reqData.lastName} font="" /></Grid>
-            <Grid item xs={12} sm={6}><StyledField label="Request Date" value={reqData.submitDate} font="" /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Request Number" value={reqData.requestId} /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Summary" value={reqData.summary} /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Requester" value={reqData.firstName + ' ' + reqData.lastName} /></Grid>
+            <Grid item xs={12} sm={6}><StyledField label="Request Date" value={reqData.submitDate} /></Grid>
             <Grid item xs={12}>
               <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="h6">Request Content</Typography></AccordionSummary>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}><div className={classes.accordionSummary}>Request Content</div></AccordionSummary>
                 <AccordionDetails>
                   <TableContainer>
-                    <Table size="small" aria-label="change request work info">
+                    <Table size='small' aria-label="service request content">
                       <TableHead>
                         <TableRow>
                           <TableCell>Questions</TableCell>
@@ -184,8 +194,8 @@ const ApprovalREQ = ({ history }) => {
                         {reqData.details.map((v, i) => (
                           v ? (
                             <TableRow key={i} style={{ verticalAlign: 'top' }}>
-                              <TableCell>{v.indexOf(':') > 0 ? (v.slice(0, v.indexOf(':'))) : ''}</TableCell>
-                              <StyledTableCell>{v.slice(v.indexOf(':') + 1)}</StyledTableCell>
+                              <RowTitle>{v.indexOf(':') > 0 ? (v.slice(0, v.indexOf(':'))) : ''}</RowTitle>
+                              <RowContent>{v.slice(v.indexOf(':') + 1)}</RowContent>
                             </TableRow>
                           ) : null
                         ))}
@@ -197,7 +207,6 @@ const ApprovalREQ = ({ history }) => {
             </Grid>
           </Grid>
         </Box>
-        {/* )} */}
       </Paper>
       <Box my={2}>
         <TextField

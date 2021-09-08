@@ -16,6 +16,7 @@ import Divider from '@material-ui/core/Divider';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { context } from '../../context/StoreProvider';
+import { validateToken } from '../../service/RSSOService';
 import { getAssets, assetModel } from '../../service/AssetService';
 import useStyles from './AssetStyles';
 
@@ -26,39 +27,43 @@ const AssetList = ({ history }) => {
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 2000 });
 
   useEffect(() => {
-    if (state.isAuth) handleReload();
+    validateToken(false).then(response => {
+      if (response) {
+        handleReload();
+      } else {
+        dispatch({ type: 'AUTH', payload: false });
+        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
+      }
+    });
+    // Effect clean-up
     return () => true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const handleReload = () => {
     // console.log('AssetList: state...', state);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
-      setTimeout(() => {
-        getAssets()
-          .then(response => {
-            // console.log('AssetList: response...', response.json());
-            if (!response.ok) {
-              response.json().then(data => {
-                // console.log('AssetList: response false data...', data);
-                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-              }).catch(err => {
-                // console.log('AssetList: response false err...', err);
-                dispatch({ type: 'PROGRESS', payload: false });
-                setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
-              });
-            } else {
-              return response.json().then(data => {
-                // console.log('AssetList: assets...', data);
-                dispatch({ type: 'PROGRESS', payload: false });
-                populateAssets(data.entries);
-                // setAssets(data.entries);
-                setSnackState({ severity: 'success', message: 'Assets fetched', show: true, duration: 2000 });
-              });
-            }
-          });
-      }, 500);
+      getAssets()
+        .then(response => {
+          // console.log('AssetList: response...', response.json());
+          if (!response.ok) {
+            response.json().then(data => {
+              // console.log('AssetList: response false data...', data);
+              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
+            }).catch(err => {
+              // console.log('AssetList: response false err...', err);
+              setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
+            });
+          } else {
+            return response.json().then(data => {
+              // console.log('AssetList: assets...', data);
+              populateAssets(data.entries);
+              // setAssets(data.entries);
+              setSnackState({ severity: 'success', message: 'Assets fetched', show: true, duration: 2000 });
+            });
+          }
+        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
     } else {
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 3000 });
     }

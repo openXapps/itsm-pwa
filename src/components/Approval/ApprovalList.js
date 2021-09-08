@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useState,
-  useContext
-} from 'react';
+import { useEffect, useState, useContext } from 'react';
 import clsx from 'clsx';
 
 import Typography from '@material-ui/core/Typography';
@@ -24,59 +20,60 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
 import { getApprovals } from '../../service/ApprovalService';
-import useAuth from '../../hooks/useAuth';
+import { validateToken } from '../../service/RSSOService';
 import useStyles from './ApprovalStyles';
 
 const ApprovalList = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
-  const { validateToken } = useAuth();
   const [approvals, setApprovals] = useState([]);
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
-    if (validateToken(false)) {
-      handleReload();
-    } else {
-      dispatch({ type: 'AUTH', payload: false });
-      setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
-    }
+    validateToken(false).then(response => {
+      if (response) {
+        handleReload();
+      } else {
+        dispatch({ type: 'AUTH', payload: false });
+        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
+      }
+    });
+    // Effect clean-up
     return () => true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const handleReload = () => {
     // console.log('ApprovalList: state...', state);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
+      // Need a timeout if token is still fresh
       setTimeout(() => {
         getApprovals()
           .then(response => {
             // console.log('ApprovalList: response...', response.json());
             if (!response.ok) {
               response.json().then(data => {
-                // console.log('ApprovalList: response false data...', data);
+                console.log('ApprovalList: response false data...', data);
                 throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
               }).catch(error => {
-                // console.log('ApprovalList: response false error...', error);
-                dispatch({ type: 'PROGRESS', payload: false });
-                if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
+                console.log('ApprovalList: response false error...', error);
+                if (error.message.indexOf('Unauthorized') > 0) dispatch({ type: 'AUTH', payload: false });
                 setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
               });
             } else {
               return response.json().then(data => {
                 // console.log('ApprovalList: approvals...', data);
-                dispatch({ type: 'PROGRESS', payload: false });
                 populateApprovals(data.entries);
                 setSnackState({ severity: 'success', message: 'Approvals fetched', show: true, duration: 1000 });
               });
             }
-          });
-      }, 300);
+          }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
+      }, 1000);
     } else {
-      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
+      setSnackState({ severity: 'info', message: 'Session expired', show: true, duration: 2000 });
     }
-  }
+  };
 
   const populateApprovals = (data) => {
     // console.log('populateApprovals: data', data);
@@ -88,7 +85,6 @@ const ApprovalList = ({ history }) => {
         signatureId: v.values['Signature ID'],
         sourceNumber: v.values['14516'],
         description: v.values['14506'],
-        // createDate: v.values['Create-Date-Sig'],
         createDate: userDate(v.values['Create-Date-Sig'], true),
         avatar: getAvatar(v.values['Application']),
       });
@@ -101,10 +97,10 @@ const ApprovalList = ({ history }) => {
     let avatar = 'BOB';
     switch (applicationName) {
       case 'CHG:Infrastructure Change':
-        avatar = 'CRQ'
+        avatar = 'CRQ';
         break;
       case 'SRM:Request':
-        avatar = 'REQ'
+        avatar = 'REQ';
         break;
       default:
         break;
@@ -116,7 +112,7 @@ const ApprovalList = ({ history }) => {
     const id = e.currentTarget.dataset.id;
     const module = String(e.currentTarget.dataset.module).toLowerCase();
     history.push('/approval/' + module + '/' + id);
-  }
+  };
 
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
@@ -126,7 +122,7 @@ const ApprovalList = ({ history }) => {
     <Container maxWidth="md">
       <Box mt={3} display="flex" flexWrap="nowrap" alignItems="center">
         <Box flexGrow={1}>
-          <Typography className={classes.header} variant="h5">My Approvals</Typography>
+          <Typography className={classes.header} variant="h6">My Approvals</Typography>
         </Box>
         <Button
           variant="outlined"
@@ -181,10 +177,7 @@ const ApprovalList = ({ history }) => {
         </List>
       </Box>
       <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         open={snackState.show}
         autoHideDuration={snackState.duration}
         onClose={handleSnackState}

@@ -1,10 +1,19 @@
 import { withStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 
-const StyledTableCell = withStyles((theme) => ({
+export const RowTitle = withStyles((theme) => ({
   body: {
-    color: theme.palette.primary.main,
+    [theme.breakpoints.down('xs')]: {
+      fontSize: '0.8rem',
+    },
   },
 }))(TableCell);
 
-export default StyledTableCell;
+export const RowContent = withStyles((theme) => ({
+  body: {
+    [theme.breakpoints.down('xs')]: {
+      fontSize: '0.8rem',
+    },
+    color: theme.palette.primary.main,
+  },
+}))(TableCell);
