@@ -41,13 +41,13 @@ const HeaderComponent = ({ history, location }) => {
     dispatch({ type: 'PROGRESS', payload: true });
     revokeToken('refresh_token'); // Doesn't do anything, token still remains in RSSO
     revokeToken('access_token').then(response => {
-      console.log('revokeToken: response...', response);
+      // console.log('revokeToken: response...', response);
       if (!response.ok) throw new Error('Logout error');
       saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
       if (state.isAuth) dispatch({ type: 'AUTH', payload: false });
       setSnackState({ severity: 'success', message: 'Logout successful', show: true, duration: 2000 });
     }).catch(error => {
-      console.log('revokeToken: error...', error);
+      // console.log('revokeToken: error...', error);
       setSnackState({ severity: 'error', message: 'Logout failed', show: true, duration: 2000 });
     }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
   };
@@ -56,19 +56,6 @@ const HeaderComponent = ({ history, location }) => {
     history.push('/settings');
   };
 
-  // Temp button to mock auth cache
-  // const handleMockAuthBotton = () => {
-  //   saveLocalStorage(storageObjects.rsso, {
-  //     accessToken: "002a28f20b93c2578957b7d60f0f776c",
-  //     expiresIn: 60,
-  //     refreshToken: "b4d1fb9b17f504f5141b6235ecc75d6e",
-  //     tokenDate: "2021-08-31T06:49:58.790Z",
-  //     tokenType: "Bearer",
-  //   });
-  //   dispatch({ type: 'AUTH', payload: true });
-  // }
-
-  // State handlers
   const handleSnackState = () => {
     setSnackState({ ...snackState, show: false });
   };
@@ -85,7 +72,6 @@ const HeaderComponent = ({ history, location }) => {
             {state.showProgress ? (<Box mr={1}><CircularProgress /></Box>) : null}
             {location.pathname === '/' ? (
               <div>
-                {/* <Button color="inherit" onClick={handleMockAuthBotton}>Mock Auth</Button> */}
                 {state.isAuth ? (
                   <Button color="inherit" onClick={handleLogoutButton}>Logout</Button>
                 ) : (

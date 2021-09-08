@@ -45,7 +45,10 @@ const LandingComponent = ({ history, location }) => {
     }
     // Effect clean-up
     return () => { };
-  }, [code, history, state.isAuth, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // Effect loops with validateToken() dependency
+  // }, [code, history, state.isAuth, dispatch]);
 
   const handleGoToModule = (e) => {
     const moduleId = parseInt(e.currentTarget.dataset.moduleId);

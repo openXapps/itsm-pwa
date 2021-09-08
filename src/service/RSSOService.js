@@ -159,16 +159,16 @@ export const testToken = async () => {
   */
 export const validateToken = async (runApiTest) => {
   let result = false;
-  const rsso = getLocalStorage('rsso');
+  const { tokenDate, accessToken } = getLocalStorage('rsso').data;
 
-  if (rsso.statusOK) {
-    if (rsso.data.tokenDate && rsso.data.accessToken) {
-      if (!hasTokenExpired()) {
-        if (runApiTest) {
-          // console.log('validateToken: running API test...');
-          if ((await testToken()).valueOf()) result = true;
-        } else result = true;
-      } // Removed refreshToken for now
+  if (tokenDate && accessToken) {
+    if (!hasTokenExpired()) {
+      if (runApiTest) {
+        // console.log('validateToken: running API test...');
+        if ((await testToken()).valueOf()) result = true;
+      } else result = true;
+    } else {
+      if ((await refreshToken()).valueOf()) result = true;
     }
   }
 

@@ -20,6 +20,11 @@ export const themes =
           },
         },
       },
+      MuiAccordionDetails: {
+        root: {
+          padding: 0,
+        }
+      },
     },
     palette: {
       type: 'dark',
@@ -44,6 +49,11 @@ export const themes =
           },
         },
       },
+      MuiAccordionDetails: {
+        root: {
+          padding: 0,
+        }
+      },
     },
     palette: {
       type: 'light',
@@ -58,6 +68,11 @@ export const themes =
             background: 'linear-gradient(145deg, #ffffff, #656179) no-repeat fixed', // Steel Gray
           },
         },
+      },
+      MuiAccordionDetails: {
+        root: {
+          padding: 0,
+        }
       },
     },
     palette: {
@@ -83,6 +98,11 @@ export const themes =
             background: 'linear-gradient(145deg, #7ab9e2, #748ba2) no-repeat fixed', // Nighthawk
           },
         },
+      },
+      MuiAccordionDetails: {
+        root: {
+          padding: 0,
+        }
       },
     },
     palette: {
