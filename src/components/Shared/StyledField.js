@@ -5,23 +5,23 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
   soloLabelRoot: {
     ...theme.typography.body1,
-    [theme.breakpoints.down('xs')]: {
-      fontSize: '0.8rem',
-    },
     fontWeight: theme.typography.fontWeightBold,
+    [theme.breakpoints.down('xs')]: {
+      fontSize: theme.typography.body2.fontSize,
+    },
   },
   labelRoot: {
     ...theme.typography.body1,
     [theme.breakpoints.down('xs')]: {
-      fontSize: '0.8rem',
+      fontSize: theme.typography.body2.fontSize,
     },
   },
   valueRoot: {
     ...theme.typography.body1,
-    [theme.breakpoints.down('xs')]: {
-      fontSize: '0.8rem',
-    },
     color: theme.palette.primary.main,
+    [theme.breakpoints.down('xs')]: {
+      fontSize: theme.typography.body2.fontSize,
+    },
   },
 }));
 

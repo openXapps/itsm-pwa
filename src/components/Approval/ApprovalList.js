@@ -27,15 +27,16 @@ const ApprovalList = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
   const [approvals, setApprovals] = useState([]);
-  const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
+  const [snackState, setSnackState] = useState({ severity: 'info', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
     validateToken(false).then(response => {
       if (response) {
+        // console.log('ApprovalList: effect handleReload...');
         handleReload();
       } else {
         dispatch({ type: 'AUTH', payload: false });
-        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
+        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 3000 });
       }
     });
     // Effect clean-up
@@ -44,47 +45,51 @@ const ApprovalList = ({ history }) => {
   }, []);
 
   const handleReload = () => {
-    // console.log('ApprovalList: state...', state);
+    if (approvals.length > 0) setApprovals([]);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
       // Need a timeout if token is still fresh
       setTimeout(() => {
         getApprovals()
           .then(response => {
-            // console.log('ApprovalList: response...', response.json());
+            // console.log('getApprovals: response...', response);
             if (!response.ok) {
-              response.json().then(data => {
-                console.log('ApprovalList: response false data...', data);
-                throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-              }).catch(error => {
-                console.log('ApprovalList: response false error...', error);
-                if (error.message.indexOf('Unauthorized') > 0) dispatch({ type: 'AUTH', payload: false });
-                setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
-              });
+              if (response.status === 401) {
+                dispatch({ type: 'AUTH', payload: false });
+                throw new Error('Session expired');
+              } else {
+                throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+              }
             } else {
               return response.json().then(data => {
-                // console.log('ApprovalList: approvals...', data);
+                // console.log('getApprovals: approvals...', data);
                 populateApprovals(data.entries);
-                setSnackState({ severity: 'success', message: 'Approvals fetched', show: true, duration: 1000 });
+                setSnackState({ severity: 'info', message: 'Approvals fetched', show: true, duration: 3000 });
               });
             }
+          }).catch(error => {
+            // console.log('getApprovals: error...', error);
+            setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
           }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
       }, 1000);
     } else {
-      setSnackState({ severity: 'info', message: 'Session expired', show: true, duration: 2000 });
+      setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 3000 });
     }
   };
 
   const populateApprovals = (data) => {
     // console.log('populateApprovals: data', data);
     let _approvals = [];
+    let _description = '';
     data.forEach(v => {
+      _description = v.values['14506'];
+      if (_description.indexOf('CRQ0') > -1) _description = _description.slice(18);
       _approvals.push({
         requester: v.values['Requester'],
         application: v.values['Application'],
         signatureId: v.values['Signature ID'],
         sourceNumber: v.values['14516'],
-        description: v.values['14506'],
+        description: _description,
         createDate: userDate(v.values['Create-Date-Sig'], true),
         avatar: getAvatar(v.values['Application']),
       });
@@ -127,7 +132,7 @@ const ApprovalList = ({ history }) => {
         <Button
           variant="outlined"
           onClick={handleReload}
-          disabled={!state.isAuth}
+          disabled={!state.isAuth || state.showProgress}
         >Reload</Button>
         <Button
           style={{ marginLeft: '8px' }}
@@ -144,12 +149,13 @@ const ApprovalList = ({ history }) => {
                   <ListItem disableGutters>
                     <ListItemAvatar>
                       <Avatar className={clsx(classes['avatar' + v.avatar])}>
-                        <Typography style={{ fontSize: 14 }}>{v.avatar}</Typography>
+                        <Typography variant="body2">{v.avatar}</Typography>
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary={v.createDate + ': ' + v.requester}
-                      secondary={v.sourceNumber + ': ' + v.description}
+                      disableTypography
+                      primary={<Typography className={classes.listItemPrimary}>{v.createDate + ': ' + v.requester}</Typography>}
+                      secondary={<Typography className={classes.listItemSecondary}>{v.sourceNumber + ': ' + v.description}</Typography>}
                     /><ListItemSecondaryAction>
                       <IconButton
                         edge="end"
@@ -166,11 +172,11 @@ const ApprovalList = ({ history }) => {
           ) : (
             state.showProgress ? (
               <Box mt={3}>
-                <Typography variant="h6">Loading...</Typography>
+                <Typography variant="body1">Loading...</Typography>
               </Box>
             ) : (
               <Box mt={3}>
-                <Typography variant="h6">No approvals found. Click Reload to try again.</Typography>
+                <Typography variant="body1">No approvals found. Click Reload to try again.</Typography>
               </Box>
             )
           )}

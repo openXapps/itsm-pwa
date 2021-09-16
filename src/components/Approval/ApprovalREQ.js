@@ -17,9 +17,9 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
+// import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
+// import TableCell from '@material-ui/core/TableCell';
 import TextField from '@material-ui/core/TextField';
 import Toolbar from '@material-ui/core/Toolbar';
 
@@ -29,7 +29,7 @@ import { validateToken } from '../../service/RSSOService';
 import { getServiceRequest, serviceRequestModel } from '../../service/RequestService';
 import { postApproval } from '../../service/ApprovalService';
 import StyledField from '../Shared/StyledField';
-import { RowTitle, RowContent } from '../Shared/StyledTableCell';
+import { RowHeader, RowTitle, RowContent } from '../Shared/StyledTableCell';
 import useStyles from './ApprovalStyles';
 
 const ApprovalREQ = ({ history }) => {
@@ -63,25 +63,26 @@ const ApprovalREQ = ({ history }) => {
         .then(response => {
           // console.log('getServiceRequest: response...', response.json());
           if (!response.ok) {
-            response.json().then(data => {
-              // console.log('getServiceRequest: response false data...', data);
-              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-            }).catch(error => {
-              // console.log('getServiceRequest: response false error...', error);
-              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-              setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
-            });
+            if (response.status === 401) {
+              dispatch({ type: 'AUTH', payload: false });
+              throw new Error('Session expired');
+            } else {
+              throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+            }
           } else {
             return response.json().then(data => {
               // console.log('getServiceRequest: data...', data);
               if (data.entries.length === 1) populateRequest(data.entries);
               setAssessed(false);
-              setSnackState({ severity: 'success', message: 'Request details fetched', show: true, duration: 1000 });
+              setSnackState({ severity: 'info', message: 'Request details fetched', show: true, duration: 3000 });
             });
           }
+        }).catch(error => {
+          // console.log('getServiceRequest: error...', error);
+          setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
         }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
     } else {
-      setSnackState({ severity: 'info', message: 'Session expired', show: true, duration: 2000 });
+      setSnackState({ severity: 'info', message: 'Session expired', show: true, duration: 3000 });
     }
   }
 
@@ -129,28 +130,27 @@ const ApprovalREQ = ({ history }) => {
       postApproval(data)
         .then(response => {
           if (!response.ok) {
-            response.json().then(data => {
-              console.log('postApproval: data error...', data);
-              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-            }).catch(error => {
-              if (error.message.indexOf('Authentication failed') > 0) dispatch({ type: 'AUTH', payload: false });
-              setSnackState({ severity: 'error', message: error.message, show: true, duration: 2000 });
-            });
+            if (response.status === 401) {
+              dispatch({ type: 'AUTH', payload: false });
+              throw new Error('Session expired');
+            } else {
+              throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+            }
           } else {
             response.json().then(data => {
-              console.log('postApproval: data ok...', data);
               if (data.values.status === 'Success') {
-                setSnackState({ severity: 'success', message: 'Request was ' + action, show: true, duration: 1000 });
+                setSnackState({ severity: 'success', message: 'Request was ' + action, show: true, duration: 3000 });
               } else {
                 setSnackState({ severity: 'error', message: 'Approval failed: ' + data.values.shortDescription, show: true, duration: 1000 });
               }
-            }).catch(error => {
-              console.log('postApproval: data error...', error);
-            });
+            }).catch(error => { console.log('postApproval: data error...', error) });
           }
+        }).catch(error => {
+          // console.log('postApproval: error...', error);
+          setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
         }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
     } else {
-      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 2000 });
+      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 3000 });
     }
   };
 
@@ -184,13 +184,11 @@ const ApprovalREQ = ({ history }) => {
                 <AccordionDetails>
                   <TableContainer>
                     <Table size='small' aria-label="service request content">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Questions</TableCell>
-                          <TableCell>Answers</TableCell>
-                        </TableRow>
-                      </TableHead>
                       <TableBody>
+                        <TableRow>
+                          <RowHeader>Questions</RowHeader>
+                          <RowHeader>Answers</RowHeader>
+                        </TableRow>
                         {reqData.details.map((v, i) => (
                           v ? (
                             <TableRow key={i} style={{ verticalAlign: 'top' }}>
