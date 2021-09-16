@@ -24,13 +24,12 @@ const HeaderComponent = ({ history, location }) => {
   const classes = useStyles();
   const { appVersion } = getLocalStorage('settings').data;
   const [state, dispatch] = useContext(context);
-  const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 2000 });
+  const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 3000 });
 
   // console.log('HeaderComponent render...');
 
   const handleLoginButton = () => {
     let url = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/rsso/oauth2/authorize?response_type=code';
-    // url += '&scope=Openid';
     url += '&client_id=' + localEnvironment.RSSOCLIENTID;
     url += '&client_secret=' + encodeURIComponent(localEnvironment.RSSOSECRET);
     url += '&redirect_uri=' + encodeURIComponent(localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/pwa');
@@ -39,16 +38,16 @@ const HeaderComponent = ({ history, location }) => {
 
   const handleLogoutButton = () => {
     dispatch({ type: 'PROGRESS', payload: true });
-    revokeToken('refresh_token'); // Doesn't do anything, token still remains in RSSO
+    // revokeToken('refresh_token'); // Doesn't do anything, token still remains in RSSO
     revokeToken('access_token').then(response => {
       // console.log('revokeToken: response...', response);
       if (!response.ok) throw new Error('Logout error');
       saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
       if (state.isAuth) dispatch({ type: 'AUTH', payload: false });
-      setSnackState({ severity: 'success', message: 'Logout successful', show: true, duration: 2000 });
+      setSnackState({ severity: 'success', message: 'Logout successful', show: true, duration: 3000 });
     }).catch(error => {
       // console.log('revokeToken: error...', error);
-      setSnackState({ severity: 'error', message: 'Logout failed', show: true, duration: 2000 });
+      setSnackState({ severity: 'error', message: 'Logout failed', show: true, duration: 3000 });
     }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
   };
 

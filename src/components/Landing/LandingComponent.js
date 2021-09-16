@@ -12,7 +12,6 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 import useStyles from './LandingStyles';
 import useURLQuery from '../../hooks/useURLQuery';
-// import useAuth from '../../hooks/useAuth';
 import { context } from '../../context/StoreProvider';
 import { modules } from '../../utilities/defaultdata';
 import { getLocalStorage } from '../../utilities/localstorage';
@@ -22,7 +21,7 @@ const LandingComponent = ({ history, location }) => {
   const [state, dispatch] = useContext(context);
   const classes = useStyles();
   const code = useURLQuery(location.search).get('code');
-  const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 4000 });
+  const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 3000 });
 
   // console.log('LandingComponent: render...');
 
@@ -31,7 +30,7 @@ const LandingComponent = ({ history, location }) => {
     if (code) {
       if (getTokenWithCode(code)) {
         dispatch({ type: 'AUTH', payload: true })
-        setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 2000 });
+        setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 3000 });
       } else {
         dispatch({ type: 'AUTH', payload: false })
         setSnackState({ severity: 'error', message: 'Login failed', show: true, duration: 3000 });
@@ -47,8 +46,6 @@ const LandingComponent = ({ history, location }) => {
     return () => { };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // Effect loops with validateToken() dependency
-  // }, [code, history, state.isAuth, dispatch]);
 
   const handleGoToModule = (e) => {
     const moduleId = parseInt(e.currentTarget.dataset.moduleId);
@@ -64,11 +61,11 @@ const LandingComponent = ({ history, location }) => {
       {modules.map((v, i) => {
         return (
           getLocalStorage('settings').data[v.name] ? (
-            <Box mt={{ xs: 2, sm: 3 }} mx={{ xs: 2, md: 3 }} key={i}>
+            <Box mt={{ xs: 2, sm: 3 }} mx={{ xs: 2, sm: 3 }} key={i}>
               <Paper elevation={10}>
-                <Box display="flex" p={{ xs: 1, md: 2 }} alignItems="center">
+                <Box display="flex" p={{ xs: 1, sm: 2 }} alignItems="center">
                   <img className={classes.image} src={v.img} alt={v.label} />
-                  <Typography className={classes.title} variant="h5"
+                  <Typography className={classes.title} variant="h6"
                   >{v.label} {state.isAuth && <span className={classes.counters}>({Math.floor(Math.random() * 10)})</span>}</Typography>
                   {state.isAuth ? (
                     <><Divider orientation="vertical" flexItem />

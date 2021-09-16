@@ -104,14 +104,22 @@ export const revokeToken = (hint) => {
  * @returns Boolean whether token expired or not
  */
 export const hasTokenExpired = () => {
-  let result = true;
+  let result = { accessTokenExpired: true, refreshTokenExpired: true };
+  const refreshTokenValidFor = 1800; // 30 minutes
   const { tokenDate, expiresIn } = getLocalStorage('rsso').data;
 
   if (tokenDate && expiresIn) {
-    const d1 = new Date().getTime();
-    const d2 = new Date(tokenDate).getTime();
-    let dif = ((d1 - d2) / 1000);
-    if (dif < expiresIn) result = false;
+    const d0 = new Date().getTime();
+    const d1 = new Date(tokenDate).getTime();
+    const d2 = d1 + (expiresIn * 1000);
+    const d3 = d1 + (refreshTokenValidFor * 1000);
+    // console.log('hasTokenExpired: tokenDate......', new Date(d1));
+    // console.log('hasTokenExpired: accessToken....', new Date(d2));
+    // console.log('hasTokenExpired: refreshToken...', new Date(d3));
+    // accessToken
+    if (d2 > d0) result = { ...result, accessTokenExpired: false };
+    // refreshToken
+    if (d3 > d0) result = { ...result, refreshTokenExpired: false };
   }
 
   return result;
@@ -125,7 +133,7 @@ export const testToken = async () => {
   let result = false;
   const { tokenType, accessToken } = getLocalStorage('rsso').data;
   const { settingsId } = getLocalStorage('settings').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const query = `'submitter'=$USER$`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
   const url = `/api/arsys/v1/entry/SBSA:PWA:UserSettings?q=(${query})&fields=values(${fields})`;
@@ -162,13 +170,14 @@ export const validateToken = async (runApiTest) => {
   const { tokenDate, accessToken } = getLocalStorage('rsso').data;
 
   if (tokenDate && accessToken) {
-    if (!hasTokenExpired()) {
+    const { accessTokenExpired, refreshTokenExpired } = hasTokenExpired();
+    if (!accessTokenExpired) {
       if (runApiTest) {
         // console.log('validateToken: running API test...');
         if ((await testToken()).valueOf()) result = true;
       } else result = true;
     } else {
-      if ((await refreshToken()).valueOf()) result = true;
+      if (!refreshTokenExpired && (await refreshToken()).valueOf()) result = true;
     }
   }
 

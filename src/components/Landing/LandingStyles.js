@@ -5,7 +5,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(2),
     flexGrow: 1,
     [theme.breakpoints.down('xs')]: {
-      fontSize: 18,
+      fontSize: theme.typography.body1.fontSize,
     },
   },
   image: {
