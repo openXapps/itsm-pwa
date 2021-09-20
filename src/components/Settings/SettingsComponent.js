@@ -15,7 +15,6 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
 import useStyles from './SettingsStyles';
-// import useAuth from '../../hooks/useAuth';
 import { context } from '../../context/StoreProvider';
 import { putARSettings, postARSettings, getARSettings } from '../../service/SettingsService';
 import { themeList } from '../../service/ThemeService';
@@ -33,12 +32,11 @@ const initialFieldData = () => {
 const SettingsComponent = ({ history }) => {
   const [state, dispatch] = useContext(context);
   const classes = useStyles();
-  // const isTokenValid = useAuth(false);
   const [fields, setFields] = useState(initialFieldData());
   const [settingsId, setSettingsId] = useState(getLocalStorage('settings').data.settingsId);
   const [isSaved, setIsSaved] = useState(false);
   const [criticalErr, setCriticalErr] = useState({ status: false, message: '' });
-  const [snackState, setSnackState] = useState({ severity: 'info', message: 'X', show: false, duration: 2000 });
+  const [snackState, setSnackState] = useState({ severity: 'info', message: 'X', show: false, duration: 3000 });
 
   // console.log('SettingsComponent render...');
 
@@ -65,7 +63,7 @@ const SettingsComponent = ({ history }) => {
               assets: data.entries[0].values.showAsset === 'true' ? true : false,
               people: data.entries[0].values.showPeople === 'true' ? true : false,
             });
-            setSnackState({ severity: 'info', message: 'Settings fetched', show: true, duration: 2000 });
+            setSnackState({ severity: 'info', message: 'Settings fetched', show: true, duration: 3000 });
           }
         }).catch(err => {
           setCriticalErr({ status: true, message: err.message })
@@ -102,7 +100,7 @@ const SettingsComponent = ({ history }) => {
       return;
     }
     if (!fields.theme) {
-      setSnackState({ severity: 'error', message: 'Must have a theme', show: true, duration: 2000 });
+      setSnackState({ severity: 'error', message: 'Must have a theme', show: true, duration: 3000 });
       return;
     }
     if (state.theme !== fields.theme) dispatch({ type: 'THEME', payload: fields.theme });
@@ -125,7 +123,7 @@ const SettingsComponent = ({ history }) => {
           setSettingsId(data.values.requestId);
           setIsSaved(true);
           dispatch({ type: 'PROGRESS', payload: false });
-          setSnackState({ severity: 'success', message: 'Settings created', show: true, duration: 2000 });
+          setSnackState({ severity: 'success', message: 'Settings created', show: true, duration: 3000 });
         }).catch(err => {
           // console.log('SettingsComponent: submit ERR...', err);
           dispatch({ type: 'PROGRESS', payload: false });
@@ -143,7 +141,7 @@ const SettingsComponent = ({ history }) => {
           });
           setIsSaved(true);
           dispatch({ type: 'PROGRESS', payload: false });
-          setSnackState({ severity: 'success', message: 'Settings updated', show: true, duration: 2000 });
+          setSnackState({ severity: 'success', message: 'Settings updated', show: true, duration: 3000 });
         }).catch(err => {
           // console.log('SettingsComponent: update ERR...', err);
           dispatch({ type: 'PROGRESS', payload: false });
@@ -163,17 +161,6 @@ const SettingsComponent = ({ history }) => {
       <Box my={2} />
       <Paper component="form" elevation={0} autoComplete="off">
         <Box p={3}>
-          {/* <Autocomplete
-            value={fields.theme}
-            onChange={(e, v) => handleFieldChange({ target: { name: 'theme', value: v } })}
-            options={themeList}
-            // getOptionLabel={(option) => option.category}
-            // https://github.com/mui-org/material-ui/issues/18344
-            getOptionLabel={option => typeof option === 'string' ? option : option.themeList}
-            renderInput={(params) => (
-              <TextField {...params} label="Theme" variant="outlined" />
-            )}
-          /> */}
           <FormControl variant="outlined" fullWidth>
             <InputLabel id="sb-itsm-theme-label">Theme</InputLabel>
             <Select

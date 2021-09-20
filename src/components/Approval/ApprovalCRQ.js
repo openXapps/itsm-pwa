@@ -17,9 +17,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableContainer from '@material-ui/core/TableContainer';
-// import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-// import TableCell from '@material-ui/core/TableCell';
 import TextField from '@material-ui/core/TextField';
 import Toolbar from '@material-ui/core/Toolbar';
 
@@ -230,7 +228,7 @@ const ApprovalCRQ = ({ history }) => {
   const doApproval = (action) => {
     setAssessed(true);
     if (state.isAuth) {
-      const justificationNote = justification ? justification : 'Approved from PWA';
+      const justificationNote = justification ? justification : 'No justification';
       const data = `{ "values": {
         "approvalAction": "${action}",
         "signatureId":   "${apid}",
@@ -280,6 +278,7 @@ const ApprovalCRQ = ({ history }) => {
           <Button
             variant="outlined"
             onClick={() => history.goBack()}
+            disabled={state.showProgress}
           >Back</Button>
         </Box>
         <Paper elevation={0}>
@@ -375,7 +374,7 @@ const ApprovalCRQ = ({ history }) => {
         <Box my={2}>
           <TextField
             label="Justification"
-            placeholder="Approved from PWA"
+            placeholder="No justification"
             variant="outlined"
             fullWidth
             value={justification}
@@ -406,6 +405,7 @@ const ApprovalCRQ = ({ history }) => {
                 variant="outlined"
                 fullWidth
                 onClick={() => history.goBack()}
+                disabled={state.showProgress}
               >Back</Button></Box>
           </Grid>
         </Grid>

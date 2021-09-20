@@ -25,7 +25,7 @@ export const changeRequestModel = {
  */
 export const getChangeRequest = (changeId) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const fields = `
     Infrastructure Change ID,
     Change Request Status,
@@ -65,7 +65,7 @@ export const getChangeRequest = (changeId) => {
  */
  export const getChangeWorkInfo = (changeId) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const fields = `
     Work Log Type,
     Detailed Description,
@@ -95,7 +95,7 @@ export const getChangeRequest = (changeId) => {
  */
  export const getChangeImpactedAreas = (changeId) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const fields = `
     Company
     `;
@@ -123,7 +123,7 @@ export const getChangeRequest = (changeId) => {
  */
  export const getChangeAssociations = (changeId) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + ':' + localEnvironment.ARPORT;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const fields = `
     Request Type01,
     Request Description01

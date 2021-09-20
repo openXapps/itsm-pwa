@@ -17,22 +17,23 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { context } from '../../context/StoreProvider';
 import { validateToken } from '../../service/RSSOService';
-import { getAssets, assetModel } from '../../service/AssetService';
+import { getAssetList } from '../../service/AssetService';
 import useStyles from './AssetStyles';
 
 const AssetList = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
-  const [assets, setAssets] = useState([assetModel]);
-  const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 2000 });
+  const [assets, setAssets] = useState([]);
+  const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 3000 });
 
   useEffect(() => {
     validateToken(false).then(response => {
       if (response) {
+        // console.log('AssetList: effect handleReload...');
         handleReload();
       } else {
         dispatch({ type: 'AUTH', payload: false });
-        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 4000 });
+        setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 3000 });
       }
     });
     // Effect clean-up
@@ -41,31 +42,35 @@ const AssetList = ({ history }) => {
   }, []);
 
   const handleReload = () => {
-    // console.log('AssetList: state...', state);
+    if (assets.length > 0) setAssets([]);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
-      getAssets()
-        .then(response => {
-          // console.log('AssetList: response...', response.json());
-          if (!response.ok) {
-            response.json().then(data => {
-              // console.log('AssetList: response false data...', data);
-              throw new Error(`${data[0].messageType}: ${data[0].messageText}: ${data[0].messageAppendedText}`);
-            }).catch(err => {
-              // console.log('AssetList: response false err...', err);
-              setSnackState({ severity: 'error', message: err.message, show: true, duration: 3000 });
-            });
-          } else {
-            return response.json().then(data => {
-              // console.log('AssetList: assets...', data);
-              populateAssets(data.entries);
-              // setAssets(data.entries);
-              setSnackState({ severity: 'success', message: 'Assets fetched', show: true, duration: 2000 });
-            });
-          }
-        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
+      // Need a timeout if token is still fresh
+      setTimeout(() => {
+        getAssetList()
+          .then(response => {
+            // console.log('getAssets: response...', response);
+            if (!response.ok) {
+              if (response.status === 401) {
+                dispatch({ type: 'AUTH', payload: false });
+                throw new Error('Session expired');
+              } else {
+                throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+              }
+            } else {
+              return response.json().then(data => {
+                // console.log('getAssets: assets...', data);
+                populateAssets(data.entries);
+                setSnackState({ severity: 'info', message: 'Assets fetched', show: true, duration: 3000 });
+              });
+            }
+          }).catch(error => {
+            // console.log('getAssets: error...', error);
+            setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
+          }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
+      }, 1000);
     } else {
-      setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 3000 });
+      setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 3000 });
     }
   }
 
@@ -73,7 +78,6 @@ const AssetList = ({ history }) => {
     let _assets = [];
     data.forEach(v => {
       _assets.push({
-        ...assetModel,
         reconId: v.values['AssetInstanceId'],
         class: v.values['UserDisplayObjectName'],
         item: v.values['Item'],
@@ -88,8 +92,9 @@ const AssetList = ({ history }) => {
     setAssets(_assets);
   };
 
-  const handleAssetDetailsButton = () => {
-
+  const handleAssetDetailsButton = (e) => {
+    const id = e.currentTarget.dataset.id;
+    history.push('/asset/' + id);
   }
 
   const handleSnackState = () => {
@@ -100,16 +105,18 @@ const AssetList = ({ history }) => {
     <Container maxWidth="md">
       <Box mt={3} display="flex" flexWrap="nowrap" alignItems="center">
         <Box flexGrow={1}>
-          <Typography className={classes.header} variant="h5">My Assets</Typography>
+          <Typography className={classes.header} variant="h6">My Assets</Typography>
         </Box>
         <Button
           variant="outlined"
           onClick={handleReload}
+          disabled={!state.isAuth || state.showProgress}
         >Reload</Button>
         <Button
           style={{ marginLeft: '8px' }}
           variant="outlined"
           onClick={() => history.goBack()}
+          disabled={state.showProgress}
         >Back</Button>
       </Box>
       <Box width="100%" mt={3}>
@@ -120,10 +127,13 @@ const AssetList = ({ history }) => {
                 <div key={i}>
                   <ListItem disableGutters>
                     <ListItemText
-                      primary={v.model + ' ' + v.item}
-                      secondary={'Serial: ' + v.serial}
+                      disableTypography
+                      primary={<Typography className={classes.listItemPrimary}>{v.model + ' ' + v.item}</Typography>}
+                      secondary={<Typography className={classes.listItemSecondary}>{'Serial: ' + v.serial}</Typography>}
                     /><ListItemSecondaryAction>
-                      <IconButton edge="end"
+                      <IconButton
+                        edge="end"
+                        data-id={v.reconId}
                         onClick={handleAssetDetailsButton}
                       ><MoreVertIcon /></IconButton>
                     </ListItemSecondaryAction>
@@ -135,11 +145,11 @@ const AssetList = ({ history }) => {
           ) : (
             state.showProgress ? (
               <Box mt={3}>
-                <Typography variant="h6">Loading...</Typography>
+                <Typography variant="body1">Loading...</Typography>
               </Box>
             ) : (
               <Box mt={3}>
-                <Typography variant="h6">No assets found. Click Reload to try again.</Typography>
+                <Typography variant="body1">No assets found. Click Reload to try again.</Typography>
               </Box>
             )
           )}
