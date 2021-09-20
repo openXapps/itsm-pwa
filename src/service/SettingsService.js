@@ -63,4 +63,33 @@ export const getARSettings = () => {
   });
 };
 
+/**
+ * Module counters model - NOT USED for now
+ */
+export const moduleCountersModel = {
+  approvals: 0,
+  incidents: 0,
+  changes: 0,
+  problems: 0,
+  assets: 0,
+  people: 0,
+};
+
+/**
+ * Helper function to fetch module counters from user settings form
+ * @returns Promise of module counters
+ */
+export const getModuleCounters = () => {
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const query = `'assignedTo' = $USER$`;
+  const fields = 'requestId,approvals,incidents,changes,problems,assets,people';
+  const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=(' + query + ')&fields=values(' + fields + ')';
+  return fetch(host + url, {
+    method: 'GET',
+    headers: { 'Authorization': tokenType + ' ' + accessToken },
+    mode: 'cors'
+  });
+};
+
 
