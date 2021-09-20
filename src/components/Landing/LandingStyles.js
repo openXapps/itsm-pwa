@@ -15,9 +15,13 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   counters: {
-    fontSize: 16,
+    // marginLeft: theme.spacing(2),
+    // padding: theme.spacing(2),
+    // border: '2px solid black',
+    // borderRadius: '15px 50px 30px',
+    fontSize: theme.typography.body1.fontSize,
     [theme.breakpoints.down('xs')]: {
-      fontSize: 12,
+      fontSize: theme.typography.body2.fontSize,
     },
   }
 }));

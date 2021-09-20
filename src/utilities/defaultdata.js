@@ -42,7 +42,6 @@ export const defaultStorage = {
 export const localEnvironment = {
   ARPROTOCOL: process.env.REACT_APP_ARPROTOCOL,
   ARHOST: process.env.REACT_APP_ARHOST,
-  ARPORT: process.env.REACT_APP_ARPORT,
   RSSOCLIENTID: process.env.REACT_APP_RSSO_CLIENT_ID,
   RSSOSECRET: process.env.REACT_APP_RSSO_SECRET,
 };

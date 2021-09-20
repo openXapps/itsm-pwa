@@ -105,7 +105,7 @@ export const revokeToken = (hint) => {
  */
 export const hasTokenExpired = () => {
   let result = { accessTokenExpired: true, refreshTokenExpired: true };
-  const refreshTokenValidFor = 1800; // 30 minutes
+  const refreshTokenValidFor = 3000; // 50 minutes
   const { tokenDate, expiresIn } = getLocalStorage('rsso').data;
 
   if (tokenDate && expiresIn) {
@@ -132,7 +132,7 @@ export const hasTokenExpired = () => {
 export const testToken = async () => {
   let result = false;
   const { tokenType, accessToken } = getLocalStorage('rsso').data;
-  const { settingsId } = getLocalStorage('settings').data;
+  const { settingsId, theme } = getLocalStorage('settings').data;
   const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const query = `'submitter'=$USER$`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
@@ -151,6 +151,7 @@ export const testToken = async () => {
             saveSettings(data.entries[0].values);
           } else {
             if (settingsId !== data.entries[0].values.requestId) saveSettings(data.entries[0].values);
+            if (theme !== data.entries[0].values.theme) saveSettings(data.entries[0].values);
           }
         }
       }).catch(error => console.log(error));

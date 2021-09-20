@@ -1,8 +1,9 @@
 export const themeList = [
-  {themeId: 'light', themeAlias: 'Sunny Day'},
-  {themeId: 'dark', themeAlias: 'Darth Vader'},
-  {themeId: 'concrete', themeAlias: 'Concrete Jungle'},
-  {themeId: 'monday', themeAlias: 'Monday Blues'},
+  { themeId: 'light', themeAlias: 'Sunny Day' },
+  { themeId: 'dark', themeAlias: 'Darth Vader' },
+  { themeId: 'concrete', themeAlias: 'Concrete Jungle' },
+  { themeId: 'monday', themeAlias: 'Monday Blues' },
+  { themeId: 'ocean', themeAlias: 'Ocean Breeze' },
 ];
 
 // https://uigradients.com
@@ -117,6 +118,42 @@ export const themes =
         default: '#bbdefb',
         paper: '#90caf9',
       },
+    },
+  },
+  ocean: {
+    overrides: {
+      MuiCssBaseline: {
+        '@global': {
+          body: {
+            background: 'linear-gradient(145deg, #95abb7, #000000) no-repeat fixed', // Deep Space
+          },
+        },
+      },
+      MuiAccordionDetails: {
+        root: {
+          padding: 0,
+        }
+      },
+    },
+    palette: {
+      type: 'dark',
+      primary: {
+        main: '#cfd8dc',
+      },
+      secondary: {
+        main: '#7986cb',
+      },
+      background: {
+        default: '#263238',
+        paper: '#455a64',
+      },
+      error: {
+        main: '#f50057',
+      },
+      warning: {
+        main: '#ff6d00',
+      },
+      divider: '#aaaaaa',
     },
   },
 };

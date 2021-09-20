@@ -7,7 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
-// import Divider from '@material-ui/core/Divider';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -17,9 +16,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableContainer from '@material-ui/core/TableContainer';
-// import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-// import TableCell from '@material-ui/core/TableCell';
 import TextField from '@material-ui/core/TextField';
 import Toolbar from '@material-ui/core/Toolbar';
 
@@ -59,28 +56,31 @@ const ApprovalREQ = ({ history }) => {
     // // console.log('ApprovalCRQ: state...', state);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
-      getServiceRequest(reqid)
-        .then(response => {
-          // console.log('getServiceRequest: response...', response.json());
-          if (!response.ok) {
-            if (response.status === 401) {
-              dispatch({ type: 'AUTH', payload: false });
-              throw new Error('Session expired');
+      // Need a timeout if token is still fresh
+      setTimeout(() => {
+        getServiceRequest(reqid)
+          .then(response => {
+            // console.log('getServiceRequest: response...', response.json());
+            if (!response.ok) {
+              if (response.status === 401) {
+                dispatch({ type: 'AUTH', payload: false });
+                throw new Error('Session expired');
+              } else {
+                throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+              }
             } else {
-              throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+              return response.json().then(data => {
+                // console.log('getServiceRequest: data...', data);
+                if (data.entries.length === 1) populateRequest(data.entries);
+                setAssessed(false);
+                setSnackState({ severity: 'info', message: 'Request details fetched', show: true, duration: 3000 });
+              });
             }
-          } else {
-            return response.json().then(data => {
-              // console.log('getServiceRequest: data...', data);
-              if (data.entries.length === 1) populateRequest(data.entries);
-              setAssessed(false);
-              setSnackState({ severity: 'info', message: 'Request details fetched', show: true, duration: 3000 });
-            });
-          }
-        }).catch(error => {
-          // console.log('getServiceRequest: error...', error);
-          setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
-        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
+          }).catch(error => {
+            // console.log('getServiceRequest: error...', error);
+            setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
+          }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
+      }, 1000);
     } else {
       setSnackState({ severity: 'info', message: 'Session expired', show: true, duration: 3000 });
     }
@@ -120,7 +120,7 @@ const ApprovalREQ = ({ history }) => {
     setAssessed(true);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
-      const justificationNote = justification ? justification : 'Approved from PWA';
+      const justificationNote = justification ? justification : 'No justification';
       const data = `{ "values": {
         "approvalAction": "${action}",
         "signatureId":   "${apid}",
@@ -167,6 +167,7 @@ const ApprovalREQ = ({ history }) => {
         <Button
           variant="outlined"
           onClick={() => history.goBack()}
+          disabled={state.showProgress}
         >Back</Button>
       </Box>
       <Paper elevation={0}>
@@ -209,7 +210,7 @@ const ApprovalREQ = ({ history }) => {
       <Box my={2}>
         <TextField
           label="Justification"
-          placeholder="Approved from App"
+          placeholder="No justification"
           variant="outlined"
           fullWidth
           value={justification}
@@ -240,6 +241,7 @@ const ApprovalREQ = ({ history }) => {
               variant="outlined"
               fullWidth
               onClick={() => history.goBack()}
+              disabled={state.showProgress}
             >Back</Button></Box>
         </Grid>
       </Grid>

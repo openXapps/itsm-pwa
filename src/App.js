@@ -24,6 +24,7 @@ import ApprovalList from './components/Approval/ApprovalList';
 import ApprovalCRQ from './components/Approval/ApprovalCRQ';
 import ApprovalREQ from './components/Approval/ApprovalREQ';
 import AssetList from './components/Asset/AssetList';
+import AssetDetails from './components/Asset/AssetDetails';
 import Error404Component from './components/Error/Error404Component';
 
 const App = () => {
@@ -42,7 +43,8 @@ const App = () => {
           <Route path="/approval" exact component={ApprovalList} />
           <Route path="/approval/crq/:apid/:crqid" component={ApprovalCRQ} />
           <Route path="/approval/req/:apid/:reqid" component={ApprovalREQ} />
-          <Route path="/asset" component={AssetList} />
+          <Route path="/asset" exact component={AssetList} />
+          <Route path="/asset/:astid" component={AssetDetails} />
           <Route component={Error404Component} />
         </Switch>
       </BrowserRouter>

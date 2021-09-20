@@ -39,7 +39,9 @@ const LandingComponent = ({ history, location }) => {
     } else {
       // console.log('LandingComponent: effect calling validateToken...');
       validateToken(true).then(response => {
-        if (response && !state.isAuth) dispatch({ type: 'AUTH', payload: true });
+        const theme = getLocalStorage('settings').data.theme;
+        if (!state.isAuth && response) dispatch({ type: 'AUTH', payload: true });
+        if (state.theme !== theme) dispatch({ type: 'THEME', payload: theme });
       });
     }
     // Effect clean-up
@@ -66,7 +68,7 @@ const LandingComponent = ({ history, location }) => {
                 <Box display="flex" p={{ xs: 1, sm: 2 }} alignItems="center">
                   <img className={classes.image} src={v.img} alt={v.label} />
                   <Typography className={classes.title} variant="h6"
-                  >{v.label} {state.isAuth && <span className={classes.counters}>({Math.floor(Math.random() * 10)})</span>}</Typography>
+                  >{v.label} {state.isAuth && <span className={classes.counters}>[{Math.floor(Math.random() * 10)}]</span>}</Typography>
                   {state.isAuth ? (
                     <><Divider orientation="vertical" flexItem />
                       <Box p={1}>

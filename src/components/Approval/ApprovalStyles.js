@@ -7,12 +7,12 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   avatarREQ: {
-    color: theme.palette.warning.light,
-    backgroundColor: theme.palette.primary.dark,
+    color: theme.palette.info.light,
+    backgroundColor: theme.palette.grey.A400,
   },
   avatarCRQ: {
     color: theme.palette.warning.light,
-    backgroundColor: theme.palette.success.dark,
+    backgroundColor: theme.palette.grey.A400,
   },
   listItemPrimary: {
     fontWeight: theme.typography.fontWeightBold,

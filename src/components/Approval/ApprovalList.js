@@ -138,6 +138,7 @@ const ApprovalList = ({ history }) => {
           style={{ marginLeft: '8px' }}
           variant="outlined"
           onClick={() => history.goBack()}
+          disabled={state.showProgress}
         >Back</Button>
       </Box>
       <Box width="100%" mt={3}>
