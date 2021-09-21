@@ -10,13 +10,12 @@ import { localEnvironment, storageObjects, defaultStorage } from '../utilities/d
 */
 export const getTokenWithCode = async (code) => {
   let result = false;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
-  const url = '/rsso/oauth2/v1.1/token';
-  const redirect = encodeURIComponent(host + '/pwa');
+  const url = localEnvironment.ARHOST + '/rsso/oauth2/v1.1/token';
+  const redirect = encodeURIComponent(localEnvironment.WEBHOST + localEnvironment.WEBPATH);
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
   const body = `grant_type=authorization_code&code=${code}&redirect_uri=${redirect}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
 
-  const response = await fetch(host + url, {
+  const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body
@@ -46,12 +45,11 @@ export const getTokenWithCode = async (code) => {
 export const refreshToken = async () => {
   let result = false;
   const { refreshToken } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
-  const url = '/rsso/oauth2/v1.1/token';
+  const url = localEnvironment.ARHOST + '/rsso/oauth2/v1.1/token';
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
   const body = `grant_type=refresh_token&refresh_token=${refreshToken}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
 
-  await fetch(host + url, {
+  await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body,
@@ -84,12 +82,11 @@ export const refreshToken = async () => {
  */
 export const revokeToken = (hint) => {
   const { accessToken } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
-  const url = '/rsso/oauth2/revoke';
+  const url = localEnvironment.ARHOST + '/rsso/oauth2/revoke';
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
   const body = `token=${accessToken}&token_type_hint=${hint}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
 
-  return fetch(host + url, {
+  return fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -133,12 +130,11 @@ export const testToken = async () => {
   let result = false;
   const { tokenType, accessToken } = getLocalStorage('rsso').data;
   const { settingsId, theme } = getLocalStorage('settings').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const query = `'submitter'=$USER$`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
-  const url = `/api/arsys/v1/entry/SBSA:PWA:UserSettings?q=(${query})&fields=values(${fields})`;
+  const url = `${localEnvironment.ARHOST}/api/arsys/v1/entry/SBSA:PWA:UserSettings?q=(${query})&fields=values(${fields})`;
 
-  await fetch(host + url, {
+  await fetch(url, {
     method: 'GET',
     headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',

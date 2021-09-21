@@ -22,7 +22,7 @@ export const assetListModel = {
  */
 export const getAssetList = () => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const query = `'DatasetId' = "BMC.ASSET" AND 'Login Name' = $USER$`;
   // 240001003 = Manufacturer Name+
   const fields = 'AssetInstanceId,UserDisplayObjectName,Item,Model Number,240001003,Serial Number,Name,AssetLifecycleStatus,Class Id';
@@ -52,7 +52,7 @@ export const getAssetList = () => {
  */
 export const getCustomFields = (reconId) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const query = `'Reconciliation ID' = "${reconId}"`;
   const fields = 'Last Logged on User,Last Logged on Date,Last Verified By,Last Verified Date';
   const url = '/api/arsys/v1/entry/SBSA:AST:CustomFields/?q=(' + query + ')&fields=values(' + fields + ')';
@@ -89,7 +89,7 @@ export const computerSystemModel = {
  */
 export const getComputerSystem = (reconId) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const query = `'Data Set Id' = "BMC.ASSET" AND 'Reconciliation Identity' = "${reconId}"`;
   // 240001003 = Manufacturer Name+
   const fields = 'Name,Serial Number,Tag Number,AssetLifecycleStatus,Item,Model Number,240001003,LastScanDate,Cost Center,UserDisplayObjectName,DNS Host Name,Domain';

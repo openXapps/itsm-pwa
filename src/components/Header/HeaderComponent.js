@@ -29,10 +29,10 @@ const HeaderComponent = ({ history, location }) => {
   // console.log('HeaderComponent render...');
 
   const handleLoginButton = () => {
-    let url = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/rsso/oauth2/authorize?response_type=code';
+    let url = localEnvironment.ARHOST + '/rsso/oauth2/authorize?response_type=code';
     url += '&client_id=' + localEnvironment.RSSOCLIENTID;
     url += '&client_secret=' + encodeURIComponent(localEnvironment.RSSOSECRET);
-    url += '&redirect_uri=' + encodeURIComponent(localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST + '/pwa');
+    url += '&redirect_uri=' + encodeURIComponent(localEnvironment.WEBHOST + localEnvironment.WEBPATH);
     window.open(url, '_self');
   };
 
