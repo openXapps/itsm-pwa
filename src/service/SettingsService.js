@@ -10,7 +10,7 @@ import { localEnvironment } from '../utilities/defaultdata';
  */
 export const postARSettings = (data) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const fields = 'requestId';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings?fields=values(' + fields + ')';
   return fetch(host + url, {
@@ -32,7 +32,7 @@ export const postARSettings = (data) => {
  */
 export const putARSettings = (requestId, data) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + requestId;
   return fetch(host + url, {
     method: 'PUT',
@@ -52,7 +52,7 @@ export const putARSettings = (requestId, data) => {
  */
 export const getARSettings = () => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const query = `'assignedTo' = $USER$`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=(' + query + ')&fields=values(' + fields + ')';
@@ -71,7 +71,7 @@ export const getARSettings = () => {
  export const putARSettingsAction = (action) => {
   const { settingsId } = getLocalStorage('settings').data;
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + settingsId;
   return fetch(host + url, {
     method: 'PUT',
@@ -103,7 +103,7 @@ export const moduleCountersModel = {
  */
 export const getModuleCounters = () => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const query = `'assignedTo' = $USER$`;
   const fields = 'requestId,approvals,incidents,changes,problems,assets,people';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=(' + query + ')&fields=values(' + fields + ')';

@@ -20,7 +20,6 @@ export const approvalModel = {
  */
 export const getApprovals = () => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
   const query = `('Approvers' LIKE $USER$) AND (('Approval Status' = 0) OR ('Approval Status' = 3) OR ('Approval Status' = 4))`;
   // const query = `('Approval Status' = 0 OR 'Approval Status' = 3 OR 'Approval Status' = 4)`;
   // const query = `'Signature ID' = "000000000002059"`;
@@ -32,8 +31,8 @@ export const getApprovals = () => {
     14516,
     Create-Date-Sig
     `;
-  const url = `/api/arsys/v1/entry/AP:Detail-Signature/?q=(${query})&fields=values(${fields})`;
-  return fetch(host + url, {
+  const url = `${localEnvironment.ARHOST}/api/arsys/v1/entry/AP:Detail-Signature/?q=(${query})&fields=values(${fields})`;
+  return fetch(url, {
     method: 'GET',
     headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
@@ -46,7 +45,7 @@ export const getApprovals = () => {
  */
 export const postApproval = (data) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const fields = 'requestId,status,shortDescription';
   const url = `/api/arsys/v1/entry/SBSA:PWA:Approval?fields=values(${fields})`;
   return fetch(host + url, {

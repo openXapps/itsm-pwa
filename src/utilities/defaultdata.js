@@ -23,9 +23,6 @@ export const defaultStorage = {
     appVersion: '1.1',
     settingsId: '',
     theme: 'light',
-    // theme: 'dark',
-    // theme: 'concrete',
-    // theme: 'monday',
     approvals: true,
     incidents: false,
     changes: false,
@@ -40,8 +37,9 @@ export const defaultStorage = {
  * @returns Environment variables from .env.local
  */
 export const localEnvironment = {
-  ARPROTOCOL: process.env.REACT_APP_ARPROTOCOL,
   ARHOST: process.env.REACT_APP_ARHOST,
+  WEBHOST: process.env.REACT_APP_WEBHOST,
+  WEBPATH: process.env.REACT_APP_WEBPATH,
   RSSOCLIENTID: process.env.REACT_APP_RSSO_CLIENT_ID,
   RSSOSECRET: process.env.REACT_APP_RSSO_SECRET,
 };

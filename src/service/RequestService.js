@@ -20,7 +20,7 @@ export const serviceRequestModel = {
  */
 export const getServiceRequest = (requestId) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
-  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const host = localEnvironment.ARHOST;
   const fields = `
     Request Number,
     Summary,
