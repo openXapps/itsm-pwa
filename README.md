@@ -8,9 +8,9 @@ The following file you have to supply after cloning the repository:
 
 **.env.local** - Environment variable file containing:
 ```
-REACT_APP_ARPROTOCOL=<http or https>
 REACT_APP_ARHOST=<Remedy Server host name for API endpoints>
-REACT_APP_ARPORT=<Remedy Server port number for API endpoints>
+REACT_APP_WEBHOST=<App web host name>
+REACT_APP_WEBPATH=<App web path>
 REACT_APP_RSSO_CLIENT_ID=<RSSO client ID>
 REACT_APP_RSSO_SECRET=<RSSO client secret>
 ```
