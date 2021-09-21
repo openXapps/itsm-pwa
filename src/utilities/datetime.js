@@ -10,8 +10,8 @@ export const userDate = (dIn, showTime) => {
   const d = dIn ? new Date(dIn) : new Date();
   // console.log('userDate: d......', d);
   dOut = d.getFullYear() + '-';
-  dOut += String(d.getMonth()).padStart(2, 0) + '-';
-  dOut += String(d.getDay()).padStart(2, 0);
+  dOut += String(d.getMonth() + 1).padStart(2, 0) + '-';
+  dOut += String(d.getDate()).padStart(2, 0);
   if (showTime) {
     dOut += ' ' + String(d.getHours()).padStart(2, 0) + ':';
     dOut += String(d.getMinutes()).padStart(2, 0);

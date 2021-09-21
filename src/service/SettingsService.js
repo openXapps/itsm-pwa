@@ -64,6 +64,28 @@ export const getARSettings = () => {
 };
 
 /**
+ * Helper function to trigger user setting actions
+ * @param {string} action Action to trigger (SET_MODULE_FLAG, SET_MODULE_COUNT or SET_MODULE_FLAG_AND_COUNT)
+ * @returns Promise of updated entry
+ */
+ export const putARSettingsAction = (action) => {
+  const { settingsId } = getLocalStorage('settings').data;
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
+  const host = localEnvironment.ARPROTOCOL + '://' + localEnvironment.ARHOST;
+  const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + settingsId;
+  return fetch(host + url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': tokenType + ' ' + accessToken,
+      'Content-Type': 'application/json',
+      'X-Requested-By': 'XMLHttpRequest',
+    },
+    mode: 'cors',
+    body: '{"values": {"zAction": "' + action + '"}}',
+  });
+};
+
+/**
  * Module counters model - NOT USED for now
  */
 export const moduleCountersModel = {
@@ -91,5 +113,4 @@ export const getModuleCounters = () => {
     mode: 'cors'
   });
 };
-
 

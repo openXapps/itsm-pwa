@@ -34,6 +34,7 @@ import {
   changeAssociationsModel,
 } from '../../service/ChangeService';
 import { validateToken } from '../../service/RSSOService';
+import { putARSettingsAction } from '../../service/SettingsService';
 import { postApproval } from '../../service/ApprovalService';
 import { RowHeader, RowTitle, RowContent } from '../Shared/StyledTableCell';
 import StyledField from '../Shared/StyledField';
@@ -258,7 +259,10 @@ const ApprovalCRQ = ({ history }) => {
         }).catch(error => {
           // console.log('postApproval: error...', error);
           setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
-        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
+        }).finally(() => {
+          dispatch({ type: 'PROGRESS', payload: false });
+          putARSettingsAction('SET_MODULE_COUNT').catch(error => console.log('putARSettingsAction: error...', error));
+        });
     } else {
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 3000 });
     }

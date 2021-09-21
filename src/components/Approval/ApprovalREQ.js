@@ -23,6 +23,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
 import { validateToken } from '../../service/RSSOService';
+import { putARSettingsAction } from '../../service/SettingsService';
 import { getServiceRequest, serviceRequestModel } from '../../service/RequestService';
 import { postApproval } from '../../service/ApprovalService';
 import StyledField from '../Shared/StyledField';
@@ -148,7 +149,10 @@ const ApprovalREQ = ({ history }) => {
         }).catch(error => {
           // console.log('postApproval: error...', error);
           setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
-        }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
+        }).finally(() => {
+          dispatch({ type: 'PROGRESS', payload: false });
+          putARSettingsAction('SET_MODULE_COUNT').catch(error => console.log('putARSettingsAction: error...', error));
+        });
     } else {
       setSnackState({ severity: 'info', message: 'Please login first', show: true, duration: 3000 });
     }

@@ -21,6 +21,7 @@ import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
 import { getApprovals } from '../../service/ApprovalService';
 import { validateToken } from '../../service/RSSOService';
+import { putARSettingsAction } from '../../service/SettingsService';
 import useStyles from './ApprovalStyles';
 
 const ApprovalList = ({ history }) => {
@@ -70,7 +71,10 @@ const ApprovalList = ({ history }) => {
           }).catch(error => {
             // console.log('getApprovals: error...', error);
             setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
-          }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
+          }).finally(() => {
+            dispatch({ type: 'PROGRESS', payload: false });
+            putARSettingsAction('SET_MODULE_COUNT').catch(error => console.log('putARSettingsAction: error...', error));
+          });
       }, 1000);
     } else {
       setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 3000 });
