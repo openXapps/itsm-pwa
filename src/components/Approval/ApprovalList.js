@@ -51,30 +51,28 @@ const ApprovalList = ({ history }) => {
       dispatch({ type: 'PROGRESS', payload: true });
       // Need a timeout if token is still fresh
       setTimeout(() => {
-        getApprovals()
-          .then(response => {
-            // console.log('getApprovals: response...', response);
-            if (!response.ok) {
-              if (response.status === 401) {
-                dispatch({ type: 'AUTH', payload: false });
-                throw new Error('Session expired');
-              } else {
-                throw new Error('ERR: ' + response.status + ' ' + response.statusText);
-              }
+        getApprovals().then(response => {
+          // console.log('getApprovals: response...', response);
+          if (!response.ok) {
+            if (response.status === 401) {
+              dispatch({ type: 'AUTH', payload: false });
+              throw new Error('Session expired');
             } else {
-              return response.json().then(data => {
-                // console.log('getApprovals: approvals...', data);
-                populateApprovals(data.entries);
-                setSnackState({ severity: 'info', message: 'Approvals fetched', show: true, duration: 3000 });
-              });
+              throw new Error('ERR: ' + response.status + ' ' + response.statusText);
             }
-          }).catch(error => {
-            // console.log('getApprovals: error...', error);
-            setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
-          }).finally(() => {
-            dispatch({ type: 'PROGRESS', payload: false });
-            putARSettingsAction('SET_MODULE_COUNT').catch(error => console.log('putARSettingsAction: error...', error));
-          });
+          }
+          return response.json();
+        }).then(data => {
+          // console.log('getApprovals: approvals...', data);
+          populateApprovals(data.entries);
+          setSnackState({ severity: 'info', message: 'Approvals fetched', show: true, duration: 3000 });
+        }).catch(error => {
+          // console.log('getApprovals: error...', error);
+          setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
+        }).finally(() => {
+          dispatch({ type: 'PROGRESS', payload: false });
+          putARSettingsAction('SET_MODULE_COUNT').catch(error => console.log('putARSettingsAction: error...', error));
+        });
       }, 1000);
     } else {
       setSnackState({ severity: 'error', message: 'Session expired', show: true, duration: 3000 });
