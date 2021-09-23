@@ -23,7 +23,7 @@ export const defaultStorage = {
     appVersion: '1.1',
     settingsId: '',
     theme: 'light',
-    approvals: true,
+    approvals: false,
     incidents: false,
     changes: false,
     problems: false,

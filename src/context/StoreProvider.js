@@ -1,7 +1,8 @@
-import React from 'react';
+import { createContext, useReducer } from 'react';
 
 import StoreReducer from './StoreReducer';
 import { initialUse, getLocalStorage } from '../utilities/localstorage';
+import { hasTokenExpired } from '../service/RSSOService';
 
 /**
  * Initial state
@@ -12,11 +13,11 @@ initialUse();
 // Initialize context data
 const contextData = {
   theme: getLocalStorage('settings').data.theme,
-  isAuth: false,
+  isAuth: !hasTokenExpired().accessTokenExpired,
   showProgress: false,
 };
 
-export const context = React.createContext(contextData);
+export const context = createContext(contextData);
 
 /**
  * Context store wrapper for entire app used in index.js
@@ -24,7 +25,7 @@ export const context = React.createContext(contextData);
  * @returns Returns a React Context Provider
  */
 const StoreProvider = (props) => {
-  const [state, dispatch] = React.useReducer(StoreReducer, contextData);
+  const [state, dispatch] = useReducer(StoreReducer, contextData);
   return (
     <context.Provider value={[state, dispatch]}>
       {props.children}

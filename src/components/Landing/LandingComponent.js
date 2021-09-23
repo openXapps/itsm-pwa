@@ -16,57 +16,59 @@ import useURLQuery from '../../hooks/useURLQuery';
 import { context } from '../../context/StoreProvider';
 import { modules } from '../../utilities/defaultdata';
 import { getLocalStorage } from '../../utilities/localstorage';
-import { getTokenWithCode, validateToken } from '../../service/RSSOService';
+import { getTokenWithCode, validateToken, testToken } from '../../service/RSSOService';
 import { getModuleCounters } from '../../service/SettingsService';
 
 const LandingComponent = ({ history, location }) => {
   const [state, dispatch] = useContext(context);
   const classes = useStyles();
   const code = useURLQuery(location.search).get('code');
+  const settings = getLocalStorage('settings').data;
   const [moduleList, setModuleList] = useState(modules);
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 3000 });
 
-  // console.log('LandingComponent: render state.isAuth...', state.isAuth);
-
   useEffect(() => {
-    // console.log('LandingComponent: effect 1 code...', code);
     function loadModuleCounters() {
-      // console.log('LandingComponent: loadModuleCounters running...');
-      getModuleCounters().then(response => {
-        if (!response.ok) {
-          if (response.status === 401) throw new Error('Refresh page again');
-          throw new Error('ERR: ' + response.status + ' ' + response.statusText);
-        } else {
-          return response.json().then(data => {
-            if (data.entries.length > 0) {
-              const _modules = [];
-              modules.forEach(v => _modules.push({ ...v, count: data.entries[0].values[v.name] }));
-              setModuleList(_modules);
-            }
-          });
-        }
-      }).catch(error => setSnackState({ severity: 'info', message: error.message, show: true, duration: 3000 }));
+      setTimeout(() => {
+        // console.log('loadModuleCounters loading...', new Date());
+        getModuleCounters().then(response => {
+          if (!response.ok) {
+            if (response.status === 401) throw new Error('Refresh page again');
+            throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+          }
+          return response.json();
+        }).then(data => {
+          if (data.entries.length > 0) {
+            const _modules = [];
+            modules.forEach(v => _modules.push({ ...v, count: data.entries[0].values[v.name] }));
+            setModuleList(_modules);
+          }
+        }).catch(error => setSnackState({ severity: 'info', message: error.message, show: true, duration: 3000 }));
+      }, 500);
     }
 
     // Checks if URL location contains a code parameter and if so, then fetch token
     if (code) {
-      if (getTokenWithCode(code)) {
-        dispatch({ type: 'AUTH', payload: true })
-        setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 3000 });
-      } else {
-        dispatch({ type: 'AUTH', payload: false })
-        setSnackState({ severity: 'error', message: 'Login failed', show: true, duration: 3000 });
+      if (!state.isAuth) {
+        getTokenWithCode(code).then(response => {
+          if (response.ok) {
+            testToken(response.token);
+            dispatch({ type: 'AUTH', payload: true })
+            setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 3000 });
+          } else {
+            dispatch({ type: 'AUTH', payload: false })
+            setSnackState({ severity: 'error', message: 'Login failed', show: true, duration: 3000 });
+          }
+          history.replace('/');
+        });
       }
-      history.replace('/');
     } else {
       if (!state.isAuth) {
         validateToken(true).then(response => {
           if (response) dispatch({ type: 'AUTH', payload: true });
         });
       } else {
-        setTimeout(() => {
-          loadModuleCounters();
-        }, 1000);
+        loadModuleCounters();
       }
     }
     // Effect clean-up
@@ -87,7 +89,7 @@ const LandingComponent = ({ history, location }) => {
     <Container maxWidth="md" disableGutters>
       {moduleList.map((v, i) => {
         return (
-          getLocalStorage('settings').data[v.name] ? (
+          settings[v.name] ? (
             <Box mt={{ xs: 2, sm: 3 }} mx={{ xs: 2, sm: 3 }} key={i}>
               <Paper elevation={10}>
                 <Box display="flex" p={{ xs: 1, sm: 2 }} alignItems="center">

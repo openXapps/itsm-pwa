@@ -1,38 +1,39 @@
 import { saveLocalStorage, getLocalStorage } from '../utilities/localstorage';
 import { localEnvironment, storageObjects, defaultStorage } from '../utilities/defaultdata';
+import { postARSettings } from './SettingsService';
 
 // https://docs.bmc.com/docs/ars2002/enabling-oauth-authorization-for-remedy-ar-system-rest-apis-909638148.html#EnablingOAuthauthorizationforRemedyARSystemRESTAPIs-TouseRemedySSOOAuth2.0authorizationinyourapplication
 
 /**
 * Function to get a token with OAuth code flow
 * @param {string} code OAuth code
-* @returns Boolean of true if token fetched
+* @returns Promise of fetch status and tokan value
 */
 export const getTokenWithCode = async (code) => {
-  let result = false;
+  let result = { ok: false, token: '' };
   const url = localEnvironment.ARHOST + '/rsso/oauth2/v1.1/token';
   const redirect = encodeURIComponent(localEnvironment.WEBHOST + localEnvironment.WEBPATH);
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
   const body = `grant_type=authorization_code&code=${code}&redirect_uri=${redirect}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
 
-  const response = await fetch(url, {
+  await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body
-  });
-
-  if (response.ok) {
-    result = true;
-    response.json().then(token => {
-      saveLocalStorage(storageObjects.rsso, {
-        accessToken: token.access_token,
-        tokenType: token.token_type,
-        expiresIn: token.expires_in,
-        tokenDate: new Date(),
-        refreshToken: token.refresh_token,
-      });
+  }).then(response => {
+    if (!response.ok) throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+    return response.json();
+  }).then(data => {
+    result = { ok: true, token: data.access_token };
+    saveLocalStorage(storageObjects.rsso, {
+      accessToken: data.access_token,
+      tokenType: data.token_type,
+      expiresIn: data.expires_in,
+      tokenDate: new Date(),
+      refreshToken: data.refresh_token,
     });
-  } else saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
+    // else saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
+  }).catch(error => console.log('getTokenWithCode: error...', error));
 
   return result;
 }
@@ -40,10 +41,10 @@ export const getTokenWithCode = async (code) => {
 /**
 * Function to refresh the current token
 * If the refresh is successful then update local session cache
-* @returns RSSO token refresh response boolean
+* @returns Promise of fetch status and token value
 */
 export const refreshToken = async () => {
-  let result = false;
+  let result = { ok: false, token: '' };
   const { refreshToken } = getLocalStorage('rsso').data;
   const url = localEnvironment.ARHOST + '/rsso/oauth2/v1.1/token';
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
@@ -54,37 +55,33 @@ export const refreshToken = async () => {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body,
   }).then(response => {
-    if (response.ok) {
-      result = true;
-      response.json().then(data => {
-        saveLocalStorage(storageObjects.rsso, {
-          accessToken: data.access_token,
-          tokenType: data.token_type,
-          expiresIn: data.expires_in,
-          tokenDate: new Date(),
-          refreshToken: data.refresh_token,
-        });
-      });
-    }
-  }).catch(error => {
-    console.log(error);
-    // saveLocalStorage(storageObjects.rsso, defaultStorage.rsso);
-  });
+    if (!response.ok) throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+    return response.json();
+  }).then(data => {
+    result = { ok: true, token: data.access_token };
+    saveLocalStorage(storageObjects.rsso, {
+      accessToken: data.access_token,
+      tokenType: data.token_type,
+      expiresIn: data.expires_in,
+      tokenDate: new Date(),
+      refreshToken: data.refresh_token,
+    });
+  }).catch(error => console.log('refreshToken: error...', error));
 
-  // console.log('refreshToken: result...', result);
   return result;
 };
 
 /**
  * Function to revoke a token from RSSO
  * @param {string} hint What token to revoke (access_token or refresh_token)
- * @returns Boolean of true if token was recoved
+ * @returns Promise of fetch Response
  */
 export const revokeToken = (hint) => {
-  const { accessToken } = getLocalStorage('rsso').data;
+  const { accessToken, refreshToken } = getLocalStorage('rsso').data;
+  const token = hint === 'access_token' ? accessToken : refreshToken;
   const url = localEnvironment.ARHOST + '/rsso/oauth2/revoke';
   const secret = encodeURIComponent(localEnvironment.RSSOSECRET);
-  const body = `token=${accessToken}&token_type_hint=${hint}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
+  const body = `token=${token}&token_type_hint=${hint}&client_secret=${secret}&client_id=${localEnvironment.RSSOCLIENTID}`;
 
   return fetch(url, {
     method: 'POST',
@@ -124,35 +121,34 @@ export const hasTokenExpired = () => {
 
 /**
  * Function to perform an API test on the current token
- * @returns Boolean whether the API test was successful or not
+ * @returns Promise of Boolean whether the API test was successful or not
  */
-export const testToken = async () => {
+export const testToken = async (token) => {
   let result = false;
   const { tokenType, accessToken } = getLocalStorage('rsso').data;
-  const { settingsId, theme } = getLocalStorage('settings').data;
-  const query = `'submitter'=$USER$`;
+  const query = `'assignedTo'=$USER$`;
   const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
   const url = `${localEnvironment.ARHOST}/api/arsys/v1/entry/SBSA:PWA:UserSettings?q=(${query})&fields=values(${fields})`;
 
   await fetch(url, {
     method: 'GET',
-    headers: { 'Authorization': tokenType + ' ' + accessToken },
+    headers: { 'Authorization': tokenType + ' ' + token || accessToken },
     mode: 'cors',
   }).then(response => {
-    if (response.ok) {
-      result = true;
-      response.json().then(data => {
-        if (data.entries.length > 0) {
-          if (!settingsId) {
-            saveSettings(data.entries[0].values);
-          } else {
-            if (settingsId !== data.entries[0].values.requestId) saveSettings(data.entries[0].values);
-            if (theme !== data.entries[0].values.theme) saveSettings(data.entries[0].values);
-          }
-        }
-      }).catch(error => console.log(error));
+    if (!response.ok) throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+    return response.json();
+  }).then(data => {
+    result = true;
+    if (data.entries.length > 0) saveSettings(data.entries[0].values);
+    if (data.entries.length === 0) {
+      postARSettings('{"values": {"zAction": "SET_MODULE_FLAG_AND_COUNT"}}').then(response => {
+        if (response.status !== 201) throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+        return response.json();
+      }).then(data => {
+        saveSettings(data.values);
+      }).catch(error => console.log('postARSettings: error...', error.message));
     }
-  }).catch(error => console.log(error));
+  }).catch(error => console.log('testToken: error...', error.message));
 
   return result;
 };
@@ -160,7 +156,7 @@ export const testToken = async () => {
 /**
   * Function to validate token
   * @param {boolean} runApiTest Should an API test be performed
-  * @returns Boolean of true if token is valid
+  * @returns Promise of Boolean whether token is still valid
   */
 export const validateToken = async (runApiTest) => {
   let result = false;
@@ -169,12 +165,13 @@ export const validateToken = async (runApiTest) => {
   if (tokenDate && accessToken) {
     const { accessTokenExpired, refreshTokenExpired } = hasTokenExpired();
     if (!accessTokenExpired) {
-      if (runApiTest) {
-        // console.log('validateToken: running API test...');
-        if ((await testToken()).valueOf()) result = true;
-      } else result = true;
-    } else {
-      if (!refreshTokenExpired && (await refreshToken()).valueOf()) result = true;
+      result = true;
+      if (runApiTest) await testToken();
+    }
+    if (!refreshTokenExpired && !result) {
+      const refresh = await refreshToken();
+      result = refresh.ok;
+      if (result && runApiTest) await testToken(refresh.token);
     }
   }
 

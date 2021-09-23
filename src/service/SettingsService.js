@@ -11,7 +11,7 @@ import { localEnvironment } from '../utilities/defaultdata';
 export const postARSettings = (data) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARHOST;
-  const fields = 'requestId';
+  const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings?fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'POST',
