@@ -164,7 +164,7 @@ const SettingsComponent = ({ history }) => {
 
   return (
     <Container maxWidth="sm">
-      <Box mt={3} display="flex" flexWrap="nowrap" alignItems="center">
+      <Box my={{ xs: 2, md: 3 }} display="flex" flexWrap="nowrap" alignItems="center">
         <Box flexGrow={1}>
           <Typography className={classes.header} variant="h6">Application Settings</Typography>
         </Box>
@@ -174,51 +174,50 @@ const SettingsComponent = ({ history }) => {
           disabled={state.showProgress}
         >Back</Button>
       </Box>
-      <Box my={3}>
-        <Paper component="form" elevation={0} autoComplete="off">
-          <Box p={3}>
-            <FormControl variant="outlined" fullWidth>
-              <InputLabel id="sb-itsm-theme-label">Theme</InputLabel>
-              <Select
-                labelId="sb-itsm-theme-label"
-                // id="sb-itsm-theme-picker"
-                name="theme"
-                value={fields.theme}
-                onChange={handleFieldChange}
-                label="Theme"
-              >
-                {themeList.map((v, i) => {
-                  return (
-                    <MenuItem key={i} value={v.themeId}>{v.themeAlias}</MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-            {modules.map((v, i) => {
-              return (
-                <Box key={i} mt={3} display="flex" alignItems="center">
-                  <Typography className={classes.grow} variant="body1">Show {v.label}</Typography>
-                  <Switch
-                    checked={fields[v.name]}
-                    onChange={() => handleFieldChange({ target: { name: v.name, value: !fields[v.name] } })}
-                  />
-                </Box>
-              );
-            })}
-          </Box>
-        </Paper>
+      <Paper component="form" elevation={0} autoComplete="off">
+        <Box p={3}>
+          <FormControl variant="outlined" fullWidth>
+            <InputLabel id="sb-itsm-theme-label">Theme</InputLabel>
+            <Select
+              labelId="sb-itsm-theme-label"
+              // id="sb-itsm-theme-picker"
+              name="theme"
+              value={fields.theme}
+              onChange={handleFieldChange}
+              label="Theme"
+            >
+              {themeList.map((v, i) => {
+                return (
+                  <MenuItem key={i} value={v.themeId}>{v.themeAlias}</MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          {modules.map((v, i) => {
+            return (
+              <Box key={i} mt={3} display="flex" alignItems="center">
+                <Typography className={classes.grow} variant="body1">Show {v.label}</Typography>
+                <Switch
+                  checked={fields[v.name]}
+                  onChange={() => handleFieldChange({ target: { name: v.name, value: !fields[v.name] } })}
+                />
+              </Box>
+            );
+          })}
+        </Box>
+      </Paper>
+      <Box my={2}>
+        <Grid container alignItems="center">
+          <Grid item xs={12} sm={6}>
+            <Button variant="outlined" fullWidth onClick={handleSaveButton} disabled={isSaved}>Save</Button>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box ml={{ xs: 0, sm: 1 }} mt={{ xs: 1, sm: 0 }}>
+              <Button variant="outlined" fullWidth onClick={() => history.goBack()} disabled={state.showProgress}>Back</Button>
+            </Box>
+          </Grid>
+        </Grid>
       </Box>
-      <Grid container alignItems="center">
-        <Grid item xs={12} sm={6}>
-          <Button variant="outlined" fullWidth onClick={handleSaveButton} disabled={isSaved}>Save</Button>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Box ml={{ xs: 0, sm: 1 }} mt={{ xs: 1, sm: 0 }}>
-            <Button variant="outlined" fullWidth onClick={() => history.goBack()} disabled={state.showProgress}>Back</Button>
-          </Box>
-        </Grid>
-      </Grid>
-      <Box my={2} />
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center', }}
         open={snackState.show}
