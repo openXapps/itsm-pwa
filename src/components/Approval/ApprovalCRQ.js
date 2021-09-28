@@ -275,7 +275,7 @@ const ApprovalCRQ = ({ history }) => {
   return (
     <>
       <Container maxWidth="md">
-        <Box my={3} display="flex" flexWrap="nowrap" alignItems="center">
+        <Box my={{ xs: 2, md: 3 }} display="flex" flexWrap="nowrap" alignItems="center">
           <Box flexGrow={1}>
             <Typography className={classes.header} variant="h6">Change Request Approval</Typography>
           </Box>

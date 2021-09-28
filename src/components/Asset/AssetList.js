@@ -103,7 +103,7 @@ const AssetList = ({ history }) => {
 
   return (
     <Container maxWidth="md">
-      <Box mt={3} display="flex" flexWrap="nowrap" alignItems="center">
+      <Box my={{ xs: 2, md: 3 }} display="flex" flexWrap="nowrap" alignItems="center">
         <Box flexGrow={1}>
           <Typography className={classes.header} variant="h6">My Assets</Typography>
         </Box>
@@ -119,7 +119,7 @@ const AssetList = ({ history }) => {
           disabled={state.showProgress}
         >Back</Button>
       </Box>
-      <Box width="100%" mt={3}>
+      <Box width="100%">
         <List disablePadding>
           {assets.length > 0 ? (
             assets.map((v, i) => {
