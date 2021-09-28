@@ -6,14 +6,6 @@ const useStyles = makeStyles((theme) => ({
       fontSize: theme.typography.body1.fontSize,
     },
   },
-  avatarREQ: {
-    color: theme.palette.info.light,
-    backgroundColor: theme.palette.grey.A400,
-  },
-  avatarCRQ: {
-    color: theme.palette.warning.light,
-    backgroundColor: theme.palette.grey.A400,
-  },
   listItemPrimary: {
     fontWeight: theme.typography.fontWeightBold,
     [theme.breakpoints.down('xs')]: {
