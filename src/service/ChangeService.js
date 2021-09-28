@@ -2,6 +2,33 @@ import { getLocalStorage } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 /**
+ * Change list model
+ */
+ export const changeListModel = {
+  changeId: '',
+  description: '',
+  status: '',
+  created: '',
+};
+
+/**
+ * Helper function to fetch change requests
+ * @returns Promise a list of change requests
+ */
+export const getChangeList = () => {
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
+  const host = localEnvironment.ARHOST;
+  const query = `(('ASLOGID' = $USER$) OR ('Customer Login ID' = $USER$) OR ('Requestor ID' = $USER$)) AND ('Change Request Status' < "Completed")`;
+  const fields = 'Infrastructure Change ID,Description,Change Request Status,Submit Date';
+  const url = '/api/arsys/v1/entry/CHG:ChangeInterface/?q=(' + query + ')&fields=values(' + fields + ')';
+  return fetch(host + url, {
+    method: 'GET',
+    headers: { 'Authorization': tokenType + ' ' + accessToken },
+    mode: 'cors',
+  });
+};
+
+/**
  * Change request model
  */
 export const changeRequestModel = {

@@ -54,7 +54,7 @@ const LandingComponent = ({ history, location }) => {
             });
           }
         }).finally(() => setLoadingCounters(false));
-      }, 1000);
+      }, 500);
     }
 
     // Checks if URL location contains a code parameter and if so, then fetch token
