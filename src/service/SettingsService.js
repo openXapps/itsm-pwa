@@ -68,11 +68,14 @@ export const getARSettings = () => {
  * @param {string} action Action to trigger (SET_MODULE_FLAG, SET_MODULE_COUNT or SET_MODULE_FLAG_AND_COUNT)
  * @returns Promise of updated entry
  */
- export const putARSettingsAction = (action) => {
+export const putARSettingsAction = (action) => {
   const { settingsId } = getLocalStorage('settings').data;
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARHOST;
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/' + settingsId;
+
+  if (!settingsId) return Promise.resolve({ ok: true });
+
   return fetch(host + url, {
     method: 'PUT',
     headers: {

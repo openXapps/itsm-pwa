@@ -37,7 +37,7 @@ export const themes =
       },
       background: {
         default: '#303030',
-        paper: '#616161',
+        paper: '#404040',
       },
     },
   },
