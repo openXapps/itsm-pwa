@@ -27,6 +27,8 @@ import AssetList from './components/Asset/AssetList';
 import AssetDetails from './components/Asset/AssetDetails';
 import ChangeList from './components/Change/ChangeList';
 import ChangeView from './components/Change/ChangeView';
+import PeopleList from './components/People/PeopleList';
+import PeopleView from './components/People/PeopleView';
 import Error404Component from './components/Error/Error404Component';
 
 const App = () => {
@@ -49,6 +51,8 @@ const App = () => {
           <Route path="/asset/:astid" component={AssetDetails} />
           <Route path="/change" exact component={ChangeList} />
           <Route path="/change/:crqid" component={ChangeView} />
+          <Route path="/people" exact component={PeopleList} />
+          <Route path="/people/:pplid" component={PeopleView} />
           <Route component={Error404Component} />
         </Switch>
       </BrowserRouter>

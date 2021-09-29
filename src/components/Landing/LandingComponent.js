@@ -32,29 +32,32 @@ const LandingComponent = ({ history, location }) => {
   useEffect(() => {
     function loadModuleCounters() {
       setLoadingCounters(true);
-      setTimeout(() => {
-        // console.log('loadModuleCounters loading...', new Date());
-        putARSettingsAction('SET_MODULE_COUNT').then((response) => {
-          // console.log('putARSettingsAction response...', response);
-          if (response.ok) {
-            getModuleCounters().then(response => {
-              if (!response.ok) {
-                if (response.status === 401) throw new Error('Refresh page again');
-                throw new Error('ERR: ' + response.status + ' ' + response.statusText);
-              }
-              return response.json();
-            }).then(data => {
-              if (data.entries.length > 0) {
-                const _modules = [];
-                modules.forEach(v => _modules.push({ ...v, count: data.entries[0].values[v.name] }));
-                setModuleList(_modules);
-              }
-            }).catch(error => {
-              setSnackState({ severity: 'info', message: error.message, show: true, duration: 3000 });
-            });
-          }
-        }).finally(() => setLoadingCounters(false));
-      }, 500);
+      // setTimeout(() => {
+      // console.log('loadModuleCounters loading...', new Date());
+      putARSettingsAction('SET_MODULE_COUNT').then((response) => {
+        // console.log('putARSettingsAction response...', response);
+        if (response.ok) {
+          getModuleCounters().then(response => {
+            if (!response.ok) {
+              if (response.status === 401) throw new Error('Refresh page again');
+              throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+            }
+            return response.json();
+          }).then(data => {
+            if (data.entries.length > 0) {
+              const _modules = [];
+              modules.forEach(v => _modules.push({ ...v, count: data.entries[0].values[v.name] }));
+              setModuleList(_modules);
+            }
+          }).catch(error => {
+            setSnackState({ severity: 'info', message: error.message, show: true, duration: 3000 });
+          });
+        }
+      }).finally(() => {
+        if (state.theme !== settings.theme) dispatch({ type: 'THEME', payload: settings.theme });
+        setLoadingCounters(false);
+      });
+      // }, 500);
     }
 
     // Checks if URL location contains a code parameter and if so, then fetch token
@@ -84,7 +87,7 @@ const LandingComponent = ({ history, location }) => {
     // Effect clean-up
     return () => { };
     // ***eslint-disable-next-line react-hooks/exhaustive-deps***
-  }, [code, dispatch, history, state.isAuth]);
+  }, [code, dispatch, history, state.isAuth, settings.theme, state.theme]);
 
   const handleGoToModule = (e) => {
     const moduleId = parseInt(e.currentTarget.dataset.moduleId);
