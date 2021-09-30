@@ -21,6 +21,7 @@ export const getChangeList = () => {
   const query = `(('ASLOGID' = $USER$) OR ('Customer Login ID' = $USER$) OR ('Requestor ID' = $USER$)) AND ('Change Request Status' < "Completed")`;
   const fields = 'Infrastructure Change ID,Description,Change Request Status,Submit Date';
   const url = '/api/arsys/v1/entry/CHG:ChangeInterface/?q=(' + query + ')&fields=values(' + fields + ')';
+
   return fetch(host + url, {
     method: 'GET',
     headers: { 'Authorization': tokenType + ' ' + accessToken },
@@ -68,6 +69,7 @@ export const getChangeRequest = (changeId) => {
     `;
   const query = `'Infrastructure Change ID'="${changeId}"`;
   const url = '/api/arsys/v1/entry/CHG:Infrastructure Change/?q=(' + query + ')&fields=values(' + fields + ')';
+
   return fetch(host + url, {
     method: 'GET',
     headers: { 'Authorization': tokenType + ' ' + accessToken },
@@ -101,6 +103,7 @@ export const getChangeRequest = (changeId) => {
     `;
   const query = `'Infrastructure Change ID'="${changeId}"`;
   const url = '/api/arsys/v1/entry/CHG:WorkLog/?q=(' + query + ')&fields=values(' + fields + ')';
+  
   return fetch(host + url, {
     method: 'GET',
     headers: { 'Authorization': tokenType + ' ' + accessToken },

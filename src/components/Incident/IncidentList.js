@@ -17,18 +17,20 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { context } from '../../context/StoreProvider';
 import { validateToken } from '../../service/RSSOService';
-import { getPeopleList } from '../../service/PeopleService';
+import { getIncidentList } from '../../service/IncidentService';
 import useStyles from '../Shared/ListStyles';
+import { userDate } from '../../utilities/datetime';
 
-const PeopleList = ({ history }) => {
+const IncidenttList = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
-  const [people, setPeople] = useState([]);
+  const [incidents, setIncidents] = useState([]);
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 3000 });
 
   useEffect(() => {
     validateToken(false).then(response => {
       if (response) {
+        // console.log('IncidenttList: effect handleReload...');
         handleReload();
       } else {
         dispatch({ type: 'AUTH', payload: false });
@@ -41,13 +43,14 @@ const PeopleList = ({ history }) => {
   }, []);
 
   const handleReload = () => {
-    if (people.length > 0) setPeople([]);
+    if (incidents.length > 0) setIncidents([]);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
+      // Need a timeout if token is still fresh
       setTimeout(() => {
-        getPeopleList()
+        getIncidentList()
           .then(response => {
-            // console.log('getPeopleList: response...', response);
+            // console.log('getIncidentList: response...', response);
             if (!response.ok) {
               if (response.status === 401) {
                 dispatch({ type: 'AUTH', payload: false });
@@ -57,13 +60,13 @@ const PeopleList = ({ history }) => {
               }
             } else {
               return response.json().then(data => {
-                // console.log('getPeopleList: people...', data);
-                populatePeople(data.entries);
-                setSnackState({ severity: 'info', message: 'People fetched', show: true, duration: 3000 });
+                // console.log('getIncidentList: incidents...', data);
+                populateIncidents(data.entries);
+                setSnackState({ severity: 'info', message: 'Incidents fetched', show: true, duration: 3000 });
               });
             }
           }).catch(error => {
-            // console.log('getPeopleList: error...', error);
+            // console.log('getIncidentList: error...', error);
             setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
           }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
       }, 1000);
@@ -72,23 +75,24 @@ const PeopleList = ({ history }) => {
     }
   }
 
-  const populatePeople = (data) => {
-    let _people = [];
+  const populateIncidents = (data) => {
+    let _incidents = [];
     data.forEach(v => {
-      _people.push({
-        personId: v.values['Person ID'],
+      _incidents.push({
+        incidentId: v.values['Incident Number'],
+        submitDate: userDate(v.values['Submit Date'], false),
+        description: v.values['Description'],
         firstName: v.values['First Name'],
         lastName: v.values['Last Name'],
-        email: v.values['Remedy Login ID'],
       });
     });
-    // console.log('populatePeople: _people', _people);
-    setPeople(_people);
+    // console.log('populateIncidents: _incidents', _incidents);
+    setIncidents(_incidents);
   };
 
-  const handlePeopleDetailsButton = (e) => {
+  const handleIncidentDetailsButton = (e) => {
     const id = e.currentTarget.dataset.id;
-    history.push('/people/' + id);
+    history.push('/incident/' + id);
   }
 
   const handleSnackState = () => {
@@ -99,7 +103,7 @@ const PeopleList = ({ history }) => {
     <Container maxWidth="md">
       <Box my={{ xs: 2, md: 3 }} display="flex" flexWrap="nowrap" alignItems="center">
         <Box flexGrow={1}>
-          <Typography className={classes.header} variant="h6">My People</Typography>
+          <Typography className={classes.header} variant="h6">My Incidents</Typography>
         </Box>
         <Button
           variant="outlined"
@@ -115,20 +119,25 @@ const PeopleList = ({ history }) => {
       </Box>
       <Box width="100%">
         <List disablePadding>
-          {people.length > 0 ? (
-            people.map((v, i) => {
+          {incidents.length > 0 ? (
+            incidents.map((v, i) => {
               return (
                 <div key={i}>
                   <ListItem disableGutters>
                     <ListItemText
                       disableTypography
-                      primary={<Typography className={classes.listItemPrimary}>{v.firstName + ' ' + v.lastName}</Typography>}
-                      secondary={<Typography className={classes.listItemSecondary}>{'Email: ' + v.email}</Typography>}
+                      primary={<Typography className={classes.listItemPrimary}>{v.incidentId + ': ' + v.submitDate}</Typography>}
+                      secondary={
+                        <>
+                          <Typography className={classes.listItemSecondary}>{'User: ' + v.firstName + ' ' + v.lastName}</Typography>
+                          <Typography className={classes.listItemSecondary}>{'Summary: ' + v.description}</Typography>
+                        </>
+                      }
                     /><ListItemSecondaryAction>
                       <IconButton
                         edge="end"
-                        data-id={v.personId}
-                        onClick={handlePeopleDetailsButton}
+                        data-id={v.incidentId}
+                        onClick={handleIncidentDetailsButton}
                       ><MoreVertIcon /></IconButton>
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -143,7 +152,7 @@ const PeopleList = ({ history }) => {
               </Box>
             ) : (
               <Box mt={3}>
-                <Typography variant="body1">No people found. Click Reload to try again.</Typography>
+                <Typography variant="body1">No incidents found. Click Reload to try again.</Typography>
               </Box>
             )
           )}
@@ -161,4 +170,4 @@ const PeopleList = ({ history }) => {
   );
 };
 
-export default PeopleList;
+export default IncidenttList;

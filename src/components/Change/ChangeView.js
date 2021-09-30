@@ -8,8 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
-// import Grid from '@material-ui/core/Grid';
-// import TextField from '@material-ui/core/TextField';
 
 import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
@@ -25,7 +23,7 @@ import {
 } from '../../service/ChangeService';
 import { validateToken } from '../../service/RSSOService';
 import ChangeDetails from '../Shared/ChangeDetails';
-import useStyles from './ChangeStyles';
+import useStyles from '../Shared/ListStyles';
 
 const ChangeView = ({ history }) => {
   const classes = useStyles();
@@ -144,7 +142,7 @@ const ChangeView = ({ history }) => {
     // console.log('populateChange: data...', data);
     setCrqData({
       ...changeRequestModel,
-      changeId: data[0].values['Infrastructure Change ID'],
+      changeId: crqid,
       status: data[0].values['Change Request Status'],
       coordinator: data[0].values['ASCHG'],
       description: data[0].values['Description'],

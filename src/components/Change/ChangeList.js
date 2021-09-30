@@ -18,7 +18,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { context } from '../../context/StoreProvider';
 import { validateToken } from '../../service/RSSOService';
 import { getChangeList } from '../../service/ChangeService';
-import useStyles from './ChangeStyles';
+import useStyles from '../Shared/ListStyles';
 import { userDate } from '../../utilities/datetime';
 
 const ChangetList = ({ history }) => {
