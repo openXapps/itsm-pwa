@@ -125,7 +125,7 @@ export const themes =
       MuiCssBaseline: {
         '@global': {
           body: {
-            background: 'linear-gradient(145deg, #95abb7, #000000) no-repeat fixed', // Deep Space
+            background: 'linear-gradient(145deg, #678798, #000000) no-repeat fixed', // Deep Space
           },
         },
       },
@@ -153,7 +153,7 @@ export const themes =
       warning: {
         main: '#ff6d00',
       },
-      divider: '#aaaaaa',
+      divider: '#8c8c8c',
     },
   },
 };

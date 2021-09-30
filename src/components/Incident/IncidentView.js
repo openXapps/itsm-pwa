@@ -10,26 +10,26 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
 import { context } from '../../context/StoreProvider';
-// import { userDate } from '../../utilities/datetime';
+import { userDate } from '../../utilities/datetime';
 import {
-  getPeopleProfile,
-  peopleProfileModel,
-} from '../../service/PeopleService';
+  getIncident,
+  incidentModel,
+} from '../../service/IncidentService';
 import { validateToken } from '../../service/RSSOService';
-import PeopleDetails from '../Shared/PeopleDetails';
+import IncidentDetails from '../Shared/IncidentDetails';
 import useStyles from '../Shared/ListStyles';
 
-const PeopleView = ({ history }) => {
+const IncidentView = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
-  const { pplid } = useParams();
-  const [pplData, setPllData] = useState(peopleProfileModel);
+  const { incid } = useParams();
+  const [incData, setIncData] = useState(incidentModel);
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'X', show: false, duration: 3000 });
 
   useEffect(() => {
     validateToken(false).then(response => {
       if (response) {
-        // console.log('PeopleView: effect handleDataLoad...');
+        // console.log('IncidentView: effect handleDataLoad...');
         handleDataLoad();
       } else {
         dispatch({ type: 'AUTH', payload: false });
@@ -46,9 +46,9 @@ const PeopleView = ({ history }) => {
       dispatch({ type: 'PROGRESS', payload: true });
       // Need a timeout if token is still fresh
       setTimeout(() => {
-        getPeopleProfile(pplid)
+        getIncident(incid)
           .then(response => {
-            // console.log('getPeopleProfile: response...', response);
+            // console.log('getIncident: response...', response);
             if (!response.ok) {
               if (response.status === 401) {
                 dispatch({ type: 'AUTH', payload: false });
@@ -58,17 +58,17 @@ const PeopleView = ({ history }) => {
               }
             } else {
               return response.json().then(data => {
-                // console.log('getPeopleProfile: data...', data);
-                if (data.entries.length === 1) populatePeople(data.entries);
-                setSnackState({ severity: 'info', message: 'People profile fetched', show: true, duration: 3000 });
+                // console.log('getIncident: data...', data);
+                if (data.entries.length === 1) populateIncident(data.entries);
+                setSnackState({ severity: 'info', message: 'Incident fetched', show: true, duration: 3000 });
               });
             }
           }).catch(error => {
-            // console.log('getPeopleProfile: error...', error);
+            // console.log('getIncident: error...', error);
             setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
           })
 
-          // getChangeWorkInfo(pplid)
+          // getChangeWorkInfo(incid)
           //   .then(response => {
           //     // console.log('getChangeWorkInfo: response...', response);
           //     if (!response.ok) {
@@ -86,41 +86,6 @@ const PeopleView = ({ history }) => {
           //     }
           //   }).catch(error => console.log('getChangeWorkInfo: error...', error));
 
-          // getChangeImpactedAreas(pplid)
-          //   .then(response => {
-          //     // console.log('getChangeImpactedAreas: response...', response);
-          //     if (!response.ok) {
-          //       if (response.status === 401) {
-          //         dispatch({ type: 'AUTH', payload: false });
-          //         throw new Error('Session expired');
-          //       } else {
-          //         throw new Error('ERR: ' + response.status + ' ' + response.statusText);
-          //       }
-          //     } else {
-          //       return response.json().then(data => {
-          //         // console.log('getChangeImpactedAreas: data...', data);
-          //         if (data.entries.length > 0) populateImpactedAreas(data.entries);
-          //       });
-          //     }
-          //   }).catch(error => console.log('getChangeImpactedAreas: error...', error));
-
-          // getChangeAssociations(pplid)
-          //   .then(response => {
-          //     // console.log('getChangeAssociations: response...', response);
-          //     if (!response.ok) {
-          //       if (response.status === 401) {
-          //         dispatch({ type: 'AUTH', payload: false });
-          //         throw new Error('Session expired');
-          //       } else {
-          //         throw new Error('ERR: ' + response.status + ' ' + response.statusText);
-          //       }
-          //     } else {
-          //       return response.json().then(data => {
-          //         // console.log('getChangeAssociations: data...', data);
-          //         if (data.entries.length > 0) populateAssociations(data.entries);
-          //       });
-          //     }
-          //   }).catch(error => console.log('getChangeAssociations: error...', error))
           .finally(() => dispatch({ type: 'PROGRESS', payload: false }));
       }, 1000);
     } else {
@@ -128,17 +93,18 @@ const PeopleView = ({ history }) => {
     }
   }
 
-  const populatePeople = (data) => {
-    // console.log('populatePeople: data...', data);
-    setPllData({
-      ...peopleProfileModel,
+  const populateIncident = (data) => {
+    // console.log('populateIncident: data...', data);
+    setIncData({
+      ...incidentModel,
+      incidentId: incid,
+      submitDate: userDate(data[0].values['Submit Date'], false),
+      description: data[0].values['Description'],
+      notes: data[0].values['Detailed Decription'] || 'no data',
       firstName: data[0].values['First Name'],
       lastName: data[0].values['Last Name'],
-      email: data[0].values['Remedy Login ID'],
-      corporateId: data[0].values['Corporate ID'] || 'no data',
-      jobTitle: data[0].values['JobTitle'] || 'no data',
-      phoneNumber: data[0].values['Phone Number Business'] || 'no data',
-      supportStaff: data[0].values['Support Staff'],
+      email: data[0].values['Customer Login ID'],
+      phone: data[0].values['Phone Number'] || 'no data',
     });
   };
 
@@ -166,7 +132,7 @@ const PeopleView = ({ history }) => {
       <Container maxWidth="md">
         <Box my={{ xs: 2, md: 3 }} display="flex" flexWrap="nowrap" alignItems="center">
           <Box flexGrow={1}>
-            <Typography className={classes.header} variant="h6">People Profile View</Typography>
+            <Typography className={classes.header} variant="h6">Incident View</Typography>
           </Box>
           <Button
             variant="outlined"
@@ -174,8 +140,8 @@ const PeopleView = ({ history }) => {
             disabled={state.showProgress}
           >Back</Button>
         </Box>
-        <PeopleDetails
-          pplData={pplData}
+        <IncidentDetails
+          incData={incData}
         />
         {/* <Grid container alignItems="center">
           <Grid item xs={12} sm={4}>
@@ -209,4 +175,4 @@ const PeopleView = ({ history }) => {
   );
 };
 
-export default PeopleView;
+export default IncidentView;
