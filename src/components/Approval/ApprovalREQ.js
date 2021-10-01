@@ -15,7 +15,7 @@ import { context } from '../../context/StoreProvider';
 import { userDate } from '../../utilities/datetime';
 import { validateToken } from '../../service/RSSOService';
 import { putARSettingsAction } from '../../service/SettingsService';
-import { getServiceRequest, serviceRequestModel } from '../../service/RequestService';
+import { getRequest, requestModel } from '../../service/RequestService';
 import { postApproval } from '../../service/ApprovalService';
 import RequestDetails from '../Shared/RequestDetails';
 import useStyles from './ApprovalStyles';
@@ -24,7 +24,7 @@ const ApprovalREQ = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
   const [assessed, setAssessed] = useState(true);
-  const [reqData, setReqData] = useState(serviceRequestModel);
+  const [reqData, setReqData] = useState(requestModel);
   const { apid, reqid } = useParams();
   const [justification, setJustification] = useState('');
   const [snackState, setSnackState] = useState({ severity: 'success', message: 'X', show: false, duration: 3000 });
@@ -49,9 +49,9 @@ const ApprovalREQ = ({ history }) => {
       dispatch({ type: 'PROGRESS', payload: true });
       // Need a timeout if token is still fresh
       setTimeout(() => {
-        getServiceRequest(reqid)
+        getRequest(reqid)
           .then(response => {
-            // console.log('getServiceRequest: response...', response.json());
+            // console.log('getRequest: response...', response.json());
             if (!response.ok) {
               if (response.status === 401) {
                 dispatch({ type: 'AUTH', payload: false });
@@ -61,14 +61,14 @@ const ApprovalREQ = ({ history }) => {
               }
             } else {
               return response.json().then(data => {
-                // console.log('getServiceRequest: data...', data);
+                // console.log('getRequest: data...', data);
                 if (data.entries.length === 1) populateRequest(data.entries);
                 setAssessed(false);
                 setSnackState({ severity: 'info', message: 'Request details fetched', show: true, duration: 3000 });
               });
             }
           }).catch(error => {
-            // console.log('getServiceRequest: error...', error);
+            // console.log('getRequest: error...', error);
             setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
           }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
       }, 1000);
@@ -81,8 +81,8 @@ const ApprovalREQ = ({ history }) => {
     // console.log('populateRequest: data', data);
     // let details = String(data[0].values['SR Type Field 1']).split('\n');
     setReqData({
-      ...serviceRequestModel,
-      requestId: data[0].values['Request Number'],
+      ...requestModel,
+      requestId: reqid,
       summary: data[0].values['Summary'],
       firstName: data[0].values['First Name'],
       lastName: data[0].values['Last Name'],

@@ -17,19 +17,20 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { context } from '../../context/StoreProvider';
 import { validateToken } from '../../service/RSSOService';
-import { getAssetList } from '../../service/AssetService';
+import { getRequestList } from '../../service/RequestService';
+import { userDate } from '../../utilities/datetime';
 import useStyles from '../Shared/ListStyles';
 
-const AssetList = ({ history }) => {
+const RequestList = ({ history }) => {
   const classes = useStyles();
   const [state, dispatch] = useContext(context);
-  const [assets, setAssets] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [snackState, setSnackState] = useState({ severity: 'info', message: 'x', show: false, duration: 3000 });
 
   useEffect(() => {
     validateToken(false).then(response => {
       if (response) {
-        // console.log('AssetList: effect handleReload...');
+        // console.log('RequestList: effect handleReload...');
         handleReload();
       } else {
         dispatch({ type: 'AUTH', payload: false });
@@ -42,14 +43,14 @@ const AssetList = ({ history }) => {
   }, []);
 
   const handleReload = () => {
-    if (assets.length > 0) setAssets([]);
+    if (requests.length > 0) setRequests([]);
     if (state.isAuth) {
       dispatch({ type: 'PROGRESS', payload: true });
       // Need a timeout if token is still fresh
       setTimeout(() => {
-        getAssetList()
+        getRequestList()
           .then(response => {
-            // console.log('getAssets: response...', response);
+            // console.log('getRequestList: response...', response);
             if (!response.ok) {
               if (response.status === 401) {
                 dispatch({ type: 'AUTH', payload: false });
@@ -59,13 +60,13 @@ const AssetList = ({ history }) => {
               }
             } else {
               return response.json().then(data => {
-                // console.log('getAssets: assets...', data);
-                populateAssets(data.entries);
-                setSnackState({ severity: 'info', message: 'Assets fetched', show: true, duration: 3000 });
+                // console.log('getRequestList: requests...', data);
+                populateRequests(data.entries);
+                setSnackState({ severity: 'info', message: 'Requests fetched', show: true, duration: 3000 });
               });
             }
           }).catch(error => {
-            // console.log('getAssets: error...', error);
+            // console.log('getRequestList: error...', error);
             setSnackState({ severity: 'error', message: error.message, show: true, duration: 3000 });
           }).finally(() => dispatch({ type: 'PROGRESS', payload: false }));
       }, 1000);
@@ -74,27 +75,23 @@ const AssetList = ({ history }) => {
     }
   }
 
-  const populateAssets = (data) => {
-    let _assets = [];
+  const populateRequests = (data) => {
+    let _requests = [];
     data.forEach(v => {
-      _assets.push({
-        reconId: v.values['AssetInstanceId'],
-        class: v.values['UserDisplayObjectName'],
-        item: v.values['Item'],
-        model: v.values['Model Number'],
-        make: v.values['240001003'],
-        serial: v.values['Serial Number'],
-        name: v.values['Name'],
-        status: v.values['AssetLifecycleStatus'],
+      _requests.push({
+        requestId: v.values['Request Number'],
+        summary: v.values['Summary'],
+        submitDate: userDate(v.values['Submit Date'], false),
+        status: v.values['Status']
       });
     });
-    // console.log('populateAssets: _assets', _assets);
-    setAssets(_assets);
+    // console.log('populateRequests: _requests', _requests);
+    setRequests(_requests);
   };
 
-  const handleAssetDetailsButton = (e) => {
+  const handleRequestDetailsButton = (e) => {
     const id = e.currentTarget.dataset.id;
-    history.push('/asset/' + id);
+    history.push('/request/' + id);
   }
 
   const handleSnackState = () => {
@@ -105,7 +102,7 @@ const AssetList = ({ history }) => {
     <Container maxWidth="md">
       <Box my={{ xs: 2, md: 3 }} display="flex" flexWrap="nowrap" alignItems="center">
         <Box flexGrow={1}>
-          <Typography className={classes.header} variant="h6">My Assets</Typography>
+          <Typography className={classes.header} variant="h6">My Requests</Typography>
         </Box>
         <Button
           variant="outlined"
@@ -121,20 +118,25 @@ const AssetList = ({ history }) => {
       </Box>
       <Box width="100%">
         <List disablePadding>
-          {assets.length > 0 ? (
-            assets.map((v, i) => {
+          {requests.length > 0 ? (
+            requests.map((v, i) => {
               return (
                 <div key={i}>
                   <ListItem disableGutters>
                     <ListItemText
                       disableTypography
-                      primary={<Typography className={classes.listItemPrimary}>{v.model + ' ' + v.item}</Typography>}
-                      secondary={<Typography className={classes.listItemSecondary}>{'Serial: ' + v.serial}</Typography>}
+                      primary={<Typography className={classes.listItemPrimary}>{v.requestId + ': ' + v.submitDate}</Typography>}
+                      secondary={
+                        <>
+                          <Typography className={classes.listItemSecondary}>{'Status: ' + v.status}</Typography>
+                          <Typography className={classes.listItemSecondary}>{'Description: ' + v.summary}</Typography>
+                        </>
+                      }
                     /><ListItemSecondaryAction>
                       <IconButton
                         edge="end"
-                        data-id={v.reconId}
-                        onClick={handleAssetDetailsButton}
+                        data-id={v.requestId}
+                        onClick={handleRequestDetailsButton}
                       ><MoreVertIcon /></IconButton>
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -149,7 +151,7 @@ const AssetList = ({ history }) => {
               </Box>
             ) : (
               <Box mt={3}>
-                <Typography variant="body1">No assets found. Click Reload to try again.</Typography>
+                <Typography variant="body1">No requests found. Click Reload to try again.</Typography>
               </Box>
             )
           )}
@@ -167,4 +169,4 @@ const AssetList = ({ history }) => {
   );
 };
 
-export default AssetList;
+export default RequestList;

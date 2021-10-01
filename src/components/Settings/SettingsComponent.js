@@ -74,7 +74,7 @@ const SettingsComponent = ({ history }) => {
             approvals: data.entries[0].values.showApproval === 'true' ? true : false,
             incidents: data.entries[0].values.showIncident === 'true' ? true : false,
             changes: data.entries[0].values.showChange === 'true' ? true : false,
-            problems: data.entries[0].values.showProblem === 'true' ? true : false,
+            requests: data.entries[0].values.showRequest === 'true' ? true : false,
             assets: data.entries[0].values.showAsset === 'true' ? true : false,
             people: data.entries[0].values.showPeople === 'true' ? true : false,
           });
@@ -115,7 +115,7 @@ const SettingsComponent = ({ history }) => {
           "showApproval": "${fields.approvals}",
           "showIncident": "${fields.incidents}",
           "showChange":   "${fields.changes}",
-          "showProblem":  "${fields.problems}",
+          "showRequest":  "${fields.requests}",
           "showAsset":    "${fields.assets}",
           "showPeople":   "${fields.people}"
         }}`;

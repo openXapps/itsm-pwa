@@ -11,7 +11,7 @@ import { localEnvironment } from '../utilities/defaultdata';
 export const postARSettings = (data) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARHOST;
-  const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
+  const fields = 'requestId,theme,showApproval,showIncident,showChange,showRequest,showAsset,showPeople';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings?fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'POST',
@@ -54,7 +54,7 @@ export const getARSettings = () => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARHOST;
   const query = `'assignedTo' = $USER$`;
-  const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
+  const fields = 'requestId,theme,showApproval,showIncident,showChange,showRequest,showAsset,showPeople';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',
@@ -95,7 +95,7 @@ export const moduleCountersModel = {
   approvals: 0,
   incidents: 0,
   changes: 0,
-  problems: 0,
+  requests: 0,
   assets: 0,
   people: 0,
 };
@@ -108,7 +108,7 @@ export const getModuleCounters = () => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARHOST;
   const query = `'assignedTo' = $USER$`;
-  const fields = 'requestId,approvals,incidents,changes,problems,assets,people';
+  const fields = 'requestId,approvals,incidents,changes,requests,assets,people';
   const url = '/api/arsys/v1/entry/SBSA:PWA:UserSettings/?q=(' + query + ')&fields=values(' + fields + ')';
   return fetch(host + url, {
     method: 'GET',

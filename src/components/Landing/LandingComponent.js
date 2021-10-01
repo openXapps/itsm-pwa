@@ -17,7 +17,7 @@ import useURLQuery from '../../hooks/useURLQuery';
 import { context } from '../../context/StoreProvider';
 import { modules } from '../../utilities/defaultdata';
 import { getLocalStorage } from '../../utilities/localstorage';
-import { getTokenWithCode, validateToken, testToken } from '../../service/RSSOService';
+import { getTokenWithCode, validateToken, testToken, hasTokenExpired } from '../../service/RSSOService';
 import { getModuleCounters, putARSettingsAction } from '../../service/SettingsService';
 
 const LandingComponent = ({ history, location }) => {
@@ -31,33 +31,33 @@ const LandingComponent = ({ history, location }) => {
 
   useEffect(() => {
     function loadModuleCounters() {
-      setLoadingCounters(true);
-      // setTimeout(() => {
       // console.log('loadModuleCounters loading...', new Date());
-      putARSettingsAction('SET_MODULE_COUNT').then((response) => {
-        // console.log('putARSettingsAction response...', response);
-        if (response.ok) {
-          getModuleCounters().then(response => {
-            if (!response.ok) {
-              if (response.status === 401) throw new Error('Refresh page again');
-              throw new Error('ERR: ' + response.status + ' ' + response.statusText);
-            }
-            return response.json();
-          }).then(data => {
-            if (data.entries.length > 0) {
-              const _modules = [];
-              modules.forEach(v => _modules.push({ ...v, count: data.entries[0].values[v.name] }));
-              setModuleList(_modules);
-            }
-          }).catch(error => {
-            setSnackState({ severity: 'info', message: error.message, show: true, duration: 3000 });
-          });
-        }
-      }).finally(() => {
-        if (state.theme !== settings.theme) dispatch({ type: 'THEME', payload: settings.theme });
-        setLoadingCounters(false);
-      });
-      // }, 500);
+      if (!hasTokenExpired().accessTokenExpired) {
+        setLoadingCounters(true);
+        putARSettingsAction('SET_MODULE_COUNT').then((response) => {
+          // console.log('putARSettingsAction response...', response);
+          if (response.ok) {
+            getModuleCounters().then(response => {
+              if (!response.ok) {
+                if (response.status === 401) throw new Error('Refresh page again');
+                throw new Error('ERR: ' + response.status + ' ' + response.statusText);
+              }
+              return response.json();
+            }).then(data => {
+              if (data.entries.length > 0) {
+                const _modules = [];
+                modules.forEach(v => _modules.push({ ...v, count: data.entries[0].values[v.name] }));
+                setModuleList(_modules);
+              }
+            }).catch(error => {
+              setSnackState({ severity: 'info', message: error.message, show: true, duration: 3000 });
+            });
+          }
+        }).finally(() => {
+          if (state.theme !== settings.theme) dispatch({ type: 'THEME', payload: settings.theme });
+          setLoadingCounters(false);
+        });
+      } else dispatch({ type: 'AUTH', payload: false });
     }
 
     // Checks if URL location contains a code parameter and if so, then fetch token
@@ -66,10 +66,10 @@ const LandingComponent = ({ history, location }) => {
         getTokenWithCode(code).then(response => {
           if (response.ok) {
             testToken(response.token);
-            dispatch({ type: 'AUTH', payload: true })
+            dispatch({ type: 'AUTH', payload: true });
             setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 3000 });
           } else {
-            dispatch({ type: 'AUTH', payload: false })
+            dispatch({ type: 'AUTH', payload: false });
             setSnackState({ severity: 'error', message: 'Login failed', show: true, duration: 3000 });
           }
           history.replace('/');
@@ -80,9 +80,7 @@ const LandingComponent = ({ history, location }) => {
         validateToken(true).then(response => {
           if (response) dispatch({ type: 'AUTH', payload: true });
         });
-      } else {
-        loadModuleCounters();
-      }
+      } else loadModuleCounters();
     }
     // Effect clean-up
     return () => { };

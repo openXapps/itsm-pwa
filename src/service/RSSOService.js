@@ -127,7 +127,7 @@ export const testToken = async (token) => {
   let result = false;
   const { tokenType, accessToken } = getLocalStorage('rsso').data;
   const query = `'assignedTo'=$USER$`;
-  const fields = 'requestId,theme,showApproval,showIncident,showChange,showProblem,showAsset,showPeople';
+  const fields = 'requestId,theme,showApproval,showIncident,showChange,showRequest,showAsset,showPeople';
   const url = `${localEnvironment.ARHOST}/api/arsys/v1/entry/SBSA:PWA:UserSettings?q=(${query})&fields=values(${fields})`;
 
   await fetch(url, {
@@ -190,7 +190,7 @@ function saveSettings(data) {
     approvals: data.showApproval === 'true' ? true : false,
     incidents: data.showIncident === 'true' ? true : false,
     changes: data.showChange === 'true' ? true : false,
-    problems: data.showProblem === 'true' ? true : false,
+    requests: data.showRequest === 'true' ? true : false,
     assets: data.showAsset === 'true' ? true : false,
     people: data.showPeople === 'true' ? true : false,
   });

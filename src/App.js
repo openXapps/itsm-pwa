@@ -24,13 +24,15 @@ import ApprovalList from './components/Approval/ApprovalList';
 import ApprovalCRQ from './components/Approval/ApprovalCRQ';
 import ApprovalREQ from './components/Approval/ApprovalREQ';
 import AssetList from './components/Asset/AssetList';
-import AssetDetails from './components/Asset/AssetDetails';
+import AssetView from './components/Asset/AssetView';
 import ChangeList from './components/Change/ChangeList';
 import ChangeView from './components/Change/ChangeView';
 import PeopleList from './components/People/PeopleList';
 import PeopleView from './components/People/PeopleView';
 import IncidentList from './components/Incident/IncidentList';
 import IncidentView from './components/Incident/IncidentView';
+import RequestList from './components/Request/RequestList';
+import RequestView from './components/Request/RequestView';
 import Error404Component from './components/Error/Error404Component';
 
 const App = () => {
@@ -50,13 +52,15 @@ const App = () => {
           <Route path="/approval/crq/:apid/:crqid" component={ApprovalCRQ} />
           <Route path="/approval/req/:apid/:reqid" component={ApprovalREQ} />
           <Route path="/asset" exact component={AssetList} />
-          <Route path="/asset/:astid" component={AssetDetails} />
+          <Route path="/asset/:astid" component={AssetView} />
           <Route path="/change" exact component={ChangeList} />
           <Route path="/change/:crqid" component={ChangeView} />
           <Route path="/incident" exact component={IncidentList} />
           <Route path="/incident/:incid" component={IncidentView} />
           <Route path="/people" exact component={PeopleList} />
           <Route path="/people/:pplid" component={PeopleView} />
+          <Route path="/request" exact component={RequestList} />
+          <Route path="/request/:reqid" component={RequestView} />
           <Route component={Error404Component} />
         </Switch>
       </BrowserRouter>

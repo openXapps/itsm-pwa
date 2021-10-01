@@ -27,7 +27,12 @@ const IncidentDetails = (props) => {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}><StyledField label="Incident Number" value={incData.incidentId} /></Grid>
           <Grid item xs={12} sm={6}><StyledField label="Submit Date" value={incData.submitDate} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Summary" value={incData.description} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Description" value={incData.description} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Incident Type" value="User Service Restoration" /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Impact" value="4-Minor/Localized" /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Priority" value="4-Low" /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Assigned Group" value="Remedy Support" /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Status" value="Assigned" /></Grid>
           <Grid item xs={12}><Divider /></Grid>
           <Grid item xs={12}><StyledField label="User Details" /></Grid>
           <Grid item xs={12} sm={6}><StyledField label="Name" value={incData.firstName + ' ' + incData.lastName} /></Grid>

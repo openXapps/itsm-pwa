@@ -19,8 +19,15 @@ export const incidentListModel = {
 export const getIncidentList = () => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARHOST;
+  // https://www.chromestatus.com/feature/5735596811091968
   const query = `'Status' < 4 AND 'Assignee Login ID' = $USER$`;
-  const fields = 'Incident Number,Submit Date,Description,First Name,Last Name';
+  const fields = encodeURIComponent(`
+    Incident Number,
+    Submit Date,
+    Description,
+    First Name,
+    Last Name
+  `);
   const url = '/api/arsys/v1/entry/HPD:Help Desk/?q=(' + query + ')&fields=values(' + fields + ')';
 
   return fetch(host + url, {
@@ -53,7 +60,16 @@ export const getIncident = (incId) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARHOST;
   const query = `'Incident Number' = "${incId}"`;
-  const fields = 'Submit Date,Description,ServiceCI,First Name,Last Name,Phone Number,Customer Login ID,Detailed Decription';
+  const fields = `
+    Submit Date,
+    Description,
+    ServiceCI,
+    First Name,
+    Last Name,
+    Phone Number,
+    Customer Login ID,
+    Detailed Decription
+  `;
   const url = '/api/arsys/v1/entry/HPD:Help Desk/?q=(' + query + ')&fields=values(' + fields + ')';
 
   return fetch(host + url, {
