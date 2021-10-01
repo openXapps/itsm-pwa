@@ -2,9 +2,9 @@ import { getLocalStorage } from '../utilities/localstorage';
 import { localEnvironment } from '../utilities/defaultdata';
 
 /**
- * Service request model
+ * Request model
  */
-export const serviceRequestModel = {
+export const requestModel = {
   requestId: '',
   summary: '',
   firstName: '',
@@ -14,11 +14,11 @@ export const serviceRequestModel = {
 };
 
 /**
- * Helper function to fetch a service request
- * @param {string} requestId Service request number to search
- * @returns Promise of a service request
+ * Helper function to fetch a request
+ * @param {string} requestId Request number to search
+ * @returns Promise of a request
  */
-export const getServiceRequest = (requestId) => {
+export const getRequest = (requestId) => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARHOST;
   const fields = `
@@ -37,3 +37,32 @@ export const getServiceRequest = (requestId) => {
     mode: 'cors',
   });
 };
+
+/**
+ * Request list model
+ */
+export const requestListModel = {
+  requestId: '',
+  summary: '',
+  submitDate: '',
+  status: '',
+};
+
+/**
+ * Helper function to fetch requests
+ * @returns Promise a list of requests
+ */
+export const getRequestList = () => {
+  const { accessToken, tokenType } = getLocalStorage('rsso').data;
+  const host = localEnvironment.ARHOST;
+  const query = `'Requested By Login ID' = $USER$ AND 'Status' < "Cancelled"`;
+  const fields = `Request Number,Summary,Submit Date,Status`;
+  const url = '/api/arsys/v1/entry/SRM:Request/?q=(' + query + ')&fields=values(' + fields + ')';
+
+  return fetch(host + url, {
+    method: 'GET',
+    headers: { 'Authorization': tokenType + ' ' + accessToken },
+    mode: 'cors',
+  });
+};
+

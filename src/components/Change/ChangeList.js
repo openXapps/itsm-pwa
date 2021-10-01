@@ -125,10 +125,10 @@ const ChangetList = ({ history }) => {
                   <ListItem disableGutters>
                     <ListItemText
                       disableTypography
-                      primary={<Typography className={classes.listItemPrimary}>{v.changeId + ': ' + v.status}</Typography>}
+                      primary={<Typography className={classes.listItemPrimary}>{v.changeId + ': ' + v.created}</Typography>}
                       secondary={
                         <>
-                          <Typography className={classes.listItemSecondary}>{'Created: ' + v.created}</Typography>
+                          <Typography className={classes.listItemSecondary}>{'Status: ' + v.status}</Typography>
                           <Typography className={classes.listItemSecondary}>{'Description: ' + v.description}</Typography>
                         </>
                       }

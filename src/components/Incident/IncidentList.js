@@ -130,7 +130,7 @@ const IncidenttList = ({ history }) => {
                       secondary={
                         <>
                           <Typography className={classes.listItemSecondary}>{'User: ' + v.firstName + ' ' + v.lastName}</Typography>
-                          <Typography className={classes.listItemSecondary}>{'Summary: ' + v.description}</Typography>
+                          <Typography className={classes.listItemSecondary}>{'Description: ' + v.description}</Typography>
                         </>
                       }
                     /><ListItemSecondaryAction>

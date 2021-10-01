@@ -25,21 +25,30 @@ export const getAssetList = () => {
   const host = localEnvironment.ARHOST;
   const query = `'DatasetId' = "BMC.ASSET" AND 'Login Name' = $USER$`;
   // 240001003 = Manufacturer Name+
-  const fields = 'AssetInstanceId,UserDisplayObjectName,Item,Model Number,240001003,Serial Number,Name,AssetLifecycleStatus,Class Id';
+  const fields = `
+    AssetInstanceId,
+    UserDisplayObjectName,
+    Item,
+    Model Number,
+    240001003,
+    Serial Number,
+    Name,
+    AssetLifecycleStatus,
+    Class Id
+  `;
   const url = '/api/arsys/v1/entry/AST:AssetJoinASTPeople/?q=(' + query + ')&fields=values(' + fields + ')';
+  
   return fetch(host + url, {
     method: 'GET',
     headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
   });
-  // console.log('getAssets: response...', response);
-  // return response;
 };
 
 /**
  * Asset custom fields model
  */
- export const customFieldsModel = {
+export const customFieldsModel = {
   loginUser: '',
   loginDate: '',
   verifyUser: '',
@@ -56,13 +65,12 @@ export const getCustomFields = (reconId) => {
   const query = `'Reconciliation ID' = "${reconId}"`;
   const fields = 'Last Logged on User,Last Logged on Date,Last Verified By,Last Verified Date';
   const url = '/api/arsys/v1/entry/SBSA:AST:CustomFields/?q=(' + query + ')&fields=values(' + fields + ')';
+
   return fetch(host + url, {
     method: 'GET',
     headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
   });
-  // console.log('getAssets: response...', response);
-  // return response;
 };
 
 /**
@@ -80,7 +88,6 @@ export const computerSystemModel = {
   scanDate: '',
   costCenter: '',
   hostName: '',
-  domainName: '',
 };
 
 /**
@@ -92,15 +99,26 @@ export const getComputerSystem = (reconId) => {
   const host = localEnvironment.ARHOST;
   const query = `'Data Set Id' = "BMC.ASSET" AND 'Reconciliation Identity' = "${reconId}"`;
   // 240001003 = Manufacturer Name+
-  const fields = 'Name,Serial Number,Tag Number,AssetLifecycleStatus,Item,Model Number,240001003,LastScanDate,Cost Center,UserDisplayObjectName,DNS Host Name,Domain';
+  const fields = `
+    Name,
+    Serial Number,
+    Tag Number,
+    AssetLifecycleStatus,
+    Item,
+    Model Number,
+    240001003,
+    LastScanDate,
+    Cost Center,
+    UserDisplayObjectName,
+    DNS Host Name
+  `;
   const url = '/api/arsys/v1/entry/AST:ComputerSystem/?q=(' + query + ')&fields=values(' + fields + ')';
+
   return fetch(host + url, {
     method: 'GET',
     headers: { 'Authorization': tokenType + ' ' + accessToken },
     mode: 'cors',
   });
-  // console.log('getAssets: response...', response);
-  // return response;
 };
 
 

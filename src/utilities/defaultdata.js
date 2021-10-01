@@ -26,7 +26,7 @@ export const defaultStorage = {
     approvals: false,
     incidents: false,
     changes: false,
-    problems: false,
+    requests: true,
     assets: true,
     people: false,
   }
@@ -49,9 +49,9 @@ export const localEnvironment = {
  */
 export const modules = [
   { name: 'approvals', label: 'My Approvals', img: './img/itsm-apr-alpha.png', path: '/approval', count: 0 },
+  { name: 'requests', label: 'My Requests', img: './img/itsm-req-alpha.png', path: '/request', count: 0 },
+  { name: 'assets', label: 'My Assets', img: './img/itsm-ast-alpha.png', path: '/asset', count: 0 },
   { name: 'incidents', label: 'My Incidents', img: './img/itsm-inc-alpha.png', path: '/incident', count: 0 },
   { name: 'changes', label: 'My Changes', img: './img/itsm-chg-alpha.png', path: '/change', count: 0 },
-  { name: 'problems', label: 'My Investigations', img: './img/itsm-pbm-alpha.png', path: '/problem', count: 0 },
-  { name: 'assets', label: 'My Assets', img: './img/itsm-ast-alpha.png', path: '/asset', count: 0 },
   { name: 'people', label: 'My People', img: './img/itsm-ppl-alpha.png', path: '/people', count: 0 },
 ];
