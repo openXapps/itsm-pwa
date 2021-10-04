@@ -24,10 +24,10 @@ const RequestDetails = (props) => {
         <StyledField label="Service Request Details" />
         <Box mt={{ xs: 1, md: 3 }} />
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}><StyledField label="Request Number" value={reqData.requestId} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Summary" value={reqData.summary} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Requester" value={reqData.firstName + ' ' + reqData.lastName} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Request Date" value={reqData.submitDate} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Request Number" value={reqData.requestId} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Summary" value={reqData.summary} wrap={true} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Requester" value={reqData.firstName + ' ' + reqData.lastName} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Request Date" value={reqData.submitDate} wrap={false} /></Grid>
           <Grid item xs={12}>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}><div className={classes.accordionSummary}>Request Content</div></AccordionSummary>

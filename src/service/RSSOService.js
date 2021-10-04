@@ -141,7 +141,7 @@ export const testToken = async (token) => {
     result = true;
     if (data.entries.length > 0) saveSettings(data.entries[0].values);
     if (data.entries.length === 0) {
-      postARSettings('{"values": {"zAction": "SET_MODULE_FLAG_AND_COUNT"}}').then(response => {
+      postARSettings('{"values": {"zAction": "SET_MODULE_COUNT_AND_FLAG"}}').then(response => {
         if (response.status !== 201) throw new Error('ERR: ' + response.status + ' ' + response.statusText);
         return response.json();
       }).then(data => {

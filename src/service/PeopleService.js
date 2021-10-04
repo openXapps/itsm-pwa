@@ -8,7 +8,8 @@ export const peopleListModel = {
   personId: '',
   firstName: '',
   lastName: '',
-  email: '',
+  jobTitle: '',
+  supportStaff: '',
 };
 
 /**
@@ -19,7 +20,7 @@ export const getPeopleList = () => {
   const { accessToken, tokenType } = getLocalStorage('rsso').data;
   const host = localEnvironment.ARHOST;
   const query = `'ManagerLoginID' = $USER$ AND 'Profile Status' = "Enabled"`;
-  const fields = 'Person ID,First Name,Last Name,Remedy Login ID';
+  const fields = 'Person ID,First Name,Last Name,JobTitle,Support Staff';
   const url = '/api/arsys/v1/entry/CTM:People/?q=(' + query + ')&fields=values(' + fields + ')';
 
   return fetch(host + url, {

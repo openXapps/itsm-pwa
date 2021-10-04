@@ -25,17 +25,17 @@ const ChangeDetails = (props) => {
         <StyledField label="Change Request Details" />
         <Box mt={{ xs: 1, md: 3 }} />
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}><StyledField label="Change Number" value={crqData.changeId} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Status" value={crqData.status} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Coordinator" value={crqData.coordinator} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Description" value={crqData.description} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Service CI" value={crqData.serviceCI} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Change Reason" value={crqData.reason} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Change Number" value={crqData.changeId} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Status" value={crqData.status} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Coordinator" value={crqData.coordinator} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Description" value={crqData.description} wrap={true} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Service CI" value={crqData.serviceCI} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Change Reason" value={crqData.reason} wrap={false} /></Grid>
           <Grid item xs={12}><Divider /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Impact" value={crqData.impact} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Risk Level" value={crqData.risk} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Start Date" value={crqData.scheduleStart} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="End Date" value={crqData.scheduleEnd} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Impact" value={crqData.impact} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Risk Level" value={crqData.risk} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Start Date" value={crqData.scheduleStart} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="End Date" value={crqData.scheduleEnd} wrap={false} /></Grid>
           <Grid item xs={12}>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}><div className={classes.accordionSummary}>Change Notes</div></AccordionSummary>
