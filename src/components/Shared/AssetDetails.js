@@ -25,19 +25,19 @@ const AssetDetails = (props) => {
         <StyledField label={astData.item + " Details"} />
         <Box mt={{ xs: 1, md: 3 }} />
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}><StyledField label="Name" value={astData.name} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Status" value={astData.status} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Tag" value={astData.tag} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Serial" value={astData.serial} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Model" value={astData.model} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Make" value={astData.make} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Name" value={astData.name} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Status" value={astData.status} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Tag" value={astData.tag} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Serial" value={astData.serial} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Model" value={astData.model} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Make" value={astData.make} wrap={false} /></Grid>
           <Grid item xs={12}><Divider /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Cost Centre" value={astData.costCenter} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Last Scanned" value={astData.scanDate} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Last Used By" value={astCustomData.loginUser} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Used By Date" value={astCustomData.loginDate} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Verified By" value={astCustomData.verifyUser} /></Grid>
-          <Grid item xs={12} sm={6}><StyledField label="Verified Date" value={astCustomData.verifyDate} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Cost Centre" value={astData.costCenter} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Last Scanned" value={astData.scanDate} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Last Used By" value={astCustomData.loginUser} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Used By Date" value={astCustomData.loginDate} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Verified By" value={astCustomData.verifyUser} wrap={false} /></Grid>
+          <Grid item xs={12} sm={6}><StyledField label="Verified Date" value={astCustomData.verifyDate} wrap={false} /></Grid>
           <Grid item xs={12}>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}><div className={classes.accordionSummary}>Work Info</div></AccordionSummary>

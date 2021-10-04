@@ -79,7 +79,8 @@ const PeopleList = ({ history }) => {
         personId: v.values['Person ID'],
         firstName: v.values['First Name'],
         lastName: v.values['Last Name'],
-        email: v.values['Remedy Login ID'],
+        jobTitle: v.values['JobTitle'] || 'No title',
+        supportStaff: v.values['Support Staff'],
       });
     });
     // console.log('populatePeople: _people', _people);
@@ -123,7 +124,12 @@ const PeopleList = ({ history }) => {
                     <ListItemText
                       disableTypography
                       primary={<Typography className={classes.listItemPrimary}>{v.firstName + ' ' + v.lastName}</Typography>}
-                      secondary={<Typography className={classes.listItemSecondary}>{'Email: ' + v.email}</Typography>}
+                      secondary={
+                        <>
+                          <Typography className={classes.listItemSecondary}>{'Job Title: ' + v.jobTitle}</Typography>
+                          <Typography className={classes.listItemSecondary}>{'Support Staff: ' + v.supportStaff}</Typography>
+                        </>
+                      }
                     /><ListItemSecondaryAction>
                       <IconButton
                         edge="end"
