@@ -65,14 +65,16 @@ const LandingComponent = ({ history, location }) => {
       if (!state.isAuth) {
         getTokenWithCode(code).then(response => {
           if (response.ok) {
-            testToken(response.token);
-            dispatch({ type: 'AUTH', payload: true });
-            setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 3000 });
+            testToken(response.token).finally(() => {
+              dispatch({ type: 'AUTH', payload: true });
+              setSnackState({ severity: 'success', message: 'Login successful', show: true, duration: 3000 });
+              history.replace('/');
+            });
           } else {
             dispatch({ type: 'AUTH', payload: false });
             setSnackState({ severity: 'error', message: 'Login failed', show: true, duration: 3000 });
+            history.replace('/');
           }
-          history.replace('/');
         });
       }
     } else {
